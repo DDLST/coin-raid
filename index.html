@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#122a29" />
-  <meta name="description" content="RAID COIN: лесная погоня. Собирай монеты, уходи от стражей и пройди пять полян. Можно играть на компьютере и телефоне." />
+  <meta name="description" content="RAID COIN: лесная погоня. Собирай золото, уходи от волков, обходи препятствия и переживи грозу. Можно играть на компьютере и телефоне." />
   <title>RAID COIN · Лесная погоня</title>
 </head>
 <body>
 <main id="app" class="shell">
   <header class="topbar">
     <div class="brand"><span class="brand-coin" aria-hidden="true">✦</span><div><h1>RAID COIN</h1><p>ЛЕСНАЯ ПОГОНЯ</p></div></div>
-    <div class="topbar-right"><span class="edition">5 полян · один маленький герой</span><button id="help-button" class="icon-button" aria-label="Правила игры">?</button><button id="pause-button" class="icon-button" aria-label="Пауза">Ⅱ</button></div>
+    <div class="topbar-right"><span class="edition">5 полян · один маленький герой</span><button id="shop-button" class="wallet-button" aria-label="Открыть магазин">✦ <span id="wallet-count">0</span><span class="shop-word"> · магазин</span></button><button id="help-button" class="icon-button" aria-label="Правила игры">?</button><button id="pause-button" class="icon-button" aria-label="Пауза">Ⅱ</button></div>
   </header>
   <section class="hud" aria-label="Прогресс игры">
     <div class="level-info"><span class="eyebrow" id="level-label">ПОЛЯНА 1 / 5</span><strong id="level-name">Тихая роща</strong></div>
@@ -21,21 +21,26 @@
   </section>
   <section class="arena" id="arena" aria-label="Игровое поле">
     <div id="game"></div>
-    <div class="arena-status"><span id="enemy-label">1 страж</span><span id="combo-label">Собирай монеты подряд</span></div>
+    <div class="arena-status"><span id="enemy-label">1 волк</span><span id="combo-label">Собирай монеты подряд</span></div>
+    <div class="field-bottom"><span id="weather-label">☀ Ясно</span><span id="terrain-label">Деревья и пни нужно обходить</span></div>
     <div id="toast" class="toast" role="status"></div>
-    <div id="overlay" class="overlay">
-      <div class="modal">
+    <div id="overlay" class="overlay rules-open">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <span class="modal-tag" id="modal-tag">МАЛЕНЬКОЕ ПРИКЛЮЧЕНИЕ</span>
         <div class="portrait" aria-hidden="true"><svg viewBox="0 0 140 110"><path d="M32 64 15 12 54 34Q70 25 86 34L125 12 108 64Q110 98 70 102 30 98 32 64" fill="#e99448"/><path d="m22 26 12 32 16-18m68-14-12 32-16-18" fill="#613634"/><path d="M31 63Q42 54 57 67L70 79 83 67Q98 54 109 63 111 98 70 102 29 98 31 63" fill="#fff0cb"/><ellipse cx="49" cy="60" rx="5" ry="8" fill="#163a37"/><ellipse cx="91" cy="60" rx="5" ry="8" fill="#163a37"/><path d="m63 79 14 0-7 8z" fill="#163a37"/><path d="M44 95Q70 109 96 95L98 106H42z" fill="#59bbae"/></svg></div>
         <h2 id="modal-title">Золото любит смелых.</h2>
-        <p id="modal-description">Пять лесных полян, монеты и стражи, которые идут по твоему следу. Сможешь собрать всё?</p>
+        <p id="modal-description">Пять полян · три жизни. Собирай золото и ускользай от волков.</p>
         <div id="help-content" class="help-content">
-          <div><span>✦</span><p><strong>Собирай</strong>Все монеты поляны открывают следующий уровень.</p></div>
-          <div><span>↗</span><p><strong>Уходи от стражей</strong>Они преследуют тебя. Жёлтая линия предупреждает о рывке.</p></div>
-          <div><span>⚡</span><p><strong>Используй рывок</strong>Пробел / Shift или кнопка ⚡. Во время рывка ты защищён.</p></div>
+          <div><span>✦</span><p><strong>Собирай золото</strong>Все монеты → следующая поляна.</p></div>
+          <div><span>↗</span><p><strong>Обмани волка</strong>Он прогнозирует путь. Меняй курс.</p></div>
+          <div><span>♧</span><p><strong>Выбирай обход</strong>Деревья и пни - преграды. Лужи тормозят всех.</p></div>
+          <div><span>☂</span><p><strong>Следи за погодой</strong>Мокрые круги тормозят. Оранжевый - молния.</p></div>
+          <div><span>ϟ</span><p><strong>Делай рывок</strong>Пробел / Shift или ϟ. Защита от волков.</p></div>
+          <div><span>◈</span><p><strong>Загляни в магазин</strong>Монеты остаются. Купи скин или улучшение.</p></div>
         </div>
         <div id="modal-stats" class="modal-stats"></div>
         <button id="primary-button" class="primary-button">Начать погоню <span>↗</span></button>
+        <button id="modal-shop-button" class="modal-shop-button">Магазин · скины и улучшения</button>
         <button id="secondary-button" class="secondary-button" hidden>Начать заново</button>
         <p class="control-hint" id="control-hint">WASD / стрелки · Пробел - рывок · P - пауза</p>
       </div>
@@ -51,6 +56,16 @@
     <div class="touch-help">Левый палец - движение<br>Правый - рывок</div>
     <button id="dash-button" class="dash-button" aria-label="Рывок"><span>⚡</span><small>РЫВОК</small></button>
   </section>
+  <div id="shop-overlay" class="overlay shop-overlay" hidden>
+    <div class="modal shop-modal" role="dialog" aria-modal="true" aria-labelledby="shop-title">
+      <div class="shop-heading"><div><span class="modal-tag">ЛЕСНАЯ ЛАВКА</span><h2 id="shop-title">Твой следующий побег</h2></div><strong id="shop-wallet">0 ✦</strong></div>
+      <div class="shop-tabs" role="tablist" aria-label="Категории магазина"><button id="tab-skins" role="tab" aria-selected="true" class="selected">Скины</button><button id="tab-upgrades" role="tab" aria-selected="false">Улучшения</button></div>
+      <div id="shop-items" class="shop-items"></div>
+      <p id="shop-message" class="shop-message" role="status">Каждая монета пополняет кошелёк.</p>
+      <button id="shop-close" class="primary-button">Вернуться <span>↗</span></button>
+      <p id="storage-status" class="storage-status">Покупки сохраняются в этом браузере.</p>
+    </div>
+  </div>
 </main>
 <script type="module" src="/src/main.ts"></script>
 </body>

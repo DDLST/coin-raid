@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { background, createArtwork, type Palette } from './art';
+import { clampPoint, clearLine, findPath, freePoint, makeGrid, makeTerrain, moveCircle, type Bounds, type NavGrid, type Point, type Terrain } from './world';
+import { PROFILE_KEY, SKINS, UPGRADES, newProfile, parseProfile, purchase, type Profile } from './progression';
 
 // Баланс игры: основные параметры собраны здесь для дальнейшей доработки.
 const PLAYER_SPEED = 238;
@@ -14,6 +16,12 @@ const COMBO_WINDOW = 5;
 const FIELD_MARGIN = 29;
 const FIELD_TOP = 55;
 const STORAGE_KEY = 'raid-coin-best-v2';
+const PATH_REFRESH = .32;
+const PREDICT_LIMIT = 145;
+const WEATHER_INTERVAL = [9, 15] as const;
+const WEATHER_DURATION = 12;
+const LIGHTNING_WARNING = 1.2;
+const LIGHTNING_RADIUS = 42;
 
 type GameState = 'ready' | 'playing' | 'paused' | 'between' | 'won' | 'lost';
 type EnemyMode = 'chase' | 'warning' | 'rush';
@@ -35,7 +43,12 @@ const LEVELS: Level[] = [
 type Enemy = {
   sprite: Phaser.GameObjects.Image; shadow: Phaser.GameObjects.Ellipse;
   mode: EnemyMode; timer: number; rushX: number; rushY: number; index: number;
+  path: Point[]; pathLeft: number; stunned: number;
 };
+
+type WeatherKind = 'clear' | 'rain' | 'storm';
+type WetZone = Point & { radius: number };
+type Strike = Point & { phase: 'warning' | 'impact'; left: number };
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Image;
@@ -74,6 +87,24 @@ export class GameScene extends Phaser.Scene {
   private oldBackground = '';
   private toastTimeout = 0;
   private listeners!: AbortController;
+  private terrain: Terrain[] = [];
+  private terrainSprites: Phaser.GameObjects.Image[] = [];
+  private nav!: NavGrid;
+  private weatherInk!: Phaser.GameObjects.Graphics;
+  private stormInk!: Phaser.GameObjects.Graphics;
+  private weather: WeatherKind = 'clear';
+  private weatherLeft = 0;
+  private weatherNext = 10;
+  private wetZones: WetZone[] = [];
+  private strike: Strike | null = null;
+  private strikeNext = 2;
+  private playerStunned = 0;
+  private playerVelocity: Point = { x: 0, y: 0 };
+  private profile: Profile = newProfile();
+  private storageAvailable = true;
+  private shopOpen = false;
+  private shopReturn: GameState = 'ready';
+  private shopTab: 'skins' | 'upgrades' = 'skins';
 
   constructor() { super('GameScene'); }
 
@@ -84,8 +115,12 @@ export class GameScene extends Phaser.Scene {
     createArtwork(this);
     this.backdrop = this.add.image(0, 0, 'fox').setOrigin(0).setDepth(0);
     this.warnings = this.add.graphics().setDepth(4);
+    this.weatherInk = this.add.graphics().setDepth(3);
+    this.stormInk = this.add.graphics().setDepth(16);
+    try { this.profile = parseProfile(localStorage.getItem(PROFILE_KEY)); }
+    catch { this.storageAvailable = false; }
     this.playerShadow = this.add.ellipse(0, 0, 34, 13, 0x0f3027, 0.3).setDepth(5);
-    this.player = this.add.image(0, 0, 'fox').setDepth(10);
+    this.player = this.add.image(0, 0, this.profile.skin).setDepth(10);
     this.coinShadow = this.add.ellipse(0, 0, 23, 9, 0x2f4932, 0.24).setDepth(5);
     this.target = this.add.image(0, 0, 'coin').setDepth(8);
     this.best = this.readBest();
@@ -97,7 +132,7 @@ export class GameScene extends Phaser.Scene {
     const edition = document.querySelector('.edition');
     if (edition) edition.textContent = `${LEVELS.length} полян · один маленький герой`;
     this.showModal('МАЛЕНЬКОЕ ПРИКЛЮЧЕНИЕ', 'Золото любит смелых.',
-      `Собери монеты на всех полянах: их ${LEVELS.length}. Стражи идут по твоему следу, но у тебя есть рывок и три жизни.`, 'Начать погоню', true);
+      `${LEVELS.length} полян · три жизни. Собирай золото и ускользай от волков.`, 'Начать погоню', true);
     this.scale.on('resize', this.resizeField, this);
     this.events.once('shutdown', () => {
       this.listeners.abort();
@@ -120,10 +155,24 @@ export class GameScene extends Phaser.Scene {
     this.element('pause-button').addEventListener('click', () => this.togglePause(), { signal });
     this.element('help-button').addEventListener('click', () => {
       if (this.state === 'playing') this.pause(true);
-      else if (this.state === 'paused') this.element('help-content').hidden = false;
+      else if (this.state === 'paused') this.pause(true);
     }, { signal });
     this.element('dash-button').addEventListener('pointerdown', event => {
       event.preventDefault(); this.useDash();
+    }, { signal });
+    this.element('shop-button').addEventListener('click', () => this.openShop(), { signal });
+    this.element('modal-shop-button').addEventListener('click', () => this.openShop(), { signal });
+    this.element('shop-close').addEventListener('click', () => this.closeShop(), { signal });
+    for (const tab of ['skins', 'upgrades'] as const) this.element(`tab-${tab}`).addEventListener('click', () => {
+      this.shopTab = tab; this.renderShop();
+    }, { signal });
+    this.element('shop-items').addEventListener('click', event => {
+      const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-item]') : null;
+      if (!button?.dataset.item || button.disabled) return;
+      this.element('shop-message').textContent = purchase(this.profile, button.dataset.item);
+      this.player.setTexture(this.profile.skin); this.saveProfile(); this.updateWallet();
+      this.dashCooldown = Math.min(this.dashCooldown, this.dashWait());
+      this.renderShop(); this.updateDashUI();
     }, { signal });
     const joystick = this.element('joystick');
     const release = (event?: PointerEvent) => {
@@ -165,6 +214,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
+    if (this.shopOpen) {
+      if (Phaser.Input.Keyboard.JustDown(this.keys.ESC)) this.closeShop();
+      return;
+    }
     if (Phaser.Input.Keyboard.JustDown(this.keys.R)) { this.startNewRun(); return; }
     if (Phaser.Input.Keyboard.JustDown(this.keys.P) || Phaser.Input.Keyboard.JustDown(this.keys.ESC)) this.togglePause();
     if (Phaser.Input.Keyboard.JustDown(this.keys.ENTER) && this.state !== 'playing') this.primaryAction();
@@ -175,6 +228,7 @@ export class GameScene extends Phaser.Scene {
     this.elapsed += seconds; this.animationTime += seconds;
     this.dashCooldown = Math.max(0, this.dashCooldown - seconds);
     this.hurtLeft = Math.max(0, this.hurtLeft - seconds);
+    this.updateWeather(seconds);
     this.movePlayer(seconds);
     this.moveEnemies(seconds);
     this.animateObjects();
@@ -187,7 +241,7 @@ export class GameScene extends Phaser.Scene {
     this.score = 0; this.totalCoins = 0; this.lives = STARTING_LIVES;
     this.elapsed = 0; this.animationTime = 0;
     this.loadLevel(0); this.hideModal();
-    this.toast('Собирай монеты. Страж уже идёт за тобой!');
+    this.toast('Волк предугадывает путь. Меняй направление!');
   }
 
   private loadLevel(index: number): void {
@@ -195,8 +249,9 @@ export class GameScene extends Phaser.Scene {
     this.lastCoinTime = -COMBO_WINDOW; this.dashLeft = 0; this.dashCooldown = 0;
     this.hurtLeft = 1; this.touchX = 0; this.touchY = 0; this.isMoving = false;
     this.movementX = 1; this.movementY = 0;
-    this.updateUnit(); this.drawBackground(); this.warnings.clear();
-    this.player.setPosition(this.width * .32, this.height * .55).setAlpha(1).setFlipX(false);
+    this.updateUnit(); this.drawBackground(); this.warnings.clear(); this.setupTerrain(); this.resetWeather();
+    this.player.setTexture(this.profile.skin).setPosition(this.width * .32, this.height * .55).setAlpha(1).setFlipX(false);
+    this.playerVelocity = { x: 0, y: 0 }; this.playerStunned = 0;
     this.player.setDisplaySize(61 * this.unit, 61 * this.unit);
     this.playerShadow.setSize(31 * this.unit, 12 * this.unit);
     this.target.setVisible(true).setDisplaySize(53 * this.unit, 53 * this.unit);
@@ -211,10 +266,11 @@ export class GameScene extends Phaser.Scene {
     for (let i = 0; i < LEVELS[index].enemies; i++) {
       const position = starts[i];
       const shadow = this.add.ellipse(position.x, position.y + 14 * this.unit, 35 * this.unit, 12 * this.unit, 0x203529, .32).setDepth(5);
-      const sprite = this.add.image(position.x, position.y, ['warden', 'tracker', 'bramble'][i])
-        .setDisplaySize(58 * this.unit, 58 * this.unit).setDepth(9);
-      this.enemies.push({ sprite, shadow, mode: 'chase', timer: 3 + i * 2, rushX: 0, rushY: 0, index: i });
+      const sprite = this.add.image(position.x, position.y, ['wolf-grey', 'wolf-snow', 'wolf-brown'][i])
+        .setDisplaySize(67 * this.unit, 67 * this.unit).setDepth(9);
+      this.enemies.push({ sprite, shadow, mode: 'chase', timer: 3 + i * 2, rushX: 0, rushY: 0, index: i, path: [], pathLeft: 0, stunned: 0 });
     }
+    for (const object of [this.player, ...this.enemies.map(e => e.sprite)]) this.resolvePosition(object, PLAYER_RADIUS * this.unit);
     this.placeCoin(); this.state = 'playing'; this.updateHUD(); this.updateDashUI();
   }
 
@@ -232,11 +288,13 @@ export class GameScene extends Phaser.Scene {
     }
     const dashing = this.dashLeft > 0;
     if (dashing) { x = this.dashX; y = this.dashY; }
-    const speed = PLAYER_SPEED * this.unit * (dashing ? DASH_MULTIPLIER : 1);
-    this.player.x += x * speed * seconds; this.player.y += y * speed * seconds;
-    this.clampObject(this.player);
+    const speed = this.playerSpeed() * this.unit * (dashing ? DASH_MULTIPLIER : 1) * this.groundSpeed(this.player, true);
+    const before = { x: this.player.x, y: this.player.y };
+    const moved = moveCircle(before, x * speed * seconds, y * speed * seconds, PLAYER_RADIUS * this.unit, this.terrain, this.bounds());
+    this.player.setPosition(moved.x, moved.y);
+    this.playerVelocity = seconds > 0 ? { x: (moved.x - before.x) / seconds, y: (moved.y - before.y) / seconds } : { x: 0, y: 0 };
     if (dashing && Math.floor(this.animationTime * 50) % 3 === 0) {
-      const ghost = this.add.image(this.player.x, this.player.y, 'fox').setDisplaySize(61 * this.unit, 61 * this.unit)
+      const ghost = this.add.image(this.player.x, this.player.y, this.profile.skin).setDisplaySize(61 * this.unit, 61 * this.unit)
         .setFlipX(this.player.flipX).setAlpha(.24).setDepth(6);
       this.tweens.add({ targets: ghost, alpha: 0, duration: 180, onComplete: () => ghost.destroy() });
     }
@@ -249,44 +307,63 @@ export class GameScene extends Phaser.Scene {
 
   private useDash(): void {
     if (this.state !== 'playing' || this.dashCooldown > 0) return;
-    this.dashLeft = DASH_DURATION; this.dashCooldown = DASH_COOLDOWN;
+    this.dashLeft = DASH_DURATION; this.dashCooldown = this.dashWait();
     this.dashX = this.movementX; this.dashY = this.movementY;
     this.particles(this.player.x, this.player.y, 5, 0xb8e9c8);
     this.updateDashUI();
+  }
+
+  private predictedTarget(enemy: Enemy): Point {
+    const distance = Math.hypot(this.player.x - enemy.sprite.x, this.player.y - enemy.sprite.y);
+    const horizon = Math.min(.8, distance / (PLAYER_SPEED * this.unit)) * (.6 + enemy.index * .13);
+    const speed = Math.hypot(this.playerVelocity.x, this.playerVelocity.y);
+    const limit = speed > 0 ? Math.min(horizon, PREDICT_LIMIT * this.unit / speed) : 0;
+    // Линейный прогноз по фактической скорости, включая столкновения и замедления.
+    return clampPoint({ x: this.player.x + this.playerVelocity.x * limit,
+      y: this.player.y + this.playerVelocity.y * limit }, this.bounds());
   }
 
   private moveEnemies(seconds: number): void {
     this.warnings.clear();
     const level = LEVELS[this.levelIndex];
     for (const enemy of this.enemies) {
-      const sprite = enemy.sprite;
-      enemy.timer -= seconds;
-      // Второй страж немного срезает путь в направлении движения игрока.
-      const lead = enemy.index === 1 && this.isMoving ? 50 * this.unit : 0;
-      const dx = this.player.x + this.movementX * lead - sprite.x;
-      const dy = this.player.y + this.movementY * lead - sprite.y;
-      const distance = Math.hypot(dx, dy) || 1;
+      const sprite = enemy.sprite, predicted = this.predictedTarget(enemy);
+      enemy.timer -= seconds; enemy.pathLeft -= seconds;
+      const dx = predicted.x - sprite.x, dy = predicted.y - sprite.y, distance = Math.hypot(dx, dy) || 1;
+      if (enemy.stunned > 0) {
+        this.warnings.lineStyle(2, 0xf7de8e, .8); this.warnings.strokeCircle(sprite.x, sprite.y, 23 * this.unit);
+        continue;
+      }
       if (enemy.mode === 'chase' && level.rush && enemy.timer <= 0) {
         enemy.mode = 'warning'; enemy.timer = .75;
         enemy.rushX = dx / distance; enemy.rushY = dy / distance;
       }
+      const slow = this.groundSpeed(sprite, false);
       if (enemy.mode === 'warning') {
-        // Направление фиксируется заранее: рывок можно прочитать и обойти.
         this.warnings.lineStyle(2, 0xffdfa0, .8);
         this.warnings.lineBetween(sprite.x, sprite.y, sprite.x + enemy.rushX * 120 * this.unit, sprite.y + enemy.rushY * 120 * this.unit);
         this.warnings.strokeCircle(sprite.x, sprite.y, (23 + Math.sin(this.animationTime * 20) * 3) * this.unit);
         if (enemy.timer <= 0) { enemy.mode = 'rush'; enemy.timer = .4; }
       } else if (enemy.mode === 'rush') {
-        sprite.x += enemy.rushX * 350 * this.unit * seconds;
-        sprite.y += enemy.rushY * 350 * this.unit * seconds;
-        if (enemy.timer <= 0) { enemy.mode = 'chase'; enemy.timer = 4.5 + enemy.index; }
+        const moved = moveCircle(sprite, enemy.rushX * 350 * this.unit * slow * seconds,
+          enemy.rushY * 350 * this.unit * slow * seconds, ENEMY_RADIUS * this.unit, this.terrain, this.bounds());
+        sprite.setPosition(moved.x, moved.y);
+        if (enemy.timer <= 0) { enemy.mode = 'chase'; enemy.timer = 4.5 + enemy.index; enemy.pathLeft = 0; }
       } else {
-        // Скорость растёт с уровнем и понемногу с каждой собранной монетой.
-        const speed = Math.min(PLAYER_SPEED * .87, level.speed + this.stageCoins * 2) * this.unit;
-        sprite.x += dx / distance * speed * seconds; sprite.y += dy / distance * speed * seconds;
+        let aim = predicted;
+        if (!clearLine(sprite, predicted, ENEMY_RADIUS * this.unit, this.terrain, this.bounds())) {
+          if (enemy.pathLeft <= 0) { enemy.path = findPath(sprite, predicted, this.nav); enemy.pathLeft = PATH_REFRESH; }
+          while (enemy.path.length > 1 && (Math.hypot(sprite.x - enemy.path[0].x, sprite.y - enemy.path[0].y) < 12 * this.unit ||
+            clearLine(sprite, enemy.path[1], ENEMY_RADIUS * this.unit, this.terrain, this.bounds()))) enemy.path.shift();
+          if (enemy.path.length) aim = enemy.path[0];
+        } else { enemy.path = []; enemy.pathLeft = 0; }
+        const ax = aim.x - sprite.x, ay = aim.y - sprite.y, len = Math.hypot(ax, ay) || 1;
+        const speed = Math.min(PLAYER_SPEED * .87, level.speed + this.stageCoins * 2) * this.unit * slow;
+        const travel = Math.min(speed * seconds, len);
+        const moved = moveCircle(sprite, ax / len * travel, ay / len * travel, ENEMY_RADIUS * this.unit, this.terrain, this.bounds());
+        sprite.setPosition(moved.x, moved.y);
       }
-      this.clampObject(sprite);
-      sprite.setFlipX(dx < 0).setAngle(Math.sin(this.animationTime * 12 + enemy.index) * 4);
+      sprite.setFlipX(dx < 0).setAngle(Math.sin(this.animationTime * 12 + enemy.index) * 3);
       enemy.shadow.setPosition(sprite.x, sprite.y + 16 * this.unit);
     }
   }
@@ -303,19 +380,20 @@ export class GameScene extends Phaser.Scene {
   private checkDamage(): void {
     if (this.hurtLeft > 0 || this.dashLeft > 0) return;
     for (const enemy of this.enemies) {
+      if (enemy.stunned > 0) continue;
       const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, enemy.sprite.x, enemy.sprite.y);
       if (distance > (PLAYER_RADIUS + ENEMY_RADIUS) * this.unit * .88) continue;
       this.lives -= 1; this.hurtLeft = HIT_PROTECTION; this.combo = 0;
       this.particles(this.player.x, this.player.y, 10, 0xffc49d);
       const dx = enemy.sprite.x - this.player.x, dy = enemy.sprite.y - this.player.y;
       const length = Math.hypot(dx, dy) || 1;
-      enemy.sprite.x += (length === 1 ? 1 : dx / length) * 100 * this.unit;
-      enemy.sprite.y += dy / length * 100 * this.unit;
-      this.clampObject(enemy.sprite);
+      const knockback = moveCircle(enemy.sprite, (length === 1 ? 1 : dx / length) * 100 * this.unit,
+        dy / length * 100 * this.unit, ENEMY_RADIUS * this.unit, this.terrain, this.bounds());
+      enemy.sprite.setPosition(knockback.x, knockback.y); enemy.pathLeft = 0;
       enemy.mode = 'chase'; enemy.timer = 3;
       this.element('combo-label').textContent = 'Серия прервана'; this.updateHUD();
       if (this.lives <= 0) this.finishGame('lost');
-      else this.toast('Минус жизнь. Рывок помогает пройти сквозь стража.');
+      else this.toast('Минус жизнь. Рывок защищает от волка, но не проходит сквозь деревья.');
       break;
     }
   }
@@ -328,6 +406,7 @@ export class GameScene extends Phaser.Scene {
     const multiplier = Math.min(3, 1 + Math.floor((this.combo - 1) / 3));
     const points = (100 + this.levelIndex * 20) * multiplier;
     this.score += points; this.stageCoins += 1; this.totalCoins += 1;
+    this.profile.coins++; this.saveProfile(); this.updateWallet();
     this.saveBest(); this.updateHUD();
     this.element('combo-label').textContent = multiplier > 1 ? `Серия ${this.combo} · очки ×${multiplier}` : `Серия ${this.combo} · успей за 5 секунд`;
     this.particles(this.target.x, this.target.y, 8, 0xffdda0);
@@ -343,20 +422,23 @@ export class GameScene extends Phaser.Scene {
   }
 
   private placeCoin(): void {
-    const margin = FIELD_MARGIN * this.unit + 10;
-    const safeDistance = 85 * this.unit;
-    // Ограниченное число попыток и запасная точка исключают бесконечный цикл.
-    let best = { x: this.width / 2, y: this.height / 2, clearance: -1 };
-    for (let i = 0; i < 60; i++) {
-      const x = Phaser.Math.FloatBetween(margin, this.width - margin);
-      const y = Phaser.Math.FloatBetween(FIELD_TOP + 15, this.height - margin);
-      let clearance = Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y);
-      for (const enemy of this.enemies) clearance = Math.min(clearance, Phaser.Math.Distance.Between(x, y, enemy.sprite.x, enemy.sprite.y));
-      if (clearance > best.clearance) best = { x, y, clearance };
+    const margin = FIELD_MARGIN * this.unit + 10, safeDistance = 85 * this.unit;
+    let best: Point | null = null, bestClearance = -1;
+    for (let i = 0; i < 100; i++) {
+      const point = { x: Phaser.Math.FloatBetween(margin, this.width - margin),
+        y: Phaser.Math.FloatBetween(FIELD_TOP + 15, this.height - margin) };
+      if (!freePoint(point, PLAYER_RADIUS * this.unit + 8, this.terrain, this.bounds())) continue;
+      if (!clearLine(this.player, point, PLAYER_RADIUS * this.unit, this.terrain, this.bounds()) && !findPath(this.player, point, this.nav).length) continue;
+      let clearance = Math.hypot(point.x - this.player.x, point.y - this.player.y);
+      for (const enemy of this.enemies) clearance = Math.min(clearance, Math.hypot(point.x - enemy.sprite.x, point.y - enemy.sprite.y));
+      if (clearance > bestClearance) { best = point; bestClearance = clearance; }
       if (clearance >= safeDistance) break;
     }
-    this.target.setPosition(best.x, best.y);
-    this.coinShadow.setPosition(best.x, best.y + 16 * this.unit);
+    if (!best) {
+      const index = this.nav.free.findIndex(Boolean);
+      best = { x: (index % this.nav.cols + .5) * this.nav.cell, y: (Math.floor(index / this.nav.cols) + .5) * this.nav.cell };
+    }
+    this.target.setPosition(best.x, best.y); this.coinShadow.setPosition(best.x, best.y + 16 * this.unit);
   }
 
   private completeLevel(): void {
@@ -366,23 +448,23 @@ export class GameScene extends Phaser.Scene {
     this.saveBest(); this.updateHUD(); this.resetTouch();
     const next = LEVELS[this.levelIndex + 1];
     this.showModal(`ПОЛЯНА ${this.levelIndex + 1} ПРОЙДЕНА`, 'Отличный побег!',
-      `Дальше: ${next.name}. ${next.coins} монет, ${next.enemies} ${next.enemies === 1 ? 'страж' : 'стража'} и больше скорость.${next.rush ? ' Следи за предупреждением о рывке.' : ''} ${restoredLife ? 'Восстановлена одна жизнь.' : 'Все три жизни сохранены.'}`, 'На следующую поляну', false);
+      `Дальше: ${next.name}. ${next.coins} монет, ${next.enemies} ${next.enemies === 1 ? 'волк' : 'волка'} и больше скорость.${next.rush ? ' Следи за предупреждением о рывке.' : ''} ${restoredLife ? 'Восстановлена одна жизнь.' : 'Все три жизни сохранены.'}`, 'На следующую поляну', false);
     this.showStats();
   }
 
   private finishGame(result: 'won' | 'lost'): void {
     this.state = result; this.saveBest(); this.resetTouch(); this.warnings.clear();
     this.showModal(result === 'won' ? 'ВСЕ ПОЛЯНЫ ПРОЙДЕНЫ' : `ПОЛЯНА ${this.levelIndex + 1} / ${LEVELS.length}`,
-      result === 'won' ? 'Лес запомнит тебя.' : 'Стражи оказались быстрее.',
+      result === 'won' ? 'Лес запомнит тебя.' : 'Волки оказались быстрее.',
       result === 'won' ? `Все ${LEVELS.reduce((sum, level) => sum + level.coins, 0)} монет собраны! Попробуй пройти ещё раз: длинные серии приносят больше очков.`
-        : 'Заходи к монетам по дуге и используй рывок, когда страж перекрывает путь. Следующая попытка будет лучше.', 'Ещё одна попытка', false);
+        : 'Заходи к монетам по дуге и используй рывок, когда волк перекрывает путь. Следующая попытка будет лучше.', 'Ещё одна попытка', false);
     this.showStats();
   }
 
   private primaryAction(): void {
     if (this.state === 'between') {
       this.loadLevel(this.levelIndex + 1); this.hideModal();
-      this.toast(this.levelIndex === 2 ? 'Новый страж умеет срезать путь.' : this.levelIndex === 3 ? 'Жёлтая линия - предупреждение о рывке!' : 'Стражи стали быстрее. Не забывай о рывке.');
+      this.toast(this.levelIndex === 2 ? 'Два волка предугадывают твой путь.' : this.levelIndex === 3 ? 'Жёлтая линия - предупреждение о рывке!' : 'Волки стали быстрее. Используй обходы и лужи.');
     } else if (this.state === 'paused') this.resume();
     else if (this.state === 'ready' || this.state === 'won' || this.state === 'lost') this.startNewRun();
   }
@@ -395,7 +477,7 @@ export class GameScene extends Phaser.Scene {
   private pause(help: boolean): void {
     this.state = 'paused'; this.resetTouch();
     this.showModal(help ? 'ПРАВИЛА ЛЕСНОЙ ПОГОНИ' : 'МОЖНО ПЕРЕВЕСТИ ДУХ', help ? 'Как остаться на шаг впереди' : 'Пауза',
-      help ? 'Три жизни на забег. За каждую пройденную поляну восстанавливается одна. Монеты подряд дают больше очков.'
+      help ? 'Три жизни. Между полянами +1 жизнь. Монеты для магазина сохраняются после поражения.'
         : 'Игра остановлена. Монеты, жизни и прогресс сохраняются до продолжения этой попытки.', 'Продолжить', help);
     this.element('secondary-button').hidden = false;
     this.element('pause-button').textContent = '▶';
@@ -417,6 +499,8 @@ export class GameScene extends Phaser.Scene {
     this.element('modal-stats').replaceChildren();
     this.element('secondary-button').hidden = true;
     this.element('overlay').hidden = false;
+    this.element('overlay').classList.toggle('rules-open', help);
+    document.body.classList.add('menu-open');
   }
 
   private showStats(): void {
@@ -429,7 +513,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private hideModal(): void { this.element('overlay').hidden = true; this.element('pause-button').textContent = 'Ⅱ'; }
+  private hideModal(): void { this.element('overlay').hidden = true; document.body.classList.remove('menu-open'); this.element('pause-button').textContent = 'Ⅱ'; }
 
   private updateHUD(): void {
     const level = LEVELS[this.levelIndex];
@@ -441,12 +525,12 @@ export class GameScene extends Phaser.Scene {
     this.element('best-label').textContent = `Рекорд: ${this.best}`;
     this.element('hearts').textContent = '♥ '.repeat(this.lives) + '♡ '.repeat(STARTING_LIVES - this.lives);
     this.element('hearts').setAttribute('aria-label', `Жизни: ${this.lives}`);
-    this.element('enemy-label').textContent = `${level.enemies} ${level.enemies === 1 ? 'страж' : 'стража'} · ${level.rush ? 'опасные рывки' : 'идут по следу'}`;
-    this.element('combo-label').textContent = 'Собирай монеты подряд';
+    this.element('enemy-label').textContent = `${level.enemies} ${level.enemies === 1 ? 'волк' : 'волка'} · ${level.rush ? 'прогноз + рывки' : 'предугадывают путь'}`;
+    this.element('combo-label').textContent = 'Собирай монеты подряд'; this.updateWallet();
   }
 
   private updateDashUI(): void {
-    this.element('dash-progress').style.width = `${(1 - this.dashCooldown / DASH_COOLDOWN) * 100}%`;
+    this.element('dash-progress').style.width = `${(1 - this.dashCooldown / this.dashWait()) * 100}%`;
     this.element('dash-label').textContent = this.dashCooldown > .05 ? `Рывок через ${this.dashCooldown.toFixed(1)} с` : 'Рывок готов';
     this.element('dash-button').classList.toggle('cooldown', this.dashCooldown > 0);
   }
@@ -494,10 +578,201 @@ export class GameScene extends Phaser.Scene {
     this.playerShadow.setSize(31 * this.unit, 12 * this.unit).setPosition(this.player.x, this.player.y + 18 * this.unit);
     this.coinShadow.setSize(22 * this.unit, 8 * this.unit).setPosition(this.target.x, this.target.y + 16 * this.unit);
     for (const enemy of this.enemies) {
-      enemy.sprite.setDisplaySize(58 * this.unit, 58 * this.unit);
+      enemy.sprite.setDisplaySize(67 * this.unit, 67 * this.unit);
       enemy.shadow.setSize(35 * this.unit, 12 * this.unit).setPosition(enemy.sprite.x, enemy.sprite.y + 16 * this.unit);
     }
-    this.resetTouch();
+    const sx = this.width / oldWidth, sy = this.height / oldHeight;
+    for (const zone of this.wetZones) { zone.x *= sx; zone.y *= sy; zone.radius *= Math.min(sx, sy); }
+    if (this.strike) { this.strike.x *= sx; this.strike.y *= sy; }
+    this.setupTerrain();
+    for (const object of [this.player, ...this.enemies.map(e => e.sprite)]) this.resolvePosition(object, ENEMY_RADIUS * this.unit);
+    for (const enemy of this.enemies) { enemy.path = []; enemy.pathLeft = 0; }
+    if (!freePoint(this.target, PLAYER_RADIUS * this.unit + 8, this.terrain, this.bounds())) this.placeCoin();
+    this.playerShadow.setPosition(this.player.x, this.player.y + 18 * this.unit);
+    for (const enemy of this.enemies) enemy.shadow.setPosition(enemy.sprite.x, enemy.sprite.y + 16 * this.unit);
+    this.coinShadow.setPosition(this.target.x, this.target.y + 16 * this.unit);
+    this.element('control-hint').textContent = matchMedia('(pointer: coarse)').matches || this.width < 700
+      ? 'Джойстик слева - движение · ϟ справа - рывок' : 'WASD / стрелки · Пробел - рывок · P - пауза';
+    this.playerVelocity = { x: 0, y: 0 }; this.drawWeather(); this.resetTouch();
+  }
+
+  private bounds(): Bounds { return { width: this.width, height: this.height, margin: FIELD_MARGIN * this.unit, top: FIELD_TOP }; }
+  private playerSpeed(): number { return PLAYER_SPEED * (1 + this.profile.upgrades.speed * .06); }
+  private dashWait(): number { return DASH_COOLDOWN - this.profile.upgrades.dash * .3; }
+
+  private resolvePosition(object: Phaser.GameObjects.Image, radius: number): void {
+    const position = moveCircle(object, 0, 0, radius, this.terrain, this.bounds()); object.setPosition(position.x, position.y);
+  }
+
+  private setupTerrain(): void {
+    for (const sprite of this.terrainSprites) sprite.destroy();
+    this.terrain = makeTerrain(this.levelIndex, this.bounds(), this.unit);
+    this.terrainSprites = this.terrain.map(t => this.add.image(t.x, t.y, t.kind)
+      .setOrigin(.5, t.kind === 'tree' ? .82 : t.kind === 'stump' ? .61 : .5)
+      .setDisplaySize((t.kind === 'tree' ? 108 : t.kind === 'stump' ? 70 : 110) * this.unit,
+        (t.kind === 'tree' ? 108 : t.kind === 'stump' ? 70 : 110) * this.unit)
+      .setDepth(t.kind === 'puddle' ? 2 : 7));
+    this.nav = makeGrid(this.terrain, this.bounds(), this.unit, ENEMY_RADIUS * this.unit);
+  }
+
+  private resetWeather(): void {
+    this.weather = 'clear'; this.weatherLeft = 0; this.weatherNext = Phaser.Math.Between(...WEATHER_INTERVAL);
+    this.wetZones = []; this.strike = null;
+    this.weatherInk.clear(); this.stormInk.clear(); this.updateWeatherLabel();
+  }
+
+  private randomOpenPoint(): Point {
+    for (let i = 0; i < 60; i++) {
+      const point = { x: Phaser.Math.FloatBetween(40 * this.unit, this.width - 40 * this.unit),
+        y: Phaser.Math.FloatBetween(FIELD_TOP + 20, this.height - 40 * this.unit) };
+      if (freePoint(point, PLAYER_RADIUS * this.unit, this.terrain, this.bounds())) return point;
+    }
+    return { x: this.player.x, y: this.player.y };
+  }
+
+  private startWeather(kind: 'rain' | 'storm' = Math.random() < .5 ? 'rain' : 'storm'): void {
+    this.weather = kind; this.weatherLeft = WEATHER_DURATION; this.strikeNext = 1.7;
+    const radius = Math.min(140 * this.unit, Math.min(this.width, this.height) * .25);
+    this.wetZones = Array.from({ length: 2 }, () => ({ ...this.randomOpenPoint(), radius }));
+    this.toast(kind === 'rain' ? 'Дождь! В мокрых кругах все движутся медленнее.' : 'Гроза! Оранжевый круг предупреждает о молнии.');
+    this.updateWeatherLabel();
+  }
+
+  private queueStrike(): void {
+    let point = this.randomOpenPoint();
+    const roll = Math.random();
+    // Иногда удар рядом с героем, иногда рядом с волком, иногда в случайном месте.
+    if (roll < .4) point = clampPoint({ x: this.player.x + Phaser.Math.Between(-70, 70) * this.unit,
+      y: this.player.y + Phaser.Math.Between(-70, 70) * this.unit }, this.bounds());
+    else if (roll < .7 && this.enemies.length) {
+      const enemy = Phaser.Utils.Array.GetRandom(this.enemies);
+      point = { x: enemy.sprite.x, y: enemy.sprite.y };
+    }
+    this.strike = { ...point, phase: 'warning', left: LIGHTNING_WARNING };
+  }
+
+  private updateWeather(seconds: number): void {
+    this.playerStunned = Math.max(0, this.playerStunned - seconds);
+    for (const enemy of this.enemies) enemy.stunned = Math.max(0, enemy.stunned - seconds);
+    if (this.weather === 'clear') {
+      this.weatherNext -= seconds;
+      if (this.weatherNext <= 0) this.startWeather();
+    } else {
+      this.weatherLeft -= seconds;
+      if (this.weatherLeft <= 0) { this.resetWeather(); this.toast('Погода прояснилась.'); }
+      else if (this.weather === 'storm') {
+        this.strikeNext -= seconds;
+        if (!this.strike && this.strikeNext <= 0) this.queueStrike();
+        if (this.strike) {
+          this.strike.left -= seconds;
+          if (this.strike.left <= 0) {
+            if (this.strike.phase === 'warning') {
+              const strike = this.strike;
+              strike.phase = 'impact'; strike.left = .3; this.strikeNext = 3.2;
+              const hit = (p: Point) => Math.hypot(p.x - strike.x, p.y - strike.y) <= LIGHTNING_RADIUS * this.unit;
+              if (hit(this.player)) { this.playerStunned = 1.8; this.toast('Молния замедлила тебя. Из оранжевого круга лучше уходить.'); }
+              for (const enemy of this.enemies) if (hit(enemy.sprite)) {
+                enemy.stunned = 2.4; enemy.mode = 'chase'; enemy.timer = 3; enemy.pathLeft = 0;
+              }
+              this.particles(strike.x, strike.y, 10, 0xffe6a6);
+            } else this.strike = null;
+          }
+        }
+      }
+    }
+    this.drawWeather(); this.updateWeatherLabel();
+  }
+
+  private groundSpeed(point: Point, player: boolean): number {
+    if (player && this.playerStunned > 0) return .2;
+    let speed = 1;
+    if (this.terrain.some(t => t.kind === 'puddle' && Math.hypot(point.x - t.x, point.y - t.y) < t.radius)) speed = player ? .72 : .62;
+    if (this.weather !== 'clear' && this.wetZones.some(z => Math.hypot(point.x - z.x, point.y - z.y) < z.radius)) speed = Math.min(speed, player ? .75 : .60);
+    if (player && speed < 1) speed = Math.min(.96, speed + this.profile.upgrades.boots * .12);
+    return speed;
+  }
+
+  private drawWeather(): void {
+    const ink = this.weatherInk; ink.clear(); this.stormInk.clear();
+    for (const zone of this.wetZones) {
+      ink.fillStyle(this.weather === 'storm' ? 0x565677 : 0x538e91, .23); ink.fillCircle(zone.x, zone.y, zone.radius);
+      ink.lineStyle(2, 0xb4dbbf, .6); ink.strokeCircle(zone.x, zone.y, zone.radius);
+      ink.lineStyle(1.5, 0xd5e3d7, .65);
+      for (let i = 0; i < 30; i++) {
+        const x = zone.x + Math.sin(i * 127.1) * zone.radius * .9;
+        const y = zone.y - zone.radius + (this.animationTime * 140 + i * 39) % (zone.radius * 2);
+        if (Math.hypot(x - zone.x, y - zone.y) < zone.radius * .92) ink.lineBetween(x, y, x - 3 * this.unit, y + 10 * this.unit);
+      }
+    }
+    if (!this.strike) return;
+    const strike = this.strike, fx = this.stormInk, radius = LIGHTNING_RADIUS * this.unit;
+    fx.fillStyle(strike.phase === 'warning' ? 0xe6a454 : 0xfff1b5, strike.phase === 'warning' ? .24 : .40);
+    fx.fillCircle(strike.x, strike.y, radius); fx.lineStyle(3, 0xffd17d, .95); fx.strokeCircle(strike.x, strike.y, radius);
+    if (strike.phase === 'warning') {
+      fx.lineStyle(2, 0xffe0a0, .9); fx.strokeCircle(strike.x, strike.y, radius * Math.max(.1, strike.left / LIGHTNING_WARNING));
+      fx.lineBetween(strike.x, strike.y - 10 * this.unit, strike.x, strike.y + 2 * this.unit); fx.fillStyle(0xffecc0); fx.fillCircle(strike.x, strike.y + 9 * this.unit, 2 * this.unit);
+    } else {
+      fx.lineStyle(5 * this.unit, 0xffefa9, .9); fx.beginPath(); fx.moveTo(strike.x + 12 * this.unit, 0);
+      fx.lineTo(strike.x - 6 * this.unit, strike.y - 38 * this.unit); fx.lineTo(strike.x + 10 * this.unit, strike.y - 41 * this.unit); fx.lineTo(strike.x, strike.y); fx.strokePath();
+    }
+  }
+
+  private updateWeatherLabel(): void {
+    this.element('weather-label').textContent = this.weather === 'clear' ? '☀ Ясно' : `${this.weather === 'rain' ? '☂ Дождь' : 'ϟ Гроза'} · ${Math.ceil(this.weatherLeft)} с`;
+    this.element('terrain-label').textContent = this.playerStunned > 0 ? 'Молния: замедление' : this.groundSpeed(this.player, true) < 1 ? 'Мокрая зона: медленнее' : 'Деревья и пни нужно обходить';
+  }
+
+  private updateWallet(): void {
+    this.element('wallet-count').textContent = String(this.profile.coins);
+    this.element('shop-wallet').textContent = `${this.profile.coins} ✦`;
+  }
+
+  private saveProfile(): void {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(this.profile)); }
+    catch { this.storageAvailable = false; }
+  }
+
+  private openShop(): void {
+    if (this.shopOpen) return;
+    this.shopReturn = this.state; this.state = 'paused'; this.shopOpen = true; this.resetTouch();
+    this.element('shop-overlay').hidden = false; document.body.classList.add('menu-open');
+    this.element('shop-message').textContent = 'Каждая собранная монета пополняет кошелёк.';
+    this.renderShop();
+  }
+
+  private closeShop(): void {
+    this.shopOpen = false; this.state = this.shopReturn; this.element('shop-overlay').hidden = true;
+    if (this.element('overlay').hidden) document.body.classList.remove('menu-open');
+  }
+
+  private renderShop(): void {
+    this.updateWallet();
+    for (const tab of ['skins', 'upgrades']) {
+      const active = this.shopTab === tab; this.element(`tab-${tab}`).classList.toggle('selected', active);
+      this.element(`tab-${tab}`).setAttribute('aria-selected', String(active));
+    }
+    this.element('storage-status').textContent = this.storageAvailable ? 'Покупки сохраняются в этом браузере.' : 'Хранилище недоступно: покупки действуют до закрытия страницы.';
+    const items = this.element('shop-items'); items.replaceChildren();
+    if (this.shopTab === 'skins') for (const skin of SKINS) {
+      const owned = this.profile.owned.includes(skin.id), selected = this.profile.skin === skin.id;
+      const card = document.createElement('article'); card.className = 'shop-card';
+      const image = document.createElement('img'); image.alt = `Скин ${skin.name}`;
+      image.src = (this.textures.get(skin.id).getSourceImage() as HTMLCanvasElement).toDataURL();
+      const name = document.createElement('strong'); name.textContent = skin.name;
+      const note = document.createElement('span'); note.textContent = 'Меняет внешний вид';
+      const button = document.createElement('button'); button.dataset.item = skin.id; button.disabled = selected;
+      button.textContent = selected ? 'Надет' : owned ? 'Надеть' : `Купить · ${skin.price} ✦`;
+      card.append(image, name, note, button); items.append(card);
+    } else for (const upgrade of UPGRADES) {
+      const rank = this.profile.upgrades[upgrade.id], max = rank >= upgrade.prices.length;
+      const card = document.createElement('article'); card.className = 'shop-card';
+      const icon = document.createElement('div'); icon.className = 'upgrade-icon'; icon.textContent = upgrade.icon;
+      const name = document.createElement('strong'); name.textContent = upgrade.name;
+      const note = document.createElement('span'); note.textContent = `${upgrade.description} · ${rank}/${upgrade.prices.length}`;
+      const button = document.createElement('button'); button.dataset.item = upgrade.id; button.disabled = max;
+      button.textContent = max ? 'Максимум' : `Улучшить · ${upgrade.prices[rank]} ✦`;
+      card.append(icon, name, note, button); items.append(card);
+    }
   }
 
   private readBest(): number {
