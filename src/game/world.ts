@@ -1,7 +1,7 @@
 export type Point = { x: number; y: number };
-export type Terrain = Point & { kind: 'tree' | 'stump' | 'puddle'; radius: number };
-export type Bounds = { width: number; height: number; margin: number; top: number };
-export type NavGrid = { cell: number; cols: number; rows: number; free: boolean[]; bounds: Bounds };
+export type Terrain = Point & { kind: 'tree' | 'stump' | 'puddle' | 'rock' | 'ruin'; radius: number };
+export type Bounds = { width: number; height: number; margin: number; top: number; left?: number };
+export type NavGrid = { cell: number; cols: number; rows: number; free: boolean[]; bounds: Bounds; originX: number };
 const GRID_CELL = 24;
 
 // Координаты в долях поля: каждый уровень имеет своё расположение препятствий.
@@ -20,12 +20,12 @@ export function makeTerrain(level: number, bounds: Bounds, unit: number): Terrai
 }
 
 export function clampPoint(p: Point, bounds: Bounds): Point {
-  return { x: Math.max(bounds.margin, Math.min(bounds.width - bounds.margin, p.x)),
+  return { x: Math.max(bounds.left ?? bounds.margin, Math.min(bounds.width - bounds.margin, p.x)),
     y: Math.max(bounds.top, Math.min(bounds.height - bounds.margin, p.y)) };
 }
 
 export function freePoint(p: Point, radius: number, terrain: Terrain[], bounds: Bounds): boolean {
-  if (p.x < bounds.margin || p.x > bounds.width - bounds.margin || p.y < bounds.top || p.y > bounds.height - bounds.margin) return false;
+  if (p.x < (bounds.left ?? bounds.margin) || p.x > bounds.width - bounds.margin || p.y < bounds.top || p.y > bounds.height - bounds.margin) return false;
   return terrain.every(t => t.kind === 'puddle' || Math.hypot(p.x - t.x, p.y - t.y) >= radius + t.radius + 1);
 }
 
@@ -48,8 +48,8 @@ export function moveCircle(p: Point, dx: number, dy: number, radius: number, ter
 }
 
 export function makeGrid(terrain: Terrain[], bounds: Bounds, unit: number, radius: number): NavGrid {
-  const cell = GRID_CELL * unit, cols = Math.ceil(bounds.width / cell), rows = Math.ceil(bounds.height / cell);
-  const free = Array.from({ length: cols * rows }, (_, i) => freePoint({ x: (i % cols + .5) * cell,
+  const cell = GRID_CELL * unit, originX = bounds.left ?? 0, cols = Math.ceil((bounds.width - originX) / cell), rows = Math.ceil(bounds.height / cell);
+  const free = Array.from({ length: cols * rows }, (_, i) => freePoint({ x: originX + (i % cols + .5) * cell,
     y: (Math.floor(i / cols) + .5) * cell }, radius + cell * .3, terrain, bounds));
   // Узкий зазор может дать одиночную клетку без выхода. Навигация использует
   // крупнейшую связную область, а не предлагает волку такую ложную цель.
@@ -72,13 +72,13 @@ export function makeGrid(terrain: Terrain[], bounds: Bounds, unit: number, radiu
   }
   const connected = new Set(largest);
   for (let i = 0; i < free.length; i++) free[i] = free[i] && connected.has(i);
-  return { cell, cols, rows, free, bounds };
+  return { cell, cols, rows, free, bounds, originX };
 }
 
 function nearestCell(p: Point, grid: NavGrid): number {
   let best = -1, distance = Infinity;
   for (let i = 0; i < grid.free.length; i++) if (grid.free[i]) {
-    const x = (i % grid.cols + .5) * grid.cell, y = (Math.floor(i / grid.cols) + .5) * grid.cell;
+    const x = grid.originX + (i % grid.cols + .5) * grid.cell, y = (Math.floor(i / grid.cols) + .5) * grid.cell;
     const d = (p.x - x) ** 2 + (p.y - y) ** 2;
     if (d < distance) { best = i; distance = d; }
   }
@@ -98,7 +98,7 @@ export function findPath(from: Point, to: Point, grid: NavGrid): Point[] {
     const current = open.splice(at, 1)[0];
     if (current === goal) {
       const path: Point[] = [];
-      for (let i = goal; i !== start; i = parent[i]) path.push({ x: (i % grid.cols + .5) * grid.cell, y: (Math.floor(i / grid.cols) + .5) * grid.cell });
+      for (let i = goal; i !== start; i = parent[i]) path.push({ x: grid.originX + (i % grid.cols + .5) * grid.cell, y: (Math.floor(i / grid.cols) + .5) * grid.cell });
       return path.reverse();
     }
     closed[current] = 1;
@@ -120,4 +120,18 @@ export function clearLine(from: Point, to: Point, radius: number, terrain: Terra
   for (let i = 1; i <= steps; i++) if (!freePoint({ x: from.x + (to.x - from.x) * i / steps,
     y: from.y + (to.y - from.y) * i / steps }, radius, terrain, bounds)) return false;
   return true;
+}
+
+// Детали пяти биомов: свободная центральная дорога и боковые участки для боя.
+export function regionTerrain(index: number, start: number, width: number, height: number): Terrain[] {
+  const base = makeTerrain(index, { width, height, margin: 65, top: 90 }, 1).map(t => ({ ...t, x: t.x + start }));
+  const extra: Terrain[] = [];
+  const add = (kind: Terrain['kind'], x: number, y: number, radius: number) => extra.push({ kind, x: start + x * width, y: y * height, radius });
+  for (let i = 0; i < 8; i++) {
+    const x = .12 + (i % 4) * .22, y = i < 4 ? .14 + (i % 2) * .08 : .82 + (i % 2) * .06;
+    add(index === 1 || index === 3 ? 'ruin' : 'tree', x, y, index === 1 ? 29 : 25);
+  }
+  for (const [x, y] of [[.15, .45], [.84, .32], [.8, .74]]) add(index === 1 || index === 3 ? 'rock' : 'stump', x, y, 24);
+  if (index === 2) for (const [x, y] of [[.25,.37],[.57,.73],[.75,.18]]) add('puddle',x,y,66);
+  return [...base, ...extra].filter(t => !(Math.abs(t.y-height/2)<85 && (t.x-start<200 || t.x-start>width-200)));
 }

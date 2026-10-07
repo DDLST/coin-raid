@@ -44,6 +44,8 @@ export function createArtwork(scene: Phaser.Scene): void {
     c.strokeStyle = skin.scarf; c.lineWidth = 6; c.beginPath(); c.moveTo(18, 46); c.quadraticCurveTo(33, 53, 49, 46); c.stroke();
     c.fillStyle = skin.scarf; c.beginPath(); c.moveTo(40, 49); c.lineTo(55, 54); c.lineTo(52, 60); c.lineTo(39, 54); c.fill();
     ellipse(c, 16, 36, 3, 1.5, '#e69972'); ellipse(c, 51, 36, 3, 1.5, '#e69972');
+    if (skin.id === 'fox-royal') { c.fillStyle='#f4d578';c.beginPath();c.moveTo(23,15);c.lineTo(20,6);c.lineTo(29,10);c.lineTo(34,3);c.lineTo(40,10);c.lineTo(49,6);c.lineTo(46,15);c.fill(); }
+    if (skin.id === 'fox-star') for (const [x,y] of [[21,20],[47,19],[28,47]]) { c.fillStyle='#f5e1a4';c.fillRect(x,y,2,2); }
   });
   const wolves = [['wolf-grey', '#6c7880', '#a9b4b7'], ['wolf-snow', '#afbabc', '#e6e6da'], ['wolf-brown', '#74645b', '#b09a7c']];
   for (const [key, dark, light] of wolves) texture(scene, key, c => {
@@ -88,6 +90,59 @@ export function createArtwork(scene: Phaser.Scene): void {
     c.strokeStyle='#d0e5ca99';c.lineWidth=1.5;c.beginPath();c.ellipse(30,29,15,7,0,.4,2.8);c.stroke();
     ellipse(c,23,23,9,2,'#e6f2d16b');ellipse(c,42,39,7,1.4,'#e6f2d16b');
   });
+  texture(scene, 'boar', c => {
+    const fur=c.createLinearGradient(15,10,48,56);fur.addColorStop(0,'#b69874');fur.addColorStop(1,'#635243');
+    for(const x of [17,26,42,50]) ellipse(c,x,54,4,6,'#303a33');
+    ellipse(c,32,35,25,22,fur); c.fillStyle='#655246';c.beginPath();c.moveTo(10,27);c.lineTo(7,12);c.lineTo(23,20);c.moveTo(43,20);c.lineTo(59,12);c.lineTo(55,28);c.fill();
+    ellipse(c,33,41,20,15,'#a98467');ellipse(c,33,44,11,8,'#d6b092');ellipse(c,28,44,2,3,'#574c45');ellipse(c,38,44,2,3,'#574c45');
+    ellipse(c,21,30,3,4,'#ebc878');ellipse(c,45,30,3,4,'#ebc878');ellipse(c,21,31,1.5,2.5,'#252f2c');ellipse(c,45,31,1.5,2.5,'#252f2c');
+    c.fillStyle='#f3e6c6';c.beginPath();c.moveTo(17,44);c.quadraticCurveTo(13,60,24,51);c.lineTo(22,44);c.moveTo(48,44);c.quadraticCurveTo(53,60,42,51);c.lineTo(44,44);c.fill();
+    c.strokeStyle='#5a4c3f';c.lineWidth=3;c.beginPath();c.moveTo(29,11);c.lineTo(33,5);c.lineTo(37,13);c.stroke();
+  });
+  texture(scene, 'bear', c => {
+    const fur=c.createRadialGradient(24,21,2,32,33,30);fur.addColorStop(0,'#b7a388');fur.addColorStop(1,'#645c51');
+    ellipse(c,32,43,24,20,fur);ellipse(c,18,55,8,6,'#413f37');ellipse(c,46,55,8,6,'#413f37');
+    ellipse(c,13,14,10,10,'#736b5b');ellipse(c,51,14,10,10,'#736b5b');ellipse(c,32,27,26,24,fur);
+    ellipse(c,32,39,15,12,'#d2c6a9');ellipse(c,32,35,6,4,'#333e38');ellipse(c,22,24,3,4,'#ead389');ellipse(c,43,24,3,4,'#ead389');
+    ellipse(c,22,25,1.5,2.5,'#28352f');ellipse(c,43,25,1.5,2.5,'#28352f');
+    c.strokeStyle='#6e6355';c.lineWidth=2;c.beginPath();c.moveTo(32,39);c.lineTo(32,44);c.moveTo(26,43);c.quadraticCurveTo(32,47,39,43);c.stroke();
+  });
+  texture(scene, 'hunter', c => {
+    c.fillStyle='#333f46';c.beginPath();c.moveTo(15,59);c.lineTo(20,27);c.lineTo(9,30);c.lineTo(26,5);c.lineTo(40,5);c.lineTo(55,31);c.lineTo(46,28);c.lineTo(51,59);c.fill();
+    c.fillStyle='#526a65';c.beginPath();c.moveTo(21,59);c.lineTo(24,31);c.lineTo(42,31);c.lineTo(46,59);c.fill();
+    ellipse(c,33,23,14,17,'#647d70');ellipse(c,33,24,10,12,'#1d3132');
+    ellipse(c,29,23,2,2,'#ffd495');ellipse(c,37,23,2,2,'#ffd495');
+    c.strokeStyle='#ad9463';c.lineWidth=3;c.beginPath();c.arc(45,40,16,-1.2,1.2);c.stroke();c.strokeStyle='#efdfbd';c.lineWidth=1;c.beginPath();c.moveTo(51,25);c.lineTo(51,55);c.stroke();
+    c.fillStyle='#acbd9d';c.fillRect(25,36,16,3);
+  });
+  texture(scene, 'merchant', c => {
+    ellipse(c,32,46,23,17,'#667752');ellipse(c,18,55,6,6,'#3a4a37');ellipse(c,46,55,6,6,'#3a4a37');
+    ellipse(c,15,16,8,9,'#8b8f7c');ellipse(c,49,16,8,9,'#8b8f7c');ellipse(c,32,27,23,22,'#d4d3b8');
+    c.fillStyle='#454f48';c.beginPath();c.moveTo(14,12);c.lineTo(25,31);c.lineTo(22,46);c.lineTo(12,30);c.fill();c.beginPath();c.moveTo(50,12);c.lineTo(39,31);c.lineTo(42,46);c.lineTo(52,30);c.fill();
+    ellipse(c,23,27,3,4,'#203c32');ellipse(c,41,27,3,4,'#203c32');ellipse(c,32,39,4,3,'#33473a');
+    c.fillStyle='#aa8551';c.beginPath();c.moveTo(7,17);c.quadraticCurveTo(32,-2,57,17);c.lineTo(53,21);c.lineTo(10,21);c.fill();c.fillStyle='#e0c47e';c.fillRect(18,11,28,4);
+    ellipse(c,51,49,8,11,'#a0804d');c.strokeStyle='#d3ba7c';c.lineWidth=2;c.strokeRect(44,44,13,10);
+  });
+  texture(scene, 'sword', c => {
+    c.fillStyle='#b5d0c6';c.beginPath();c.moveTo(18,44);c.lineTo(42,8);c.lineTo(51,3);c.lineTo(49,14);c.lineTo(24,49);c.fill();
+    c.strokeStyle='#f2f1d5';c.lineWidth=2;c.beginPath();c.moveTo(22,43);c.lineTo(46,10);c.stroke();
+    c.strokeStyle='#e2ba63';c.lineWidth=5;c.beginPath();c.moveTo(12,40);c.lineTo(29,53);c.stroke();c.strokeStyle='#846147';c.lineWidth=5;c.beginPath();c.moveTo(19,47);c.lineTo(12,57);c.stroke();ellipse(c,10,59,4,3,'#ddba6e');
+  });
+  texture(scene, 'rock', c => {
+    c.fillStyle='#77847b';c.beginPath();c.moveTo(7,43);c.lineTo(13,24);c.lineTo(35,11);c.lineTo(54,23);c.lineTo(60,44);c.lineTo(40,55);c.lineTo(16,53);c.fill();
+    c.fillStyle='#aeb5a0';c.beginPath();c.moveTo(13,24);c.lineTo(35,11);c.lineTo(40,30);c.lineTo(17,35);c.fill();c.fillStyle='#566b61';c.beginPath();c.moveTo(40,30);c.lineTo(54,23);c.lineTo(60,44);c.lineTo(40,55);c.fill();ellipse(c,14,48,8,3,'#88975e');
+  });
+  texture(scene, 'ruin', c => {
+    ellipse(c,32,53,26,7,'#193d3144');c.fillStyle='#788176';c.fillRect(14,14,14,40);c.fillRect(37,8,13,46);c.fillStyle='#abb09a';c.fillRect(12,10,17,8);c.fillRect(35,5,18,8);c.fillStyle='#8c977e';c.fillRect(13,42,36,9);c.strokeStyle='#56685b';c.lineWidth=2;c.beginPath();c.moveTo(19,19);c.lineTo(17,27);c.lineTo(22,36);c.moveTo(43,14);c.lineTo(39,32);c.stroke();ellipse(c,25,50,9,3,'#82a260');
+  });
+  texture(scene, 'hut', c => {
+    c.fillStyle='#815f43';c.fillRect(8,27,48,28);c.fillStyle='#aa9363';c.fillRect(12,29,40,23);c.fillStyle='#3c5146';c.fillRect(28,36,10,19);c.fillStyle='#ebca75';c.fillRect(15,34,9,9);c.fillRect(42,34,8,9);
+    c.fillStyle='#57684d';c.beginPath();c.moveTo(3,29);c.lineTo(32,4);c.lineTo(61,29);c.fill();c.strokeStyle='#95a96d';c.lineWidth=3;c.beginPath();c.moveTo(9,25);c.lineTo(32,8);c.lineTo(53,25);c.stroke();c.fillStyle='#e5bd71';c.fillRect(9,48,46,4);
+  });
+  texture(scene, 'fire', c => {
+    c.strokeStyle='#735b42';c.lineWidth=6;c.beginPath();c.moveTo(16,48);c.lineTo(48,57);c.moveTo(48,48);c.lineTo(16,57);c.stroke();
+    c.fillStyle='#f3b75d';c.beginPath();c.moveTo(18,48);c.quadraticCurveTo(13,30,32,10);c.quadraticCurveTo(26,32,43,26);c.quadraticCurveTo(55,49,33,53);c.fill();c.fillStyle='#ffe8a2';c.beginPath();c.moveTo(26,48);c.quadraticCurveTo(24,36,35,28);c.quadraticCurveTo(46,49,33,52);c.fill();
+  });
   texture(scene, 'coin', c => {
     ellipse(c, 32, 34, 18, 19, '#956133');
     const gold = c.createLinearGradient(16, 13, 45, 46); gold.addColorStop(0, '#fff0a7'); gold.addColorStop(.4, '#f7cb60'); gold.addColorStop(1, '#d99842');
@@ -119,9 +174,9 @@ export function background(scene: Phaser.Scene, width: number, height: number, l
   c.save(); c.globalAlpha = .18; c.strokeStyle = '#f7dfa7'; c.lineWidth = Math.min(width, height) * .19;
   c.lineCap = 'round'; c.beginPath(); c.moveTo(width * .08, height * .82);
   c.bezierCurveTo(width * .63, height * .55, width * .2, height * .3, width * .85, height * .09); c.stroke(); c.restore();
-  for (let i = 0; i < width * height / 550; i++) {
+  for (let i = 0; i < width * height / 1700; i++) {
     const x = random() * width, y = random() * height;
-    c.globalAlpha = .12 + random() * .12;
+    c.globalAlpha = .07 + random() * .10;
     ellipse(c, x, y, 5 + random() * 28, 3 + random() * 10, random() > .5 ? palette.grass : '#f0efb0');
   }
   c.globalAlpha = 1;
@@ -135,6 +190,24 @@ export function background(scene: Phaser.Scene, width: number, height: number, l
     }
   }
   c.globalAlpha = 1;
+  // Детали биомов не имеют коллизий: это грунт, растения и следы прошлого.
+  if (level === 2) {
+    c.strokeStyle = '#e4d5a53b'; c.lineWidth = 2;
+    for (let i = 0; i < 18; i++) { const x=140+random()*(width-280), y=130+random()*(height-260);c.strokeRect(x,y,26+random()*25,19+random()*19); }
+  }
+  if (level === 3) for (let i=0;i<70;i++) {
+    const x=random()*width,y=random()*height;c.strokeStyle='#b2c5a966';c.lineWidth=2;c.beginPath();c.moveTo(x,y);c.lineTo(x-4,y-15);c.moveTo(x,y);c.lineTo(x+5,y-19);c.stroke();
+    if(i%5===0){ellipse(c,x+4,y-17,5,3,'#d1cb9b');ellipse(c,x-5,y-11,4,3,'#a18caf');}
+  }
+  if (level === 4) for (let i=0;i<32;i++) {
+    const x=random()*width,y=random()*height;c.strokeStyle='#302e3838';c.lineWidth=2;c.beginPath();c.moveTo(x,y);c.lineTo(x+13,y+14);c.lineTo(x+9,y+28);c.stroke();
+    if(i%3===0)ellipse(c,x+6,y+3,2,2,'#f7c185');
+  }
+  if (level === 5) {
+    const x=width*.64,y=height*.5;c.strokeStyle='#e0dba73b';c.lineWidth=4;c.beginPath();c.ellipse(x,y,115,80,0,0,Math.PI*2);c.stroke();
+    c.lineWidth=2;c.beginPath();c.ellipse(x,y,93,64,0,0,Math.PI*2);c.stroke();
+    for(let i=0;i<8;i++){const a=i*Math.PI/4;ellipse(c,x+Math.cos(a)*105,y+Math.sin(a)*72,4,4,'#eadbaa99');}
+  }
   // Декоративная листва лежит у края, не скрывая игровые объекты.
   const tree = (x: number, y: number, size: number) => {
     ellipse(c, x + 6, y + 9, size, size * .7, '#0c302449');
