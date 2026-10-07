@@ -24,26 +24,10 @@ const code = (await readFile(resolve(output, 'game.js'), 'utf8'))
 const css = await readFile(resolve(output, 'game.css'), 'utf8');
 const courseLicense = await readFile('LICENSE', 'utf8');
 const phaserLicense = await readFile('node_modules/phaser/LICENSE.md', 'utf8');
-const html = `<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#13251c">
-<title>Монетный рейд</title>
-<!-- Учебный проект на базе aologos/gamedev_course_2026_starter_pack.
-${courseLicense}
-Phaser engine license:
-${phaserLicense}
--->
-<style>${css}</style>
-</head>
-<body>
-<main id="app"><div id="game"></div></main>
-<script>${code}</script>
-</body>
-</html>
-`;
+const source = await readFile('index.html', 'utf8');
+const html = source
+  .replace('</head>', `<style>${css}</style>\n<!-- ${courseLicense}\nPhaser: ${phaserLicense} -->\n</head>`)
+  .replace('<script type="module" src="/src/main.ts"></script>', () => `<script>${code}</script>`);
 await mkdir('docs', { recursive: true });
 await writeFile('docs/index.html', html);
 await writeFile('docs/.nojekyll', '');

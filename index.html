@@ -1,15 +1,57 @@
 <!doctype html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#111827" />
-    <title>Монетный рейд</title>
-  </head>
-  <body>
-    <main id="app">
-      <div id="game"></div>
-    </main>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#122a29" />
+  <meta name="description" content="RAID COIN: лесная погоня. Собирай монеты, уходи от стражей и пройди пять полян. Можно играть на компьютере и телефоне." />
+  <title>RAID COIN · Лесная погоня</title>
+</head>
+<body>
+<main id="app" class="shell">
+  <header class="topbar">
+    <div class="brand"><span class="brand-coin" aria-hidden="true">✦</span><div><h1>RAID COIN</h1><p>ЛЕСНАЯ ПОГОНЯ</p></div></div>
+    <div class="topbar-right"><span class="edition">5 полян · один маленький герой</span><button id="help-button" class="icon-button" aria-label="Правила игры">?</button><button id="pause-button" class="icon-button" aria-label="Пауза">Ⅱ</button></div>
+  </header>
+  <section class="hud" aria-label="Прогресс игры">
+    <div class="level-info"><span class="eyebrow" id="level-label">ПОЛЯНА 1 / 5</span><strong id="level-name">Тихая роща</strong></div>
+    <div class="coin-info"><div class="coin-caption"><span>МОНЕТЫ</span><strong id="coin-count">0 / 8</strong></div><div class="progress-track"><div id="coin-progress"></div></div></div>
+    <div class="score-info"><span class="eyebrow">ОЧКИ</span><strong id="score-count">0</strong><span id="best-label">Рекорд: 0</span></div>
+    <div class="life-info"><span class="eyebrow">ЖИЗНИ</span><strong id="hearts" aria-label="3 жизни">♥ ♥ ♥</strong></div>
+  </section>
+  <section class="arena" id="arena" aria-label="Игровое поле">
+    <div id="game"></div>
+    <div class="arena-status"><span id="enemy-label">1 страж</span><span id="combo-label">Собирай монеты подряд</span></div>
+    <div id="toast" class="toast" role="status"></div>
+    <div id="overlay" class="overlay">
+      <div class="modal">
+        <span class="modal-tag" id="modal-tag">МАЛЕНЬКОЕ ПРИКЛЮЧЕНИЕ</span>
+        <div class="portrait" aria-hidden="true"><svg viewBox="0 0 140 110"><path d="M32 64 15 12 54 34Q70 25 86 34L125 12 108 64Q110 98 70 102 30 98 32 64" fill="#e99448"/><path d="m22 26 12 32 16-18m68-14-12 32-16-18" fill="#613634"/><path d="M31 63Q42 54 57 67L70 79 83 67Q98 54 109 63 111 98 70 102 29 98 31 63" fill="#fff0cb"/><ellipse cx="49" cy="60" rx="5" ry="8" fill="#163a37"/><ellipse cx="91" cy="60" rx="5" ry="8" fill="#163a37"/><path d="m63 79 14 0-7 8z" fill="#163a37"/><path d="M44 95Q70 109 96 95L98 106H42z" fill="#59bbae"/></svg></div>
+        <h2 id="modal-title">Золото любит смелых.</h2>
+        <p id="modal-description">Пять лесных полян, монеты и стражи, которые идут по твоему следу. Сможешь собрать всё?</p>
+        <div id="help-content" class="help-content">
+          <div><span>✦</span><p><strong>Собирай</strong>Все монеты поляны открывают следующий уровень.</p></div>
+          <div><span>↗</span><p><strong>Уходи от стражей</strong>Они преследуют тебя. Жёлтая линия предупреждает о рывке.</p></div>
+          <div><span>⚡</span><p><strong>Используй рывок</strong>Пробел / Shift или кнопка ⚡. Во время рывка ты защищён.</p></div>
+        </div>
+        <div id="modal-stats" class="modal-stats"></div>
+        <button id="primary-button" class="primary-button">Начать погоню <span>↗</span></button>
+        <button id="secondary-button" class="secondary-button" hidden>Начать заново</button>
+        <p class="control-hint" id="control-hint">WASD / стрелки · Пробел - рывок · P - пауза</p>
+      </div>
+    </div>
+  </section>
+  <footer class="bottom-bar">
+    <div class="desktop-controls"><kbd>WASD</kbd><span>движение</span><kbd>Пробел</kbd><span>рывок</span><kbd>R</kbd><span>заново</span></div>
+    <div class="dash-status"><span id="dash-label">Рывок готов</span><div class="dash-track"><div id="dash-progress"></div></div></div>
+    <span class="footer-note">Собирай. Уклоняйся. Ещё одна поляна.</span>
+  </footer>
+  <section class="touch-controls" id="touch-controls" aria-label="Управление на телефоне">
+    <div id="joystick" class="joystick" aria-label="Джойстик движения"><span class="joystick-cross">✣</span><div id="joystick-knob" class="joystick-knob"></div></div>
+    <div class="touch-help">Левый палец - движение<br>Правый - рывок</div>
+    <button id="dash-button" class="dash-button" aria-label="Рывок"><span>⚡</span><small>РЫВОК</small></button>
+  </section>
+</main>
+<script type="module" src="/src/main.ts"></script>
+</body>
 </html>
