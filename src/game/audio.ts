@@ -1,5 +1,7 @@
 import {RecordedMusic, type MusicMode} from './soundtrack';
-export type Sound = 'slash' | 'thrust' | 'axe' | 'cast' | 'hit' | 'bite' | 'hurt' | 'dash' | 'pickup' | 'heal' | 'checkpoint' | 'crack' | 'thunder' | 'boss' | 'loot' | 'empty' | 'ultimate' | 'howl' | 'parry' | 'achievement';
+import type { WeaponId } from './progression';
+import type { WeatherKind } from './events';
+export type Sound = 'slash' | 'thrust' | 'axe' | 'cast' | 'hit' | 'bite' | 'hurt' | 'dash' | 'pickup' | 'heal' | 'checkpoint' | 'crack' | 'thunder' | 'boss' | 'loot' | 'empty' | 'ultimate' | 'howl' | 'parry' | 'achievement' | 'meteor' | 'wind' | 'roar';
 export type AudioSettings = { master: number; music: number; effects: number; muted: boolean };
 export const DEFAULT_AUDIO: AudioSettings = { master: .65, music: .42, effects: .70, muted: false };
 const MELODIES = [
@@ -29,7 +31,7 @@ export class ForestAudio {
   private note = 0;
   private nextNote = 0;
   private paused = true;
-  private weather: 'clear' | 'rain' | 'storm' = 'clear';
+  private weather:WeatherKind = 'clear';
   private stepLeft = 0;
   unlock(): void {
     if (!this.available) return;
@@ -59,12 +61,12 @@ export class ForestAudio {
     if (!this.context) return; const at = this.context.currentTime;
     this.master.gain.setTargetAtTime(this.settings.muted ? 0 : this.settings.master, at, .05);
     this.music.gain.setTargetAtTime(this.settings.music * .60, at, .12);
-    this.effects.gain.setTargetAtTime(this.settings.effects * .7, at, .05);
+    this.effects.gain.setTargetAtTime(this.settings.effects * .90, at, .05);
   }
   setRegion(index: number): void { if (this.region !== index) { this.region = index; this.note = 0; this.nextNote = (this.context?.currentTime ?? 0) + .15; } }
-  update(dt:number,playing:boolean,weather:'clear'|'rain'|'storm',mode:MusicMode='explore'):void{
+  update(dt:number,playing:boolean,weather:WeatherKind,mode:MusicMode='explore'):void{
     this.stepLeft=Math.max(0,this.stepLeft-dt);const c=this.context;if(!c||c.state!=='running')return;
-    if(this.paused!==!playing||this.weather!==weather){this.paused=!playing;this.weather=weather;this.rain.gain.setTargetAtTime(playing&&weather!=='clear'?weather==='storm'?.13:.085:0,c.currentTime,.3);}
+    if(this.paused!==!playing||this.weather!==weather){this.paused=!playing;this.weather=weather;this.rain.gain.setTargetAtTime(playing&&(weather==='rain'||weather==='storm'||weather==='hurricane')?weather==='hurricane'?.055:weather==='storm'?.13:.085:0,c.currentTime,.3);}
     const synthMode=mode==='rage'?'boss':mode==='village'||mode==='story'?'explore':mode;this.recorded?.update(dt,playing&&!this.settings.muted,this.region,mode);if(this.mode!==synthMode){this.mode=synthMode;this.nextNote=c.currentTime+.06;this.note=0;}
     if(!playing||this.settings.muted){this.nextNote=c.currentTime+.1;return;}
     this.ambientLeft-=dt;if(this.ambientLeft<=0){this.ambientLeft=18+Math.random()*13;if(mode==='explore'&&(this.region===0||this.region===2))this.play('howl');}
@@ -101,6 +103,9 @@ export class ForestAudio {
   play(sound: Sound): void {
     if (!this.context || this.context.state !== 'running' || this.settings.muted) return;
     switch (sound) {
+      case 'roar': this.noiseBurst(.72,.20,470,'bandpass');this.tone(85,.78,.10,'sawtooth',undefined,undefined,39);this.tone(130,.62,.045,'triangle',undefined,this.context.currentTime+.1,56);break;
+      case 'meteor': this.noiseBurst(1,.36,460);this.tone(100,.75,.18,'triangle',undefined,undefined,28);break;
+      case 'wind':this.noiseBurst(1.7,.12,560,'bandpass');this.tone(160,1.4,.035,'sine',undefined,undefined,74);break;
       case 'achievement': [523,659,784,1047].forEach((hz,i)=>this.tone(hz,.45,.035,'triangle',undefined,this.context!.currentTime+i*.09));break;
       case 'howl': this.tone(210,1.9,.024,'triangle',undefined,undefined,340);this.tone(420,1.6,.010,'sine',undefined,this.context.currentTime+.25,540);break;
       case 'parry': this.tone(1240,.27,.07,'triangle',undefined,undefined,640);this.noiseBurst(.12,.22,3200,'highpass');break;
@@ -122,6 +127,23 @@ export class ForestAudio {
       case 'boss': this.tone(48, .9, .15); this.tone(71, 1.2, .07, 'triangle'); break;
       case 'empty': this.tone(190, .4, .07, 'sine', undefined, undefined, 110); break;
     }
+  }
+  weaponSound(weapon:WeaponId,impact=false):void {
+    if(!this.context||this.context.state!=='running'||this.settings.muted)return;
+    const at=this.context.currentTime;
+    const params:Record<WeaponId,{hz:number;end:number;body:number;air:number;duration:number}>= {
+      sword:{hz:780,end:230,body:.070,air:3800,duration:.19},
+      dawnblade:{hz:1120,end:420,body:.075,air:5100,duration:.23},
+      spear:{hz:340,end:150,body:.085,air:2300,duration:.17},
+      axe:{hz:140,end:44,body:.150,air:1200,duration:.31},
+      staff:{hz:220,end:940,body:.095,air:1700,duration:.34},
+      runicstaff:{hz:370,end:1320,body:.090,air:2900,duration:.39},
+    };
+    const p=params[weapon];
+    this.noiseBurst(impact?.15:p.duration,impact?.32:.29,p.air,weapon==='sword'||weapon==='dawnblade'?'highpass':'bandpass');
+    this.tone(impact?p.hz*1.3:p.hz,p.duration,p.body,weapon==='axe'?'triangle':'sine',undefined,at,p.end);
+    if(weapon==='staff'||weapon==='runicstaff')this.tone(p.hz*1.5,p.duration,.055,'triangle',undefined,at+.04,p.end*1.5);
+    else this.tone(impact?135:210,.09,.055,'triangle',undefined,at,60);
   }
   footstep(ground: 'grass' | 'stone' | 'water' | 'ash', running: boolean): void {
     if (!running || this.stepLeft > 0 || !this.context || this.paused || this.settings.muted) return;

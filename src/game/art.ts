@@ -389,3 +389,92 @@ export function createDetailArtwork(scene:Phaser.Scene):void{
   t.getContext().drawImage(interior,(i%2)*cell,Math.floor(i/2)*cell,cell,cell,0,0,cell,cell);t.refresh();
  }
 }
+
+// Границы рисунков проверены по готовому атласу: длинное оружие занимает две более высокие строки.
+export function createCombatArtwork(scene:Phaser.Scene):void{
+ const atlas=scene.textures.get('combat-atlas').getSourceImage() as HTMLImageElement;
+ const rows=[0,376,746,947,1254].map(v=>v*atlas.height/1254),cell=atlas.width/4;
+ const keys=['sword','spear','axe','staff','dawnblade','runicstaff','shot-violet','shot-bone','shot-acid','shot-bat','shot-ice','shot-fire','fx-meteor','fx-hurricane','fx-slash','shot-shadow'];
+ for(const [i,key]of keys.entries()){
+  if(scene.textures.exists(key))scene.textures.remove(key);
+  const t=scene.textures.createCanvas(key,128,128);if(!t)throw Error('Combat texture unavailable');
+  const row=Math.floor(i/4),height=rows[row+1]-rows[row],c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  c.drawImage(atlas,(i%4)*cell,rows[row],cell,height,0,0,128,128);t.refresh();
+ }
+ const spirit=scene.textures.createCanvas('shot-spirit',128,128);if(!spirit)throw Error('Spirit texture unavailable');spirit.getContext().drawImage(scene.textures.get('shot-violet').getSourceImage() as CanvasImageSource,0,0);spirit.refresh();
+}
+
+// Equipment has independently measured rectangles; an equal-grid crop would cut the hilts.
+export function createEquipmentArtwork(scene:Phaser.Scene):void{
+ const atlas=scene.textures.get('equipment-atlas').getSourceImage() as HTMLImageElement;
+ const frames:[string,number,number,number,number][]=[
+  ['sword',170,0,154,432],['spear',515,0,90,432],['axe',741,0,286,433],['staff',1127,0,172,433],
+  ['dawnblade',150,433,192,383],['runicstaff',471,433,179,383],
+  ['arm-upper',802,445,170,366],['arm-bracer',1155,439,140,370],
+  ['hand-palm',149,817,174,265],['hand-grip',478,817,170,265],
+  ['hand-open',803,814,205,272],['hand-open-back',1132,815,209,271],
+ ];
+ for(const [key,x,y,width,height]of frames){
+  const equipment=!key.startsWith('arm-')&&!key.startsWith('hand-'),size=equipment?256:128;
+  const t=scene.textures.createCanvas(equipment?`held-${key}`:key,size,size);if(!t)throw Error('Equipment texture unavailable');
+  const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  if(equipment){const scale=240/height;c.drawImage(atlas,x,y,width,height,(256-width*scale)/2,8,width*scale,240);}
+  else c.drawImage(atlas,x,y,width,height,0,0,128,128);
+  t.refresh();
+ }
+}
+
+export function createArmedMotionArtwork(scene:Phaser.Scene):void{
+ const atlas=scene.textures.get('armed-motion-atlas').getSourceImage() as HTMLImageElement;
+ // x/y/width/height/spine-x, measured on the painted bodies. Tails cross grid guides.
+ const frames=[
+  [[34,9,185,272,151],[303,7,191,278,430],[580,8,184,278,704],[866,9,192,277,991],[1173,8,176,277,1286]],
+  [[75,288,189,268,137],[363,289,191,272,420],[635,290,192,270,692],[926,291,194,270,985],[1218,290,172,271,1277]],
+  [[43,564,225,260,123],[315,562,266,265,432],[610,562,246,262,702],[868,564,268,263,982],[1174,563,221,261,1268]],
+  [[32,826,209,261,161],[306,824,257,259,446],[587,824,219,264,716],[881,825,250,261,1014],[1164,823,207,266,1287]],
+ ];
+ for(const skin of SKINS)for(const [row,direction]of ['front','back','left','right'].entries())for(let phase=0;phase<5;phase++){
+  const key=`${skin.id}-armed-${direction}${phase?`-step-${phase-1}`:''}`;
+  const t=scene.textures.createCanvas(key,128,128);if(!t)throw Error('Armed body texture unavailable');const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  if(skin.id==='fox-moon')c.filter='grayscale(1) brightness(1.4)';else if(skin.id==='fox-ash')c.filter='grayscale(.85) brightness(.75)';else if(skin.id==='fox-ember')c.filter='saturate(1.5)';
+  const [x,y,width,height,spine]=frames[row][phase],scale=116/height;
+  c.drawImage(atlas,x,y,width,height,64+(x-spine)*scale,8,width*scale,116);c.filter='none';
+  if(!['fox','fox-moon','fox-ash','fox-ember'].includes(skin.id)){c.globalCompositeOperation='source-atop';c.globalAlpha=.27;c.fillStyle=skin.scarf;c.fillRect(0,0,128,128);c.globalAlpha=1;c.globalCompositeOperation='source-over';}
+  t.refresh();
+ }
+ for(const skin of SKINS){
+  const t=scene.textures.createCanvas(`${skin.id}-arm-upper`,128,128);if(!t)throw Error('Arm texture unavailable');const c=t.getContext();
+  if(skin.id==='fox-moon')c.filter='grayscale(1) brightness(1.4)';else if(skin.id==='fox-ash')c.filter='grayscale(.85) brightness(.75)';else if(skin.id==='fox-ember')c.filter='saturate(1.5)';
+  c.drawImage(scene.textures.get('arm-upper').getSourceImage() as CanvasImageSource,0,0);c.filter='none';
+  if(!['fox','fox-moon','fox-ash','fox-ember'].includes(skin.id)){c.globalCompositeOperation='source-atop';c.globalAlpha=.27;c.fillStyle=skin.scarf;c.fillRect(0,0,128,128);c.globalAlpha=1;c.globalCompositeOperation='source-over';}
+  t.refresh();
+ }
+}
+
+export function createStrideArtwork(scene:Phaser.Scene):void{createMotionArtwork(scene,'stride-atlas','step');}
+export function createRollArtwork(scene:Phaser.Scene):void{createMotionArtwork(scene,'roll-atlas','roll');}
+function createMotionArtwork(scene:Phaser.Scene,atlasKey:string,motion:string):void{
+ const atlas=scene.textures.get(atlasKey).getSourceImage() as HTMLImageElement,cell=atlas.width/4;
+ for(const skin of SKINS)for(const [row,direction]of ['front','back','left','right'].entries())for(let phase=0;phase<4;phase++){
+  const t=scene.textures.createCanvas(`${skin.id}-${direction}-${motion}-${phase}`,128,128);if(!t)throw Error('Motion texture unavailable');
+  const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  if(skin.id==='fox-moon')c.filter='grayscale(1) brightness(1.4)';else if(skin.id==='fox-ash')c.filter='grayscale(.85) brightness(.75)';else if(skin.id==='fox-ember')c.filter='saturate(1.5)';
+  c.drawImage(atlas,phase*cell,row*cell,cell,cell,0,0,128,128);c.filter='none';
+  if(!['fox','fox-moon','fox-ash','fox-ember'].includes(skin.id)){c.globalCompositeOperation='source-atop';c.globalAlpha=.27;c.fillStyle=skin.scarf;c.fillRect(0,0,128,128);c.globalAlpha=1;c.globalCompositeOperation='source-over';}
+  t.refresh();
+ }
+}
+
+export function createResidentArtwork(scene:Phaser.Scene):void{
+ const atlas=scene.textures.get('resident-atlas').getSourceImage() as HTMLImageElement,width=atlas.width/4,height=atlas.height/2;
+ const roles=['smith','armorer','healer','trader'],colors=['#b28255','#7e98b4','#78a681','#a98aaa'];
+ for(let species=0;species<8;species++)for(const [role,name]of roles.entries()){
+  const t=scene.textures.createCanvas(`resident-${species}-${name}`,128,128);if(!t)throw Error('Resident texture unavailable');const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  c.drawImage(atlas,(species%4)*width,Math.floor(species/4)*height,width,height,16,0,96,128);c.globalCompositeOperation='source-atop';c.globalAlpha=.16;c.fillStyle=colors[role];c.fillRect(15,47,98,49);c.globalAlpha=1;c.globalCompositeOperation='source-over';
+  if(name==='smith'){c.strokeStyle='#514338';c.lineWidth=3;c.beginPath();c.moveTo(96,82);c.lineTo(105,64);c.stroke();c.fillStyle='#8f9899';c.fillRect(98,59,15,7);}
+  else if(name==='armorer'){c.fillStyle='#63798a';c.beginPath();c.moveTo(92,64);c.lineTo(111,66);c.lineTo(111,80);c.lineTo(102,88);c.lineTo(92,80);c.closePath();c.fill();c.strokeStyle='#c5b98e';c.lineWidth=2;c.stroke();}
+  else if(name==='healer'){c.fillStyle='#568665';c.fillRect(99,66,6,5);ellipse(c,102,79,8,10,'#7aac83');ellipse(c,101,77,3,5,'#b9d6a4');}
+  else{ellipse(c,101,84,10,12,'#8b684b');c.strokeStyle='#c2ab71';c.lineWidth=2;c.strokeRect(94,80,13,8);}
+  t.refresh();
+ }
+}

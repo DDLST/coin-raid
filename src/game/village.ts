@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { houseName } from './residents';
 import type { Point, Bounds, Terrain } from './world';
 import { PEOPLE, type Role } from './story';
 import { villagePosition } from './regions';
@@ -10,7 +11,7 @@ export function interiorObstacles(h:Point):Terrain[]{return[{kind:'ruin',x:h.x-7
 export function interiorArt(scene:Phaser.Scene,h:House):Phaser.GameObjects.Container{
  const group=scene.add.container(h.x,h.y).setDepth(13);
  group.add(scene.add.image(0,0,`interior-${h.role}`).setDisplaySize(350,350));
- const title=scene.add.text(0,-183,HOUSE_NAMES[h.role],{fontFamily:'system-ui',fontSize:'17px',fontStyle:'bold',color:'#f5dfb2',backgroundColor:'#172b25',padding:{x:10,y:6}}).setOrigin(.5);group.add(title);
+ const title=scene.add.text(0,-183,houseName(h.village,h.role),{fontFamily:'system-ui',fontSize:'17px',fontStyle:'bold',color:'#f5dfb2',backgroundColor:'#172b25',padding:{x:10,y:6}}).setOrigin(.5);group.add(title);
  if(h.role==='smith'){
   const glow=scene.add.ellipse(-94,-95,65,52,0xff9c43,.13);group.add(glow);
   scene.tweens.add({targets:glow,alpha:.28,yoyo:true,repeat:-1,duration:460});

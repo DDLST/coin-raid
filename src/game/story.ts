@@ -40,6 +40,6 @@ export type DeliveryId='medicine'|'blueprint';
 export type Delivery={id:DeliveryId;accepted:boolean;delivered:boolean;claimed:boolean};
 export const newDeliveries=():Delivery[]=>[{id:'medicine',accepted:false,delivered:false,claimed:false},{id:'blueprint',accepted:false,delivered:false,claimed:false}];
 export const DELIVERIES=[
- {id:'medicine' as DeliveryId,name:'Свет для больных',giver:'healer' as Role,from:1,to:0,receiver:'armorer' as Role,seals:2,parcel:'Сумка настоек Ивы',reward:35,description:'Ива приготовила настойки для раненых Серебряного дыма. Доставь сумку Маре в деревню после первого биома; вернись к Иве за наградой.',response:'Спасибо. Эти настойки помогут моим людям пережить ночь.'},
+ {id:'medicine' as DeliveryId,name:'Свет для больных',giver:'healer' as Role,from:1,to:0,receiver:'armorer' as Role,seals:2,parcel:'Сумка лечебных настоек',reward:35,description:'Ива приготовила настойки для раненых Серебряного дыма. Доставь сумку Маре в деревню после первого биома; вернись к Иве за наградой.',response:'Спасибо. Эти настойки помогут моим людям пережить ночь.'},
  {id:'blueprint' as DeliveryId,name:'Мост над тишиной',giver:'smith' as Role,from:4,to:2,receiver:'trader' as Role,seals:5,parcel:'Чертёж мостовых скоб',reward:65,description:'Брун нашёл способ восстановить старый мост. Передай чертёж Лисандру на Лунной переправе, затем вернись к Бруну в Посёлок забытых имён.',response:'Теперь караван сможет пройти. Верну мастеру его искру надежды.'},
 ] as const;
