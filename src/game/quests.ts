@@ -33,7 +33,7 @@ export function rollLoot(p: Profile, region: number, random = Math.random): Loot
   if (n < .60) return { kind: 'souls', name: `${18 + region * 7} осколков души`, icon: '◈', value: 18 + region * 7, color: '#a7eef2' };
   if (n < .80) return { kind: 'heal', name: 'Полное лечение и заряд фляги', icon: '✚', value: 1, color: '#b3d99c' };
   const candidates = n < .92 ? [...SKINS.filter(s => !p.owned.includes(s.id)).map(s => ({ id: s.id, name: s.name, icon: '♧' })), ...UPGRADES.filter(u => p.upgrades[u.id] < u.prices.length).map(u => ({ id: u.id, name: u.name, icon: u.icon }))]
-    : [...WEAPONS.filter(w => !p.weapons.includes(w.id)).map(w => ({ id: w.id, name: w.name, icon: w.icon })), ...ARMORS.filter(a => !p.armors.includes(a.id)).map(a => ({ id: a.id, name: a.name, icon: a.icon }))];
+    : [...WEAPONS.filter(w => !w.quest && !p.weapons.includes(w.id)).map(w => ({ id: w.id, name: w.name, icon: w.icon })), ...ARMORS.filter(a => !p.armors.includes(a.id)).map(a => ({ id: a.id, name: a.name, icon: a.icon }))];
   if (!candidates.length) return { kind: 'souls', name: '40 осколков души', icon: '◈', value: 40, color: '#e4c88c' };
   const item = candidates[Math.min(candidates.length - 1, Math.floor(random() * candidates.length))];
   return { kind: 'item', name: item.name, item: item.id, icon: item.icon, value: 0, color: n < .92 ? '#bac8f4' : '#e8c18f' };
