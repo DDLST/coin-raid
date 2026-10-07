@@ -21,32 +21,6 @@ function ellipse(c: CanvasRenderingContext2D, x: number, y: number, rx: number, 
 }
 
 export function createArtwork(scene: Phaser.Scene): void {
-  for (const skin of SKINS) texture(scene, skin.id, c => {
-    // Хвост, лапы, шерсть, уши и бирюзовый шарф.
-    c.fillStyle = '#c66d3b'; c.beginPath(); c.moveTo(26, 42); c.quadraticCurveTo(1, 48, 9, 18);
-    c.quadraticCurveTo(22, 21, 29, 38); c.fill();
-    c.fillStyle = '#fff0ca'; c.beginPath(); c.moveTo(9, 18); c.quadraticCurveTo(11, 29, 18, 30);
-    c.quadraticCurveTo(17, 23, 9, 18); c.fill();
-    ellipse(c, 23, 53, 6, 6, '#613c32'); ellipse(c, 43, 53, 6, 6, '#613c32');
-    const body = c.createLinearGradient(20, 28, 43, 52); body.addColorStop(0, skin.fur); body.addColorStop(1, skin.id === 'fox-moon' ? '#aaaeb4' : '#9a603c');
-    ellipse(c, 33, 42, 17, 17, body);
-    c.fillStyle = skin.fur; c.beginPath(); c.moveTo(14, 30); c.lineTo(15, 5); c.lineTo(29, 18);
-    c.quadraticCurveTo(34, 13, 41, 18); c.lineTo(54, 5); c.lineTo(54, 30); c.closePath(); c.fill();
-    c.fillStyle = '#744637'; c.beginPath(); c.moveTo(18, 12); c.lineTo(19, 27); c.lineTo(27, 20); c.fill();
-    c.beginPath(); c.moveTo(50, 12); c.lineTo(48, 27); c.lineTo(42, 20); c.fill();
-    ellipse(c, 34, 29, 22, 19, skin.fur);
-    c.fillStyle = '#ffedc5'; c.beginPath(); c.moveTo(12, 29); c.quadraticCurveTo(21, 28, 34, 39);
-    c.quadraticCurveTo(46, 28, 56, 29); c.quadraticCurveTo(52, 49, 34, 48); c.quadraticCurveTo(16, 46, 12, 29); c.fill();
-    ellipse(c, 25, 28, 2.7, 4, '#263e36'); ellipse(c, 44, 28, 2.7, 4, '#263e36');
-    ellipse(c, 24.3, 26.7, .8, 1, '#fff7dd'); ellipse(c, 43.3, 26.7, .8, 1, '#fff7dd');
-    ellipse(c, 34, 37, 3.6, 2.7, '#293d35');
-    c.strokeStyle = '#95603d'; c.lineWidth = 1; c.beginPath(); c.moveTo(34, 39); c.lineTo(34, 42); c.stroke();
-    c.strokeStyle = skin.scarf; c.lineWidth = 6; c.beginPath(); c.moveTo(18, 46); c.quadraticCurveTo(33, 53, 49, 46); c.stroke();
-    c.fillStyle = skin.scarf; c.beginPath(); c.moveTo(40, 49); c.lineTo(55, 54); c.lineTo(52, 60); c.lineTo(39, 54); c.fill();
-    ellipse(c, 16, 36, 3, 1.5, '#e69972'); ellipse(c, 51, 36, 3, 1.5, '#e69972');
-    if (skin.id === 'fox-royal') { c.fillStyle='#f4d578';c.beginPath();c.moveTo(23,15);c.lineTo(20,6);c.lineTo(29,10);c.lineTo(34,3);c.lineTo(40,10);c.lineTo(49,6);c.lineTo(46,15);c.fill(); }
-    if (skin.id === 'fox-star') for (const [x,y] of [[21,20],[47,19],[28,47]]) { c.fillStyle='#f5e1a4';c.fillRect(x,y,2,2); }
-  });
   const wolves = [['wolf-grey', '#6c7880', '#a9b4b7'], ['wolf-snow', '#afbabc', '#e6e6da'], ['wolf-brown', '#74645b', '#b09a7c']];
   for (const [key, dark, light] of wolves) texture(scene, key, c => {
     // Крупные уши, четыре лапы, длинная морда и пушистый хвост.
@@ -170,26 +144,40 @@ export function background(scene: Phaser.Scene, width: number, height: number, l
   const gradient = c.createLinearGradient(0, 0, width, height);
   gradient.addColorStop(0, palette.light); gradient.addColorStop(1, palette.ground);
   c.fillStyle = gradient; c.fillRect(0, 0, width, height);
-  // Мягкая тропа и пятна травы создают поляну, а не пустую сетку.
-  c.save(); c.globalAlpha = .18; c.strokeStyle = '#f7dfa7'; c.lineWidth = Math.min(width, height) * .19;
-  c.lineCap = 'round'; c.beginPath(); c.moveTo(width * .08, height * .82);
-  c.bezierCurveTo(width * .63, height * .55, width * .2, height * .3, width * .85, height * .09); c.stroke(); c.restore();
-  for (let i = 0; i < width * height / 1700; i++) {
-    const x = random() * width, y = random() * height;
-    c.globalAlpha = .07 + random() * .10;
-    ellipse(c, x, y, 5 + random() * 28, 3 + random() * 10, random() > .5 ? palette.grass : '#f0efb0');
-  }
-  c.globalAlpha = 1;
-  for (let i = 0; i < width * height / 3400; i++) {
-    const x = 22 + random() * (width - 44), y = 48 + random() * (height - 70);
-    c.strokeStyle = palette.grass; c.globalAlpha = .55; c.lineWidth = 1;
-    c.beginPath(); c.moveTo(x, y); c.lineTo(x - 3, y - 5); c.moveTo(x, y); c.lineTo(x + 3, y - 6); c.stroke();
-    if (i % 6 === 0) {
-      c.globalAlpha = .8; ellipse(c, x, y - 7, 2.2, 2.2, palette.accent);
-      ellipse(c, x + 2.5, y - 5.5, 1.8, 1.8, '#ffe6ab');
+  // Чёткий грунт: мелкие камни, листья, трещины и отдельные травинки.
+  const rocky=[2,5,6,7].includes(level),ash=level===4;
+  if(rocky){
+    const tile=level===6?56:74;
+    for(let row=0;row<height/tile;row++)for(let col=-1;col<width/tile;col++){
+      const x=col*tile+(row%2)*tile/2,y=row*tile;
+      c.fillStyle=palette.grass;c.globalAlpha=.11+random()*.09;c.fillRect(x+2,y+2,tile-4,tile-4);
+      c.globalAlpha=.35;c.strokeStyle=palette.tree;c.lineWidth=1;c.strokeRect(x+1,y+1,tile-2,tile-2);
+      c.strokeStyle=palette.accent;c.globalAlpha=.18;c.beginPath();c.moveTo(x+4,y+3);c.lineTo(x+tile-5,y+3);c.stroke();
+      if(random()<.3){c.globalAlpha=.38;c.strokeStyle=palette.tree;c.beginPath();c.moveTo(x+tile*.2,y+10);c.lineTo(x+tile*.45,y+tile*.55);c.lineTo(x+tile*.7,y+tile*.7);c.stroke();}
     }
   }
+  for(let n=0;n<width*height/280;n++){
+    const x=random()*width,y=random()*height,v=random();c.globalAlpha=.22+random()*.3;
+    if(v<.45){c.fillStyle=v<.2?palette.tree:palette.accent;c.fillRect(x,y,1+random()*3,1+random()*2);}
+    else if(v<.67){c.fillStyle=ash?'#26272f':palette.tree;c.beginPath();c.moveTo(x,y);c.lineTo(x+3,y-3);c.lineTo(x+8,y-1);c.lineTo(x+6,y+3);c.closePath();c.fill();c.globalAlpha=.25;c.strokeStyle=palette.accent;c.lineWidth=1;c.beginPath();c.moveTo(x+2,y-2);c.lineTo(x+6,y-1);c.stroke();}
+    else if(!rocky&&!ash){
+      c.strokeStyle=palette.grass;c.lineWidth=1;for(let blade=0;blade<3;blade++){c.beginPath();c.moveTo(x+blade*2,y);c.lineTo(x+blade*3-3,y-4-random()*5);c.stroke();}
+      if(n%13===0){c.globalAlpha=.8;ellipse(c,x,y-5,2,1,level===3?'#ba8ca8':'#dccf89');}
+    }else{c.strokeStyle=palette.tree;c.lineWidth=1;c.beginPath();c.moveTo(x,y);c.lineTo(x+6,y+4);c.lineTo(x+10,y+2);c.stroke();}
+  }
   c.globalAlpha = 1;
+  if(level>=30){
+    // Брусчатка вдоль дорог, с травой между швами.
+    for(let row=0;row<height/19;row++)for(let col=-1;col<width/31;col++){
+      const x=col*31+(row%2)*15,y=row*19;
+      const onRoad=Math.abs(y+9-550)<47||y>405&&y<947&&(Math.abs(x+15-(width/2-205))<21||Math.abs(x+15-(width/2+205))<21);
+      if(!onRoad)continue;
+      c.globalAlpha=.44;c.fillStyle=random()<.5?'#8c9180':'#afa88b';
+      c.beginPath();c.moveTo(x+2,y+3);c.lineTo(x+26,y+1);c.lineTo(x+29,y+12);c.lineTo(x+22,y+17);c.lineTo(x+4,y+16);c.closePath();c.fill();
+      c.globalAlpha=.5;c.strokeStyle='#4d6550';c.lineWidth=1;c.stroke();c.globalAlpha=.30;c.strokeStyle='#e3d5ae';c.beginPath();c.moveTo(x+4,y+3);c.lineTo(x+24-random()*8,y+2);c.stroke();
+    }
+    c.globalAlpha=1;
+  }
   // Детали биомов не имеют коллизий: это грунт, растения и следы прошлого.
   if (level === 2) {
     c.strokeStyle = '#e4d5a53b'; c.lineWidth = 2;
@@ -371,4 +359,33 @@ export function biomeGround(scene:Phaser.Scene,start:number,index:number,width:n
  const landmark=scene.add.image(start+width*.65,height*.25,`landmark-${index}`).setOrigin(.5,.85).setDisplaySize(250,334).setDepth(7);
  if(index===0||index===2||index===7){const lamp=scene.add.ellipse(start+width*.65,height*.18,170,60,parseInt(palette.accent.slice(1),16),.07).setDepth(3);scene.tweens.add({targets:lamp,alpha:.02,duration:1700,yoyo:true,repeat:-1});}
  landmark.setAlpha(.97);
+}
+
+// Направление и поза героя - настоящие отдельные кадры, экипировка рисуется поверх.
+export function createHeroArtwork(scene:Phaser.Scene):void{
+ const atlas=scene.textures.get('hero-atlas').getSourceImage() as CanvasImageSource;
+ const directions=['front','back','left','right'];
+ for(const skin of SKINS)for(let pose=0;pose<2;pose++)for(let dir=0;dir<4;dir++){
+  const key=pose===0&&dir===0?skin.id:`${skin.id}-${directions[dir]}${pose?'-run':''}`;
+  const t=scene.textures.createCanvas(key,128,128);if(!t)throw Error('Hero texture unavailable');
+  const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  if(skin.id==='fox-moon')c.filter='grayscale(1) brightness(1.4)';
+  else if(skin.id==='fox-ash')c.filter='grayscale(.85) brightness(.75)';
+  else if(skin.id==='fox-ember')c.filter='saturate(1.5)';
+  c.drawImage(atlas,dir*384,pose*512,384,512,16,0,96,128);c.filter='none';
+  if(!['fox','fox-moon','fox-ash','fox-ember'].includes(skin.id)){c.globalCompositeOperation='source-atop';c.globalAlpha=.27;c.fillStyle=skin.scarf;c.fillRect(0,0,128,128);c.globalAlpha=1;c.globalCompositeOperation='source-over';}
+  t.refresh();
+ }
+}
+export function createDetailArtwork(scene:Phaser.Scene):void{
+ const atlas=scene.textures.get('details-atlas').getSourceImage() as CanvasImageSource;
+ for(const [i,key]of ['archer','alchemist','shade','gargoyle','village-well','village-wagon','village-shrine','village-board'].entries()){
+  const t=scene.textures.createCanvas(key,128,128);if(!t)throw Error('Detail texture unavailable');
+  t.getContext().drawImage(atlas,(i%4)*384,Math.floor(i/4)*512,384,512,16,0,96,128);t.refresh();
+ }
+ const interior=scene.textures.get('interiors-atlas').getSourceImage() as HTMLImageElement,cell=interior.width/2;
+ for(const [i,role]of ['smith','armorer','healer','trader'].entries()){
+  const t=scene.textures.createCanvas(`interior-${role}`,cell,cell);if(!t)throw Error('Interior texture unavailable');
+  t.getContext().drawImage(interior,(i%2)*cell,Math.floor(i/2)*cell,cell,cell,0,0,cell,cell);t.refresh();
+ }
 }

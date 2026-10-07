@@ -27,14 +27,16 @@ export const ARMORS = [
   { id: 'robe', name: 'Роба рассвета', icon: '✦', price: 240, reduction: .18, speed: 1, regen: 1.20, stamina: 25, ward: .32, color: 0xbeb3ed, description: '-18% урона · защита от магии · +25 выносливости' },
 ] as const;
 export type ArmorId = typeof ARMORS[number]['id'];
+export const ATTRIBUTE_GAIN=10, ATTRIBUTE_FIRST_PRICE=100, ATTRIBUTE_PRICE_STEP=50;
+export type AttributeId='vitality'|'focus';
 export const UPGRADES = [
+  { id: 'vitality', name: 'Запас здоровья', icon: '♥', prices: [100], description: '+10 HP. Цена +50 за покупку. Доступно всегда.' },
+  { id: 'focus', name: 'Запас выносливости', icon: '✧', prices: [100], description: '+10 выносливости, +3% восстановления. Цена +50. Всегда доступно.' },
   { id: 'speed', name: 'Быстрые лапы', icon: '➚', prices: [45, 90, 160], description: '+6% скорости за ступень' },
   { id: 'dash', name: 'Лёгкий рывок', icon: 'ϟ', prices: [40, 85, 150], description: 'Уклонение восстанавливается на 0,1 с быстрее' },
   { id: 'boots', name: 'Сухие лапы', icon: '♧', prices: [50, 110], description: 'Меньше замедление в воде' },
   { id: 'power', name: 'Сила оружия', icon: '⚔', prices: [55, 115, 190], description: '+12% урона за ступень' },
-  { id: 'vitality', name: 'Живучесть', icon: '♥', prices: [50, 110, 185], description: '+15 максимального здоровья' },
   { id: 'armor', name: 'Укрепление брони', icon: '◇', prices: [65, 135, 220], description: 'Ещё -6% получаемого урона' },
-  { id: 'focus', name: 'Выносливость', icon: '✧', prices: [50, 110, 185], description: '+15 запаса · +10% восстановления' },
   { id: 'flask', name: 'Дорожная фляга', icon: '♜', prices: [55, 115, 190], description: '+1 заряд лечения у костра' },
   { id: 'magnet', name: 'Зов осколков', icon: '◈', prices: [45, 95], description: '+20 к радиусу сбора силы' },
   { id: 'ward', name: 'Печать от чар', icon: '☽', prices: [65, 130], description: 'Ещё -12% урона магии и яда' },
@@ -42,12 +44,15 @@ export const UPGRADES = [
   { id: 'recovery', name: 'Живое эхо', icon: '✚', prices: [75, 150], description: 'Победа над врагом лечит на 2 HP за ступень' },
 ] as const;
 export type UpgradeId = typeof UPGRADES[number]['id'];
-export type Profile = { skills:SkillId[];unlockedSkills:SkillId[];disabledSkills:SkillId[];skillPoints:number;achievements:AchievementId[];counterWins:number; coins: number; owned: string[]; skin: string; blade: boolean; upgrades: Record<UpgradeId, number>; weapons: WeaponId[]; weapon: WeaponId; relics: string[]; armors: ArmorId[]; armor: ArmorId };
-export const newProfile = (): Profile => ({ skills:[],unlockedSkills:[],disabledSkills:[],skillPoints:0,achievements:[],counterWins:0, coins: 0, owned: ['fox'], skin: 'fox', blade: false,
+export type Profile = { healthLevel:number;enduranceLevel:number;potions:number;trackedQuest:string;skills:SkillId[];unlockedSkills:SkillId[];disabledSkills:SkillId[];skillPoints:number;achievements:AchievementId[];counterWins:number; coins: number; owned: string[]; skin: string; blade: boolean; upgrades: Record<UpgradeId, number>; weapons: WeaponId[]; weapon: WeaponId; relics: string[]; armors: ArmorId[]; armor: ArmorId };
+export const newProfile = (): Profile => ({ healthLevel:0,enduranceLevel:0,potions:0,trackedQuest:'',skills:[],unlockedSkills:[],disabledSkills:[],skillPoints:0,achievements:[],counterWins:0, coins: 0, owned: ['fox'], skin: 'fox', blade: false,
   weapons: ['sword'], weapon: 'sword', relics: [], armors: ['travel'], armor: 'travel',
   upgrades: { speed: 0, dash: 0, boots: 0, power: 0, vitality: 0, armor: 0, focus: 0, flask: 0, magnet: 0, ward: 0, spirit: 0, recovery: 0 } });
 export const weaponFor = (p: Profile) => WEAPONS.find(w => w.id === p.weapon) ?? WEAPONS[0];
 export const armorFor = (p: Profile) => ARMORS.find(a => a.id === p.armor) ?? ARMORS[0];
+export const isAttribute=(id:string):id is AttributeId=>id==='vitality'||id==='focus';
+export const attributeLevel=(p:Profile,id:AttributeId):number=>id==='vitality'?p.healthLevel:p.enduranceLevel;
+export const attributePrice=(p:Profile,id:AttributeId):number=>ATTRIBUTE_FIRST_PRICE+ATTRIBUTE_PRICE_STEP*attributeLevel(p,id);
 export function parseProfile(raw: string | null): Profile {
   const p = newProfile();
   try {
@@ -55,6 +60,8 @@ export function parseProfile(raw: string | null): Profile {
     if (!data || typeof data !== 'object') return p;
     if (typeof data.coins === 'number' && Number.isFinite(data.coins)) p.coins = Math.max(0, Math.min(1e7, Math.floor(data.coins)));
     p.blade = data.blade === true;
+    for(const key of ['healthLevel','enduranceLevel','potions'] as const){const n=data[key];if(typeof n==='number'&&Number.isFinite(n))p[key]=Math.max(0,Math.min(key==='potions'?99:10000,Math.floor(n)));}
+    if(typeof data.trackedQuest==='string'&&/^(line:(bell|runes|wisp)|delivery:(medicine|blueprint)|trial:(sprint|triple|focus))$/.test(data.trackedQuest))p.trackedQuest=data.trackedQuest;
     if(Array.isArray(data.skills))p.skills=[...new Set(data.skills.filter(v=>SKILL_TREE.some(s=>s.id===v)))];
     p.unlockedSkills=[...new Set([...p.skills,...(Array.isArray(data.unlockedSkills)?data.unlockedSkills.filter(v=>SKILL_TREE.some(s=>s.id===v)):[])])];
     if(Array.isArray(data.disabledSkills))p.disabledSkills=[...new Set(data.disabledSkills.filter(v=>p.skills.includes(v)))];
@@ -69,13 +76,14 @@ export function parseProfile(raw: string | null): Profile {
     if (Array.isArray(data.armors)) p.armors = [...new Set<ArmorId>(['travel', ...data.armors.filter(v => ARMORS.some(a => a.id === v))])];
     if (data.armor && p.armors.includes(data.armor)) p.armor = data.armor;
     if (data.upgrades && typeof data.upgrades === 'object') for (const u of UPGRADES) {
-      const n = data.upgrades[u.id]; if (typeof n === 'number' && Number.isFinite(n)) p.upgrades[u.id] = Math.max(0, Math.min(u.prices.length, Math.floor(n)));
+      const n = data.upgrades[u.id]; if (typeof n === 'number' && Number.isFinite(n)) p.upgrades[u.id] = Math.max(0, Math.min(isAttribute(u.id)?3:u.prices.length, Math.floor(n)));
     }
   } catch { /* Невалидное сохранение не мешает новой игре. */ }
   return p;
 }
-export const itemUnlock=(id:string,rank=0):number=>id==='spear'?1:id==='axe'?2:id==='staff'?3:id==='ranger'?1:id==='iron'?3:id==='robe'?4:UPGRADES.some(u=>u.id===id)?(rank===0?(['power','armor','ward','spirit','recovery'].includes(id)?1:0):rank===1?3:5):0;
+export const itemUnlock=(id:string,rank=0):number=>isAttribute(id)?0:id==='spear'?1:id==='axe'?2:id==='staff'?3:id==='ranger'?1:id==='iron'?3:id==='robe'?4:UPGRADES.some(u=>u.id===id)?(rank===0?(['power','armor','ward','spirit','recovery'].includes(id)?1:0):rank===1?3:5):0;
 export function purchase(p: Profile, id: string,seals=0): string {
+  if(isAttribute(id)){const price=attributePrice(p,id);if(p.coins<price)return 'Не хватает осколков души.';p.coins-=price;if(id==='vitality')p.healthLevel++;else p.enduranceLevel++;return `+${ATTRIBUTE_GAIN} ${id==='vitality'?'HP':'выносливости'}. Следующее усиление: ${attributePrice(p,id)} ◈.`;}
   const owned=p.owned.includes(id)||p.weapons.some(v=>v===id)||p.armors.some(v=>v===id);
   const unlockRank=p.upgrades[id as UpgradeId]??0,unlock=itemUnlock(id,unlockRank);if(!owned&&seals<unlock)return `Откроется после ${unlock} печатей.`;
   const skin = SKINS.find(s => s.id === id);

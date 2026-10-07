@@ -1,17 +1,18 @@
-import { armorFor, weaponFor, type Profile } from './progression';
+import { armorFor, weaponFor, ATTRIBUTE_GAIN, type Profile } from './progression';
 import type { Point } from './world';
 import type { SkillId } from './skills';
 export const DODGE_TIME = .27;
 export const DODGE_COST = 25;
 export const HURT_PROTECTION = .62;
 export const FLASK_HEAL = 38;
+export const POTION_HEAL = 55;
 export const ULTIMATE_MAX = 100;
 export function stats(p: Profile) {
   const u = p.upgrades, a = armorFor(p), w = weaponFor(p);
-  return { maxHP: 100 + u.vitality * 15, maxStamina: 100 + u.focus * 15 + a.stamina,
+  return { maxHP: 100 + u.vitality * 15 + p.healthLevel * ATTRIBUTE_GAIN, maxStamina: 100 + u.focus * 15 + p.enduranceLevel * ATTRIBUTE_GAIN + a.stamina,
     speed: 250 * (1 + u.speed * .06) * a.speed, damage: 26 * (1 + u.power * .12) * w.damage,
     armor: Math.max(.45, (1 - a.reduction) * (1 - u.armor * .06)), ward: Math.max(.35, (1 - a.ward) * (1 - u.ward * .12) * (p.relics.includes('emberseal')?.82:1)),
-    staminaRegen: 29 * (1 + u.focus * .10) * a.regen, dodgeCooldown: .95 - u.dash * .1, flasks: 2 + u.flask };
+    staminaRegen: 29 * (1 + u.focus * .10 + p.enduranceLevel * .03) * a.regen, dodgeCooldown: .95 - u.dash * .1, flasks: 2 + u.flask };
 }
 export function slashConnects(from: Point, angle: number, target: Point, radius: number, reach: number, arc: number): boolean {
   const x = target.x - from.x, y = target.y - from.y;

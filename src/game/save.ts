@@ -3,6 +3,7 @@ import { ENEMY_KINDS, REGIONS, WORLD_HEIGHT, WORLD_WIDTH, PROLOGUE_WIDTH, ROAD_W
 import { newQuests, type Quest } from './quests';
 import { DEFAULT_AUDIO, type AudioSettings } from './audio';
 import type { Point } from './world';
+import { stats } from './combat';
 import { newLines, newDeliveries, PEOPLE, type Area, type Role, type QuestLine, type Delivery } from './story';
 export type RegionProgress={coins:number;elapsed:number;spawned:boolean;bossDead:boolean;cleared:boolean;income:number;rewarded:boolean};
 export type SavedEnemy=Point&{kind:EnemyKind;region:number;hp:number;phase2:boolean;variant:number;training:boolean};
@@ -46,6 +47,7 @@ export function parseSave(raw:string|null):Snapshot|null{
   const profile=parseProfile(JSON.stringify(d.profile));if(legacy)profile.skillPoints=progress.filter(p=>p.bossDead).length;
   const player=restartLast?{x:villagePosition(3).x+15,y:645}:area==='tutorial'?point(d.player):positioned(d.player,area==='village'?villageIndex:region,area==='village');
   if(finished)player.x=Math.min(WORLD_WIDTH-80,PROLOGUE_WIDTH+(REGIONS.length-1)*(1280+ROAD_WIDTH)+200);
-  return{version:7,manual:true,savedAt:typeof d.savedAt==='string'?d.savedAt:'',profile,region,progress,player,checkpoint:{x:villagePosition(lastVillage).x+15,y:645},hp:number(d.hp,5000,100),stamina:number(d.stamina,5000,100),flasks:Math.floor(number(d.flasks,20,2)),armed:restartLast||d.armed===true,ultimate:number(d.ultimate,100),elapsed:number(d.elapsed),score:Math.floor(number(d.score)),kills:Math.floor(number(d.kills)),deaths:Math.floor(number(d.deaths)),enemies,coins,quests,chests,audio,area,villageIndex,lastVillage,lesson:Math.floor(number(d.lesson,10)),lessonProgress:Math.floor(number(d.lessonProgress,10)),lines,wisp:d.wisp?positioned(d.wisp,3):null,villages,deliveries,interiorRole:PEOPLE.some(p=>p.role===d.interiorRole)?d.interiorRole as Role:null,interiorReturn:d.interiorReturn==='tutorial'?'tutorial':'village',migrated:legacy};
+  const limits=stats(profile);
+  return{version:7,manual:true,savedAt:typeof d.savedAt==='string'?d.savedAt:'',profile,region,progress,player,checkpoint:{x:villagePosition(lastVillage).x+15,y:645},hp:number(d.hp,limits.maxHP,limits.maxHP),stamina:number(d.stamina,limits.maxStamina,limits.maxStamina),flasks:Math.floor(number(d.flasks,limits.flasks,2)),armed:restartLast||d.armed===true,ultimate:number(d.ultimate,100),elapsed:number(d.elapsed),score:Math.floor(number(d.score)),kills:Math.floor(number(d.kills)),deaths:Math.floor(number(d.deaths)),enemies,coins,quests,chests,audio,area,villageIndex,lastVillage,lesson:Math.floor(number(d.lesson,10)),lessonProgress:Math.floor(number(d.lessonProgress,10)),lines,wisp:d.wisp?positioned(d.wisp,3):null,villages,deliveries,interiorRole:PEOPLE.some(p=>p.role===d.interiorRole)?d.interiorRole as Role:null,interiorReturn:d.interiorReturn==='tutorial'?'tutorial':'village',migrated:legacy};
  }catch{return null;}
 }
