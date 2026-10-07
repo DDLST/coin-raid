@@ -2,70 +2,35 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#122a29" />
-  <meta name="description" content="RAID COIN: лесная погоня. Собирай золото, уходи от волков, обходи препятствия и переживи грозу. Можно играть на компьютере и телефоне." />
-  <title>RAID COIN · Лесная погоня</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#102722" />
+  <meta name="description" content="RAID COIN: Лесная клятва. Связный мир, клинок, волки, боссы и торговые стоянки. Игра для компьютера и телефона." />
+  <title>RAID COIN · Лесная клятва</title>
 </head>
 <body>
-<main id="app" class="shell">
-  <header class="topbar">
-    <div class="brand"><span class="brand-coin" aria-hidden="true">✦</span><div><h1>RAID COIN</h1><p>ЛЕСНАЯ ПОГОНЯ</p></div></div>
-    <div class="topbar-right"><span class="edition">5 полян · один маленький герой</span><button id="shop-button" class="wallet-button" aria-label="Открыть магазин">✦ <span id="wallet-count">0</span><span class="shop-word"> · магазин</span></button><button id="help-button" class="icon-button" aria-label="Правила игры">?</button><button id="pause-button" class="icon-button" aria-label="Пауза">Ⅱ</button></div>
+<main id="app">
+  <div id="game" aria-label="Игровой мир"></div>
+  <header class="game-hud">
+    <div class="hero-hud panel">
+      <div class="brand-row"><span class="brand-mark">✦</span><div><strong>RAID COIN</strong><small>ЛЕСНАЯ КЛЯТВА</small></div><span id="weapon-label">Без клинка</span></div>
+      <div class="bar-label"><span>ЗДОРОВЬЕ</span><strong id="hp-text">100 / 100</strong></div><div class="bar hp"><div id="hp-fill"></div></div>
+      <div class="bar-label stamina-label"><span>ВЫНОСЛИВОСТЬ</span><strong id="stamina-text">100</strong></div><div class="bar stamina"><div id="stamina-fill"></div></div>
+    </div>
+    <div class="quest-hud panel"><span id="region-number" class="eyebrow">ОБЛАСТЬ 1 / 5</span><strong id="region-name">Роща первых огней</strong><p id="quest-text">Собери 14 монет, чтобы получить клинок</p><div class="quest-bottom"><span id="coin-goal">Золото: 0 / 14</span><span id="boss-timer">Вожак через 00:45</span></div></div>
+    <div class="utility-hud"><div class="resources panel"><strong>✦ <span id="wallet-count">0</span></strong><span id="flask-count">♜ 2</span><span id="weather-label">☀ Ясно</span></div><nav class="tools"><button id="map-button" title="Карта (M)" aria-label="Открыть карту"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/></svg></button><button id="help-button" title="Справка (H)" aria-label="Показать или скрыть справку">?</button><button id="fullscreen-button" title="Во весь экран" aria-label="Полноэкранный режим"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button><button id="pause-button" title="Пауза (P)" aria-label="Пауза"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke-width="4"/></svg></button></nav></div>
   </header>
-  <section class="hud" aria-label="Прогресс игры">
-    <div class="level-info"><span class="eyebrow" id="level-label">ПОЛЯНА 1 / 5</span><strong id="level-name">Тихая роща</strong></div>
-    <div class="coin-info"><div class="coin-caption"><span>МОНЕТЫ</span><strong id="coin-count">0 / 8</strong></div><div class="progress-track"><div id="coin-progress"></div></div></div>
-    <div class="score-info"><span class="eyebrow">ОЧКИ</span><strong id="score-count">0</strong><span id="best-label">Рекорд: 0</span></div>
-    <div class="life-info"><span class="eyebrow">ЖИЗНИ</span><strong id="hearts" aria-label="3 жизни">♥ ♥ ♥</strong></div>
-  </section>
-  <section class="arena" id="arena" aria-label="Игровое поле">
-    <div id="game"></div>
-    <div class="arena-status"><span id="enemy-label">1 волк</span><span id="combo-label">Собирай монеты подряд</span></div>
-    <div class="field-bottom"><span id="weather-label">☀ Ясно</span><span id="terrain-label">Деревья и пни нужно обходить</span></div>
-    <div id="toast" class="toast" role="status"></div>
-    <div id="overlay" class="overlay rules-open">
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <span class="modal-tag" id="modal-tag">МАЛЕНЬКОЕ ПРИКЛЮЧЕНИЕ</span>
-        <div class="portrait" aria-hidden="true"><svg viewBox="0 0 140 110"><path d="M32 64 15 12 54 34Q70 25 86 34L125 12 108 64Q110 98 70 102 30 98 32 64" fill="#e99448"/><path d="m22 26 12 32 16-18m68-14-12 32-16-18" fill="#613634"/><path d="M31 63Q42 54 57 67L70 79 83 67Q98 54 109 63 111 98 70 102 29 98 31 63" fill="#fff0cb"/><ellipse cx="49" cy="60" rx="5" ry="8" fill="#163a37"/><ellipse cx="91" cy="60" rx="5" ry="8" fill="#163a37"/><path d="m63 79 14 0-7 8z" fill="#163a37"/><path d="M44 95Q70 109 96 95L98 106H42z" fill="#59bbae"/></svg></div>
-        <h2 id="modal-title">Золото любит смелых.</h2>
-        <p id="modal-description">Пять полян · три жизни. Собирай золото и ускользай от волков.</p>
-        <div id="help-content" class="help-content">
-          <div><span>✦</span><p><strong>Собирай золото</strong>Все монеты → следующая поляна.</p></div>
-          <div><span>↗</span><p><strong>Обмани волка</strong>Он прогнозирует путь. Меняй курс.</p></div>
-          <div><span>♧</span><p><strong>Выбирай обход</strong>Деревья и пни - преграды. Лужи тормозят всех.</p></div>
-          <div><span>☂</span><p><strong>Следи за погодой</strong>Мокрые круги тормозят. Оранжевый - молния.</p></div>
-          <div><span>ϟ</span><p><strong>Делай рывок</strong>Пробел / Shift или ϟ. Защита от волков.</p></div>
-          <div><span>◈</span><p><strong>Загляни в магазин</strong>Монеты остаются. Купи скин или улучшение.</p></div>
-        </div>
-        <div id="modal-stats" class="modal-stats"></div>
-        <button id="primary-button" class="primary-button">Начать погоню <span>↗</span></button>
-        <button id="modal-shop-button" class="modal-shop-button">Магазин · скины и улучшения</button>
-        <button id="secondary-button" class="secondary-button" hidden>Начать заново</button>
-        <p class="control-hint" id="control-hint">WASD / стрелки · Пробел - рывок · P - пауза</p>
-      </div>
-    </div>
-  </section>
-  <footer class="bottom-bar">
-    <div class="desktop-controls"><kbd>WASD</kbd><span>движение</span><kbd>Пробел</kbd><span>рывок</span><kbd>R</kbd><span>заново</span></div>
-    <div class="dash-status"><span id="dash-label">Рывок готов</span><div class="dash-track"><div id="dash-progress"></div></div></div>
-    <span class="footer-note">Собирай. Уклоняйся. Ещё одна поляна.</span>
-  </footer>
-  <section class="touch-controls" id="touch-controls" aria-label="Управление на телефоне">
-    <div id="joystick" class="joystick" aria-label="Джойстик движения"><span class="joystick-cross">✣</span><div id="joystick-knob" class="joystick-knob"></div></div>
-    <div class="touch-help">Левый палец - движение<br>Правый - рывок</div>
-    <button id="dash-button" class="dash-button" aria-label="Рывок"><span>⚡</span><small>РЫВОК</small></button>
-  </section>
-  <div id="shop-overlay" class="overlay shop-overlay" hidden>
-    <div class="modal shop-modal" role="dialog" aria-modal="true" aria-labelledby="shop-title">
-      <div class="shop-heading"><div><span class="modal-tag">ЛЕСНАЯ ЛАВКА</span><h2 id="shop-title">Твой следующий побег</h2></div><strong id="shop-wallet">0 ✦</strong></div>
-      <div class="shop-tabs" role="tablist" aria-label="Категории магазина"><button id="tab-skins" role="tab" aria-selected="true" class="selected">Скины</button><button id="tab-upgrades" role="tab" aria-selected="false">Улучшения</button></div>
-      <div id="shop-items" class="shop-items"></div>
-      <p id="shop-message" class="shop-message" role="status">Каждая монета пополняет кошелёк.</p>
-      <button id="shop-close" class="primary-button">Вернуться <span>↗</span></button>
-      <p id="storage-status" class="storage-status">Покупки сохраняются в этом браузере.</p>
-    </div>
-  </div>
+  <section id="boss-hud" class="boss-hud panel" hidden><div><strong id="boss-name">Вожак</strong><span id="boss-hp-text">150 / 150</span></div><div class="bar boss"><div id="boss-hp-fill"></div></div></section>
+  <aside id="guide" class="guide panel"><div class="guide-title"><strong>ТВОЙ ПУТЬ</strong><button id="guide-close" aria-label="Убрать справку">×</button></div><p id="guide-objective">Собери золото. Получишь клинок - волки начнут убегать.</p><div class="guide-grid"><span><kbd>WASD / ↑↓←→</kbd> движение</span><span><kbd>ЛКМ / J</kbd> удар</span><span><kbd>Пробел / Shift</kbd> уклонение</span><span><kbd>Q</kbd> лечение</span><span><kbd>E</kbd> разговор</span><span><kbd>M · H · P</kbd> карта · справка · пауза</span></div><p class="guide-tip">Красная зона - замах врага. Уклоняйся и бей во время его восстановления.</p></aside>
+  <div class="navigation panel"><span id="direction-arrow">➤</span><span id="navigation-text">Золото впереди</span></div>
+  <aside class="mini-map panel"><canvas id="minimap" width="300" height="92" aria-label="Мини-карта"></canvas><span>ДОРОГА ЧЕРЕЗ ПЯТЬ ОБЛАСТЕЙ</span></aside>
+  <div id="toast" class="toast" role="status"></div>
+  <div id="interaction" class="interaction" hidden><button id="interact-button">E · Поговорить с Бруном</button></div>
+  <div class="desktop-strip"><span>ЛКМ / J - удар</span><span>Пробел - уклонение</span><span>Q - фляга</span><span id="action-status">Клинок ещё не получен</span></div>
+  <section id="touch-controls" class="touch-controls" aria-label="Управление на телефоне"><div id="joystick" class="joystick"><div id="joystick-knob"></div></div><div class="touch-actions"><button id="heal-button" class="small-action" aria-label="Выпить лечебную флягу">♜<small>ЛЕЧИТЬ</small></button><button id="dodge-button" class="small-action dodge-action" aria-label="Уклонение">ϟ<small>УКЛОН</small></button><button id="attack-button" class="attack-button" aria-label="Атаковать">⚔<small>УДАР</small></button></div></section>
+  <div id="overlay" class="overlay"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><span id="modal-tag" class="eyebrow">ЛЕСНАЯ КЛЯТВА</span><h1 id="modal-title">Золото. Клинок. Путь.</h1><p id="modal-description">Собери золото, получи оружие и победи босса. Дальше - дорога, костёр и торговец. Пять областей, одно путешествие.</p><div id="start-rules" class="start-rules"><div><span>✦</span><strong>Собирай</strong><p>Золото открывает клинок. Смотри цель сверху.</p></div><div><span>⚔</span><strong>Сражайся</strong><p>Удар, уклонение, выносливость. Босс приходит по таймеру.</p></div><div><span>♧</span><strong>Исследуй</strong><p>Победи босса и иди дальше. Магазин - у торговца на дороге.</p></div></div><div id="modal-stats" class="modal-stats"></div><button id="primary-button" class="primary-button">Войти в лес <span>↗</span></button><button id="restart-button" class="secondary-button" hidden>Новое путешествие</button><p class="control-hint">WASD - движение · ЛКМ/J - удар · Пробел - уклонение · Q - лечение</p></section></div>
+  <div id="dialog-overlay" class="dialog-overlay" hidden><section class="dialog-card panel" role="dialog" aria-modal="true" aria-labelledby="dialog-name"><img id="merchant-portrait" alt="Барсук Брун, торговец"/><div class="dialog-copy"><span class="eyebrow">ТОРГОВЕЦ У КОСТРА</span><h2 id="dialog-name">Брун</h2><p id="dialog-text">Добро пожаловать.</p><div class="dialog-options"><button id="dialog-trade">Показать товары</button><button id="dialog-road">Куда идти?</button><button id="dialog-combat">Как победить босса?</button><button id="dialog-leave">Вернуться на тропу</button></div></div></section></div>
+  <div id="shop-overlay" class="overlay" hidden><section class="modal shop-modal" role="dialog" aria-modal="true" aria-labelledby="shop-title"><div class="shop-heading"><div><span class="eyebrow">ЛАВКА БРУНА</span><h2 id="shop-title">Подготовься к пути</h2></div><strong id="shop-wallet">0 ✦</strong></div><div class="shop-tabs" role="tablist"><button id="tab-skins" role="tab" aria-selected="true">Облики</button><button id="tab-upgrades" role="tab" aria-selected="false">Снаряжение</button></div><div id="shop-items" class="shop-items"></div><div class="shop-pager"><button id="shop-prev" aria-label="Предыдущие товары">←</button><span id="shop-page">1 / 2</span><button id="shop-next" aria-label="Следующие товары">→</button></div><p id="shop-message" class="shop-message" role="status"></p><button id="shop-close" class="primary-button">Назад к Бруну <span>↗</span></button><p id="storage-status" class="control-hint">Покупки сохраняются в этом браузере.</p></section></div>
+  <div id="map-overlay" class="overlay" hidden><section class="modal map-modal" role="dialog" aria-modal="true" aria-labelledby="map-title"><span class="eyebrow">ТВОЁ ПУТЕШЕСТВИЕ</span><h2 id="map-title">Тропа древнего леса</h2><canvas id="world-map" width="1000" height="240" aria-label="Карта всех областей"></canvas><div id="map-regions" class="map-regions"></div><div class="map-legend"><span>● Лис</span><span>✦ Монеты</span><span>◆ Босс</span><span>♜ Брун и костёр</span></div><p>Дорога ведёт на восток. Выход из области открывается после сбора золота и победы над её боссом.</p><button id="map-close" class="primary-button">Закрыть карту <span>↗</span></button></section></div>
 </main>
 <script type="module" src="/src/main.ts"></script>
 </body>
