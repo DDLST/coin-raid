@@ -1,7 +1,7 @@
 import {RecordedMusic, type MusicMode} from './soundtrack';
 import type { WeaponId } from './progression';
 import type { WeatherKind } from './events';
-export type Sound = 'slash' | 'thrust' | 'axe' | 'cast' | 'hit' | 'bite' | 'hurt' | 'dash' | 'pickup' | 'heal' | 'checkpoint' | 'crack' | 'thunder' | 'boss' | 'loot' | 'empty' | 'ultimate' | 'howl' | 'parry' | 'achievement' | 'meteor' | 'wind' | 'roar';
+export type Sound = 'slash' | 'thrust' | 'axe' | 'cast' | 'hit' | 'bite' | 'hurt' | 'dash' | 'pickup' | 'heal' | 'checkpoint' | 'crack' | 'thunder' | 'boss' | 'loot' | 'empty' | 'ultimate' | 'howl' | 'parry' | 'achievement' | 'meteor' | 'wind' | 'roar' | 'heartbeat' | 'scream';
 export type AudioSettings = { master: number; music: number; effects: number; muted: boolean };
 export const DEFAULT_AUDIO: AudioSettings = { master: .65, music: .42, effects: .70, muted: false };
 const MELODIES = [
@@ -103,6 +103,8 @@ export class ForestAudio {
   play(sound: Sound): void {
     if (!this.context || this.context.state !== 'running' || this.settings.muted) return;
     switch (sound) {
+      case 'heartbeat': this.tone(62,.20,.12,'sine',undefined,undefined,34);this.tone(74,.18,.08,'triangle',undefined,this.context.currentTime+.19,42);break;
+      case 'scream': this.noiseBurst(1.6,.24,680,'bandpass');this.tone(355,1.5,.10,'sawtooth',undefined,undefined,100);this.tone(89,1.3,.10,'triangle',undefined,this.context.currentTime+.12,37);break;
       case 'roar': this.noiseBurst(.72,.20,470,'bandpass');this.tone(85,.78,.10,'sawtooth',undefined,undefined,39);this.tone(130,.62,.045,'triangle',undefined,this.context.currentTime+.1,56);break;
       case 'meteor': this.noiseBurst(1,.36,460);this.tone(100,.75,.18,'triangle',undefined,undefined,28);break;
       case 'wind':this.noiseBurst(1.7,.12,560,'bandpass');this.tone(160,1.4,.035,'sine',undefined,undefined,74);break;

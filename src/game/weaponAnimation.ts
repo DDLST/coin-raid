@@ -62,10 +62,10 @@ export function weaponPose(id:WeaponId,face:number,time:number,windup:number,act
  if(motion.guard){angle=aim-1.0;power=.35;extension=0;lean=side*-3;}
  const both=w.style==='spear'||w.style==='axe'||w.style==='sword'&&(combo===2&&time>=0||motion.guard===true);
  const bob=motion.runPhase===undefined?0:Math.sin(motion.runPhase)*1.8;
- let handX=side*(both?5:14)+Math.cos(face)*extension+Math.cos(angle)*power*3;
- let handY=-6+Math.sin(face)*extension*.55+Math.sin(angle)*power*3+bob;
+ let handX=side*(both?13:16)+Math.cos(face)*extension+Math.cos(angle)*power*3;
+ let handY=-10+Math.sin(face)*extension*.55+Math.sin(angle)*power*3+bob;
  let otherX=-side*13,otherY=-4-bob,otherAngle=.12*side;
- const separation=w.style==='spear'?13:w.style==='axe'?9:-6;
+ const separation=w.style==='spear'?-12:w.style==='axe'?-8:-6;
  if(both){otherX=handX+Math.cos(angle)*separation;otherY=handY+Math.sin(angle)*separation;otherAngle=angle+Math.PI/2;}
  else if(w.style==='staff'&&time>=0){otherX=-side*10+Math.cos(face)*power*8;otherY=-13+Math.sin(face)*power*7;otherAngle=face+Math.PI/2;}
  if(motion.roll!==undefined){
@@ -78,7 +78,7 @@ export function weaponPose(id:WeaponId,face:number,time:number,windup:number,act
 }
 
 // Painted upper arm and bracer meet at the elbow; neither segment floats.
-export const UPPER_ARM_LENGTH=16,FOREARM_LENGTH=18;
+export const UPPER_ARM_LENGTH=14,FOREARM_LENGTH=16;
 export function armElbow(shoulder:{x:number;y:number},hand:{x:number;y:number},bend:number){
  const dx=hand.x-shoulder.x,dy=hand.y-shoulder.y,distance=Math.hypot(dx,dy),d=Math.max(3,Math.min(UPPER_ARM_LENGTH+FOREARM_LENGTH-.01,distance));
  const along=(UPPER_ARM_LENGTH**2-FOREARM_LENGTH**2+d*d)/(2*d),height=Math.sqrt(Math.max(0,UPPER_ARM_LENGTH**2-along*along));

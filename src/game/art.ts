@@ -1,6 +1,34 @@
 import Phaser from 'phaser';
 import { SKINS } from './progression';
 
+// Static paths and decoration are drawn once, then culled as a single image.
+function localScenery(g:Phaser.GameObjects.Graphics,start:number):void{
+ const commands=g.commandBuffer.slice();g.clear();g.save();g.translateCanvas(-start,0);
+ g.commandBuffer=g.commandBuffer.concat(commands);g.restore();
+}
+export function mergeScenery(g:Phaser.GameObjects.Graphics,key:string,start:number,width:number,height:number):void{
+ localScenery(g,start);g.generateTexture(key,width,height);g.destroy();
+}
+export function bakeScenery(scene:Phaser.Scene,g:Phaser.GameObjects.Graphics,key:string,start:number,width:number,height:number,depth:number):Phaser.GameObjects.Image{
+ localScenery(g,start);g.generateTexture(key,width,height);g.destroy();
+ return scene.add.image(start,0,key).setOrigin(0).setDepth(depth);
+}
+
+// Short leather sleeves have a stable width, instead of stretching atlas crops.
+export function createArmArtwork(scene:Phaser.Scene):void{
+ for(const [key,bracer]of [['hero-upper',false],['hero-forearm',true]] as const){
+  if(scene.textures.exists(key))continue;
+  const texture=scene.textures.createCanvas(key,32,64);if(!texture)throw Error('Sleeve texture unavailable');
+  const c=texture.getContext(),gradient=c.createLinearGradient(0,0,32,0);
+  gradient.addColorStop(0,'#342723');gradient.addColorStop(.45,bracer?'#ad865e':'#866143');gradient.addColorStop(1,'#3e2d25');
+  c.fillStyle=gradient;c.beginPath();c.roundRect(3,0,26,64,8);c.fill();
+  c.strokeStyle='#c7a272';c.lineWidth=2;c.beginPath();c.moveTo(8,6);c.lineTo(8,57);c.stroke();
+  c.fillStyle='#322d2c';c.fillRect(4,bracer?8:51,24,7);c.fillStyle='#bda276';c.fillRect(9,bracer?10:53,5,3);
+  if(bracer){c.strokeStyle='#655347';c.lineWidth=4;for(const y of [27,46]){c.beginPath();c.moveTo(5,y);c.lineTo(27,y+3);c.stroke();}}
+  texture.refresh();
+ }
+}
+
 export type Palette = {
   ground: string; light: string; grass: string; tree: string; accent: string;
 };
@@ -346,7 +374,7 @@ export function createCreepyArtwork(scene:Phaser.Scene):void{
  }
 }
 
-export function biomeGround(scene:Phaser.Scene,start:number,index:number,width:number,height:number,palette:Palette):void{
+export function biomeGround(scene:Phaser.Scene,start:number,index:number,width:number,height:number,palette:Palette,floorKey:string):void{
  const g=scene.add.graphics().setDepth(2);let seed=4921+index*917;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  const stone=index===1||index===4||index===5||index===6;
  if(stone){for(let n=0;n<140;n++){const x=start+90+random()*(width-180),y=100+random()*(height-200);g.fillStyle(index===4?0xbbd8dc:index===5?0x686076:0xa79b84,.12);g.fillRoundedRect(x,y,24+random()*40,15+random()*24,5);g.lineStyle(1,0x142834,.17);g.strokeRoundedRect(x,y,24,16,4);}}
@@ -356,6 +384,7 @@ export function biomeGround(scene:Phaser.Scene,start:number,index:number,width:n
  if(index===5){g.lineStyle(2,0xb19ac9,.18);for(let n=0;n<20;n++){const x=start+random()*width,y=90+random()*900;g.strokeCircle(x,y,14);g.lineBetween(x-10,y-10,x+10,y+10);}}
  if(index===6){g.lineStyle(2,0xb3d4da,.25);for(let n=0;n<15;n++){const x=start+random()*width,y=80+random()*920;g.beginPath();g.moveTo(x,y);g.lineTo(x-10,y+16);g.lineTo(x+8,y+15);g.lineTo(x-2,y+31);g.strokePath();}}
  if(index===7){g.lineStyle(4,0x9edccb,.22);g.strokeEllipse(start+width*.62,height*.50,230,175);g.lineStyle(2,0xdad3ac,.28);g.strokeEllipse(start+width*.62,height*.50,195,148);}
+ mergeScenery(g,floorKey,start,width,height);
  const landmark=scene.add.image(start+width*.65,height*.25,`landmark-${index}`).setOrigin(.5,.85).setDisplaySize(250,334).setDepth(7);
  if(index===0||index===2||index===7){const lamp=scene.add.ellipse(start+width*.65,height*.18,170,60,parseInt(palette.accent.slice(1),16),.07).setDepth(3);scene.tweens.add({targets:lamp,alpha:.02,duration:1700,yoyo:true,repeat:-1});}
  landmark.setAlpha(.97);
@@ -424,7 +453,8 @@ export function createEquipmentArtwork(scene:Phaser.Scene):void{
  }
 }
 
-export function createArmedMotionArtwork(scene:Phaser.Scene):void{
+export function createArmedMotionArtwork(scene:Phaser.Scene,selected='fox'):void{
+ if(scene.textures.exists(`${selected}-armed-front`))return;
  const atlas=scene.textures.get('armed-motion-atlas').getSourceImage() as HTMLImageElement;
  // x/y/width/height/spine-x, measured on the painted bodies. Tails cross grid guides.
  const frames=[
@@ -433,7 +463,7 @@ export function createArmedMotionArtwork(scene:Phaser.Scene):void{
   [[43,564,225,260,123],[315,562,266,265,432],[610,562,246,262,702],[868,564,268,263,982],[1174,563,221,261,1268]],
   [[32,826,209,261,161],[306,824,257,259,446],[587,824,219,264,716],[881,825,250,261,1014],[1164,823,207,266,1287]],
  ];
- for(const skin of SKINS)for(const [row,direction]of ['front','back','left','right'].entries())for(let phase=0;phase<5;phase++){
+ for(const skin of SKINS.filter(s=>s.id===selected))for(const [row,direction]of ['front','back','left','right'].entries())for(let phase=0;phase<5;phase++){
   const key=`${skin.id}-armed-${direction}${phase?`-step-${phase-1}`:''}`;
   const t=scene.textures.createCanvas(key,128,128);if(!t)throw Error('Armed body texture unavailable');const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   if(skin.id==='fox-moon')c.filter='grayscale(1) brightness(1.4)';else if(skin.id==='fox-ash')c.filter='grayscale(.85) brightness(.75)';else if(skin.id==='fox-ember')c.filter='saturate(1.5)';
@@ -442,7 +472,7 @@ export function createArmedMotionArtwork(scene:Phaser.Scene):void{
   if(!['fox','fox-moon','fox-ash','fox-ember'].includes(skin.id)){c.globalCompositeOperation='source-atop';c.globalAlpha=.27;c.fillStyle=skin.scarf;c.fillRect(0,0,128,128);c.globalAlpha=1;c.globalCompositeOperation='source-over';}
   t.refresh();
  }
- for(const skin of SKINS){
+ for(const skin of SKINS.filter(s=>s.id===selected)){
   const t=scene.textures.createCanvas(`${skin.id}-arm-upper`,128,128);if(!t)throw Error('Arm texture unavailable');const c=t.getContext();
   if(skin.id==='fox-moon')c.filter='grayscale(1) brightness(1.4)';else if(skin.id==='fox-ash')c.filter='grayscale(.85) brightness(.75)';else if(skin.id==='fox-ember')c.filter='saturate(1.5)';
   c.drawImage(scene.textures.get('arm-upper').getSourceImage() as CanvasImageSource,0,0);c.filter='none';
@@ -451,11 +481,12 @@ export function createArmedMotionArtwork(scene:Phaser.Scene):void{
  }
 }
 
-export function createStrideArtwork(scene:Phaser.Scene):void{createMotionArtwork(scene,'stride-atlas','step');}
-export function createRollArtwork(scene:Phaser.Scene):void{createMotionArtwork(scene,'roll-atlas','roll');}
-function createMotionArtwork(scene:Phaser.Scene,atlasKey:string,motion:string):void{
+export function createStrideArtwork(scene:Phaser.Scene,selected='fox'):void{createMotionArtwork(scene,'stride-atlas','step',selected);}
+export function createRollArtwork(scene:Phaser.Scene,selected='fox'):void{createMotionArtwork(scene,'roll-atlas','roll',selected);}
+function createMotionArtwork(scene:Phaser.Scene,atlasKey:string,motion:string,selected:string):void{
+ if(scene.textures.exists(`${selected}-front-${motion}-0`))return;
  const atlas=scene.textures.get(atlasKey).getSourceImage() as HTMLImageElement,cell=atlas.width/4;
- for(const skin of SKINS)for(const [row,direction]of ['front','back','left','right'].entries())for(let phase=0;phase<4;phase++){
+ for(const skin of SKINS.filter(s=>s.id===selected))for(const [row,direction]of ['front','back','left','right'].entries())for(let phase=0;phase<4;phase++){
   const t=scene.textures.createCanvas(`${skin.id}-${direction}-${motion}-${phase}`,128,128);if(!t)throw Error('Motion texture unavailable');
   const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
   if(skin.id==='fox-moon')c.filter='grayscale(1) brightness(1.4)';else if(skin.id==='fox-ash')c.filter='grayscale(.85) brightness(.75)';else if(skin.id==='fox-ember')c.filter='saturate(1.5)';

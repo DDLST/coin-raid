@@ -68,3 +68,27 @@
 .briefing-overlay{z-index:37;background:#090d15ef}.briefing-card{width:min(600px,100%);text-align:center;background:#182028}.briefing-heading{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#b9b5a2}.briefing-icon{font-size:58px;color:#debc82;margin:22px 0 12px}.briefing-card h2{font-size:26px}.briefing-card>p{font-size:15px;line-height:1.6;min-height:105px}.briefing-sample{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:13px;margin-bottom:14px;border:1px solid #a8a39240;border-radius:10px;font-size:12px}.sample-health{color:#d78d7c}.sample-stamina{color:#93bb96}.sample-danger{color:#e2958c}.sample-reward{color:#c6a7d9}
 @media(max-height:650px){.briefing-card{padding:16px 20px}.briefing-icon{font-size:42px;margin:12px 0}.briefing-card h2{font-size:22px}.briefing-card>p{font-size:13px;min-height:75px}.briefing-sample{padding:9px;font-size:10px}.training-panel .lesson-keys kbd{font-size:11px;padding:5px 8px}.route-marker b{font-size:11px}}
 @media(max-height:500px){.briefing-icon{font-size:32px;margin:6px 0}.briefing-card>p{min-height:50px;font-size:11px}.briefing-card h2{font-size:20px}.briefing-sample{margin-bottom:8px;padding:6px}.training-panel #lesson-target{font-size:9px}.lesson-keys{gap:5px;margin:5px 0}.training-panel .lesson-keys kbd{font-size:9px;padding:3px 6px}.training-panel.training-in-menu{padding:4px 8px}}
+/* v10: title illustration and a brief blood countdown; gameplay stays unobstructed. */
+body.at-title #overlay{display:flex;align-items:center;background:#080e14 url('./assets/title-v10.webp') center/cover no-repeat;backdrop-filter:none;justify-content:flex-start;padding:8vw;}
+body.at-title #overlay::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#080e14b8 0%,#080e1455 48%,transparent 78%);pointer-events:none;}
+body.at-title .start-modal{position:relative;width:min(460px,46vw);padding:0;background:none;border:0;box-shadow:none;backdrop-filter:none;text-align:left;overflow:visible;max-height:none;}
+body.at-title #modal-title{font-size:clamp(52px,6.7vw,100px);line-height:.9;letter-spacing:-.045em;color:#f2e6d1;text-shadow:0 4px 22px #000a;margin:22px 0;}
+body.at-title #modal-description{max-width:330px;color:#c6c2bb;font-size:18px;line-height:1.6;margin-bottom:30px;}
+body.at-title .primary-button{width:240px;min-height:52px;background:#853a33;border-color:#b0644e;color:#fff0da;font-size:19px;}
+body.at-title .game-hud,body.at-title #boss-hud,body.at-title #counter-ready,body.at-title #achievement-banner,body.at-title #boss-countdown,body.at-title #checkpoint-banner,body.at-title #guide,body.at-title #route-marker,body.at-title #interaction,body.at-title #training-panel,body.at-title #toast{display:none;}
+.title-options label{display:flex;align-items:center;gap:10px;margin:18px 0;color:#c8c1b4;font-size:17px;}
+.title-options input{width:19px;height:19px;accent-color:#b26b50;}
+.title-options .secondary-button{width:240px;text-align:left;background:#141a22c9;border-color:#77725a77;color:#d7cebf;}
+#title-status{min-height:30px;color:#d3b58d;font-size:15px;max-width:350px;line-height:1.45;}
+#boss-timer{color:#e4a5a1;position:relative;padding:5px 10px;background:linear-gradient(105deg,#4b181dce,#220e15ae);border:1px solid #8b3b4270;border-radius:5px;box-shadow:inset 0 0 15px #51091088;font-weight:700;}
+#boss-timer::after{content:"";position:absolute;bottom:-4px;left:12px;width:3px;height:7px;background:#82343b;border-radius:0 0 4px 4px;box-shadow:13px -3px #82343b,39px -1px #652830;}
+#boss-timer.timer-safe{color:#b2bdb1;background:#10201e80;border-color:#52645566;box-shadow:none;}
+#boss-timer.timer-safe::after{display:none;}
+#boss-timer.timer-urgent{color:#ffd0c6;animation:blood-clock 1s ease-in-out infinite;}
+.boss-countdown{position:fixed;z-index:100;left:50%;top:32%;transform:translate(-50%,-50%);pointer-events:none;text-align:center;}
+.blood-digit{display:block;position:relative;font:900 clamp(76px,12vw,146px)/1 Georgia,serif;color:#c5464d;text-shadow:0 3px #400810,0 0 32px #a0122460;animation:blood-count .78s ease-out forwards;}
+.blood-digit::after{content:"";position:absolute;left:43%;bottom:1px;width:5px;height:18px;background:#942631;border-radius:0 0 9px 9px;box-shadow:20px -6px #942631,-13px -9px #74202b;}
+.boss-countdown small{display:block;color:#dca1a0;font-size:13px;letter-spacing:.18em;animation:blood-count .78s ease-out forwards;}
+@keyframes blood-count{0%{opacity:0;transform:scale(1.25) translateY(-7px);}15%{opacity:1;transform:scale(1);}65%{opacity:.85;}100%{opacity:0;transform:scale(.9) translateY(9px);}}
+@keyframes blood-clock{50%{box-shadow:0 0 16px #a8263255,inset 0 0 13px #6f172a88;}}
+@media(max-width:850px){body.at-title #overlay{padding:7vw;background-position:61% center;}body.at-title .start-modal{width:55vw;}body.at-title #modal-title{font-size:62px;}body.at-title #modal-description{font-size:16px;}}
