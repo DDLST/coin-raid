@@ -1,29 +1,37 @@
 import Phaser from 'phaser';
-import { background, createArtwork, createMysticArtwork, createVillageArtwork } from './art';
+import { background, createArtwork, createMysticArtwork, createVillageArtwork, createAtlasArtwork, createCreepyArtwork, biomeGround } from './art';
+import villageAtlas from '../assets/village-atlas.webp?url';
+import biomeAtlas from '../assets/biome-atlas.webp?url';
+import storyAtlas from '../assets/story-atlas.webp?url';
+import creepAtlas from '../assets/creep-atlas.webp?url';
 import { clampPoint, clearLine, findPath, freePoint, makeGrid, moveCircle, regionTerrain, type Bounds, type NavGrid, type Point, type Terrain } from './world';
-import { PROFILE_KEY, LEGACY_KEYS, SKINS, UPGRADES, WEAPONS, ARMORS, newProfile, purchase, weaponFor, armorFor, type Profile } from './progression';
-import { DODGE_COST, DODGE_TIME, FLASK_HEAL, HURT_PROTECTION, ULTIMATE_MAX, slashConnects, stats, attackSpec } from './combat';
-import { REGIONS, REGION_WIDTH, ROAD_WIDTH, WORLD_HEIGHT, WORLD_WIDTH, regionEnd, regionStart, villagePosition, VILLAGE_NAMES, PROLOGUE_WIDTH, type EnemyKind, type EnemyAttack } from './regions';
+import { PROFILE_KEY, LEGACY_KEYS, SKINS, UPGRADES, WEAPONS, ARMORS, newProfile, purchase, itemUnlock, weaponFor, armorFor, type Profile } from './progression';
+import { DODGE_COST, DODGE_TIME, FLASK_HEAL, HURT_PROTECTION, ULTIMATE_MAX, slashConnects, stats, attackSpec, skillAttack } from './combat';
+import { REGIONS, REGION_INCOME, REGION_WIDTH, ROAD_WIDTH, WORLD_HEIGHT, WORLD_WIDTH, regionEnd, regionStart, villagePosition, VILLAGE_NAMES, PROLOGUE_WIDTH, type EnemyKind, type EnemyAttack } from './regions';
 import { ForestAudio } from './audio';
 import { advanceQuests, newQuests, questEvent, rollLoot, LOOT_ODDS, type Quest, type Loot } from './quests';
-import { OPENING, ENDING, LESSONS, PEOPLE, LINES, newLines, lineReady, type Area, type Role, type QuestLine, type LineId } from './story';
+import { OPENING, ENDING, LESSONS, PEOPLE, LINES, DELIVERIES, newLines, newDeliveries, lineReady, type Area, type Role, type QuestLine, type LineId, type Delivery } from './story';
 import { parseSave, type RegionProgress, type Snapshot, type SavedChest } from './save';
-const PLAYER_RADIUS=16, PICKUP_RADIUS=31, PATH_INTERVAL=.45, INTERACT_DISTANCE=112, BOSS_REWARD=28;
+import { SKILL_TREE, learnSkill, refundBranch, toggleSkill, type SkillId } from './skills';
+import { ACHIEVEMENTS, earnedAchievements, type AchievementId } from './achievements';
+import { HOUSE_NAMES, housePoint, interiorArt, interiorBounds, interiorObstacles, type House } from './village';
+const PLAYER_RADIUS=16, PICKUP_RADIUS=31, PATH_INTERVAL=.45, INTERACT_DISTANCE=112, BOSS_REWARD=45;
 const STAMINA_DELAY=.48, WEATHER_DURATION=15, LIGHTNING_WARNING=1.2, LIGHTNING_RADIUS=48;
-const INTRO_DURATION=4.6, MAX_MINIONS=18;
-type GameState='ready'|'intro'|'playing'|'paused'|'dialog'|'shop'|'menu'|'map'|'loot'|'dying'|'lost'|'won'|'story'|'choice'|'confirm';
+const INTRO_DURATION=6.3, WEAPON_STEAL_AT=1.2, WEAPON_BREAK_AT=2.6, MAX_MINIONS=18;
+const PARRY_DURATION=.24, PERFECT_PARRY=.14, COUNTER_WINDOW=1.15, WAVE_FIRST=4, WAVE_SIZE=3;
+type GameState='ready'|'intro'|'playing'|'paused'|'dialog'|'shop'|'menu'|'map'|'loot'|'dying'|'lost'|'won'|'story'|'choice'|'confirm'|'travel';
 type EnemyMode='chase'|'windup'|'charge'|'recover';
 type Enemy={id:number;region:number;kind:EnemyKind;variant:number;sprite:Phaser.GameObjects.Image;shadow:Phaser.GameObjects.Ellipse;
  hp:number;maxHP:number;radius:number;damage:number;reward:number;speed:number;mode:EnemyMode;clock:number;nextPath:number;path:Point[];
- aim:Point;target:Point;hasHit:boolean;stun:number;flash:number;phase2:boolean;dead:boolean;move:EnemyAttack;moveIndex:number;training:boolean};
+ aim:Point;target:Point;hasHit:boolean;stun:number;flash:number;phase2:boolean;dead:boolean;move:EnemyAttack;moveIndex:number;training:boolean;chain:number;bleed:number;bleedTick:number};
 type Coin={region:number;sprite:Phaser.GameObjects.Image;value:number;phase:number};
 type Projectile=Point&{vx:number;vy:number;life:number;damage:number;region:number;friendly:boolean;color:number;radius:number;blast:number;hits:Set<number>};
-type Hazard=Point&{region:number;radius:number;warning:number;left:number;damage:number;kind:'poison'|'meteor'|'ring'|'sigil';fired:boolean};
+type Hazard=Point&{region:number;radius:number;warning:number;left:number;damage:number;kind:'poison'|'meteor'|'ring'|'sigil'|'wave'|'curse';fired:boolean};
 type Chest=SavedChest&{sprite:Phaser.GameObjects.Image};
 type Strike=Point&{left:number;phase:'warning'|'impact'};
 type ShopTab='weapons'|'armors'|'upgrades'|'skins'|'supplies';
 const SUPPLIES=[{id:'heal-service',name:'Перевязка',icon:'✚',price:8,description:'Восстановить 50 HP'},{id:'refill',name:'Заряд фляги',icon:'♜',price:10,description:'Добавить 1 заряд, до максимума'},{id:'rest-service',name:'Полное лечение',icon:'☀',price:18,description:'Восстановить HP и все фляги'}];
-type MenuTab='overview'|'equipment'|'quests'|'settings';
+type MenuTab='overview'|'equipment'|'skills'|'quests'|'achievements'|'settings';
 export class GameScene extends Phaser.Scene {
  private player!:Phaser.GameObjects.Image;
  private playerShadow!:Phaser.GameObjects.Ellipse;
@@ -32,6 +40,7 @@ export class GameScene extends Phaser.Scene {
  private combatInk!:Phaser.GameObjects.Graphics;
  private weatherInk!:Phaser.GameObjects.Graphics;
  private gateInk!:Phaser.GameObjects.Graphics;
+ private reaper!:Phaser.GameObjects.Image;private stolenWeapon!:Phaser.GameObjects.Image;private reaperInk!:Phaser.GameObjects.Graphics;
  private terrain:Terrain[]=[];
  private terrainByRegion:Terrain[][]=[];
  private nav:NavGrid[]=[];
@@ -52,13 +61,20 @@ export class GameScene extends Phaser.Scene {
  private regionIndex=0;
  private area:Area='village';private villageIndex=-1;private lastVillage=-1;
  private villagers:{village:number;role:Role;sprite:Phaser.GameObjects.Image}[]=[];private nearestNPC=-1;private dialogRole:Role='smith';
+ private houses:House[]=[];private nearestHouse=-1;private interiorRole:Role|null=null;private interiorReturn:'village'|'tutorial'='village';
+ private interiorLayer:Phaser.GameObjects.Container|null=null;private interiorShade:Phaser.GameObjects.Rectangle|null=null;
+ private deliveries:Delivery[]=newDeliveries();
  private lines:QuestLine[]=newLines();private questProps:{id:LineId;order:number;point:Point;sprite:Phaser.GameObjects.Image}[]=[];private nearestProp=-1;
  private wisp:Phaser.GameObjects.Image|null=null;private wispFear=0;private wispPath:Point[]=[];private wispPathLeft=0;
- private questView:'trials'|'story'='trials';
+ private questView:'trials'|'story'|'delivery'='trials';
  private lessonIndex=0;private lessonProgress=0;private tutorialFinished=false;private wantsTraining=false;
  private storyClosing=false;private storyIndex=0;private storyTime=0;
  private dirty=false;private confirmReturn:GameState='playing';private confirmTarget:'title'|'new'='title';
  private guardLeft=0;private heavyAttack=false;
+ private counterTarget=-1;private counterLeft=0;private counterStrike=false;private strikeTarget=-1;
+ private activeSkill:SkillId|null=null;private attackPulse=-1;private skillCooldowns:Partial<Record<SkillId,number>>={};private shieldLeft=0;
+ private achievementQueue:AchievementId[]=[];private achievementLeft=0;private achievementPage=0;
+ private combatMusicLeft=0;private waveClock=WAVE_FIRST;private waveNumber=0;private pruneLeft=1;
  private effects:{x:number;y:number;angle:number;kind:'slash'|'ring'|'thrust';color:number;life:number;max:number;radius:number}[]=[];
 
  private profile:Profile=newProfile();
@@ -80,20 +96,21 @@ export class GameScene extends Phaser.Scene {
  private equipmentTab:'weapons'|'armors'|'skins'='weapons';private equipmentPage=0;
  private weather:'clear'|'rain'|'storm'='clear';private weatherLeft=0;private weatherNext=13;
  private wetZones:(Point&{radius:number})[]=[];private strike:Strike|null=null;private strikeNext=2;private slowed=0;
- private introLeft=0;private introBroken=false;private introResume=false;private guideLeft=0;
+ private introLeft=0;private introBroken=false;private introResume=false;private guideWanted=true;
  private loot:Loot|null=null;private lootLeft=0;
  constructor(){super('GameScene');}
+ preload():void{this.load.image('village-atlas',villageAtlas);this.load.image('biome-atlas',biomeAtlas);this.load.image('story-atlas',storyAtlas);this.load.image('creep-atlas',creepAtlas);}
  create():void{
-  createArtwork(this);createMysticArtwork(this);createVillageArtwork(this);
+  createArtwork(this);createMysticArtwork(this);createVillageArtwork(this);createAtlasArtwork(this);createCreepyArtwork(this);
   try{for(const key of LEGACY_KEYS)localStorage.removeItem(key);this.saved=parseSave(localStorage.getItem(PROFILE_KEY));}catch{this.storageAvailable=false;}
   this.drawWorld();this.gateInk=this.add.graphics().setDepth(700);this.weatherInk=this.add.graphics().setDepth(6);
   this.playerShadow=this.add.ellipse(140,550,35,14,0x09291b,.34).setDepth(8);
   this.player=this.add.image(140,550,'fox').setDisplaySize(72,72).setDepth(20);
   this.sword=this.add.image(0,0,'sword').setDisplaySize(100,100).setOrigin(.20,.89).setVisible(false).setDepth(21);
   this.armorSprite=this.add.image(140,550,'armor-ranger').setDisplaySize(72,72).setVisible(false).setDepth(22);
-  this.combatInk=this.add.graphics().setDepth(500);
+  this.combatInk=this.add.graphics().setDepth(500);this.reaperInk=this.add.graphics().setDepth(740);this.reaper=this.add.image(0,0,'weapon-reaper').setDisplaySize(225,225).setDepth(750).setVisible(false);this.stolenWeapon=this.add.image(0,0,'sword').setDepth(755).setVisible(false);
   if(!this.input.keyboard)throw new Error('Keyboard unavailable');
-  this.keys=this.input.keyboard.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE,SHIFT,J,Q,E,P,ESC,ENTER,H,M,F,R,TAB') as Record<string,Phaser.Input.Keyboard.Key>;
+  this.keys=this.input.keyboard.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE,SHIFT,J,Q,E,P,ESC,ENTER,H,M,F,R,TAB,C,ONE,TWO,THREE') as Record<string,Phaser.Input.Keyboard.Key>;
   this.bindControls();this.configureCamera();this.resetJourney();this.startVillage(-1,true);this.showTitle();
   this.refreshSaveUI();this.scale.on('resize',this.configureCamera,this);
   this.events.once('shutdown',()=>{this.listeners.abort();this.scale.off('resize',this.configureCamera,this);clearTimeout(this.toastTimeout);this.audio.destroy();});
@@ -101,12 +118,16 @@ export class GameScene extends Phaser.Scene {
  private element<T extends HTMLElement=HTMLElement>(id:string):T{const e=document.getElementById(id);if(!e)throw new Error(`Missing UI: ${id}`);return e as T;}
  private regionBounds(index:number):Bounds{return{width:regionEnd(index),height:WORLD_HEIGHT,margin:35,top:65,left:regionStart(index)+35};}
  private playerBounds():Bounds{
+  if(this.area==='interior')return interiorBounds(housePoint(this.villageIndex,this.interiorRole??'smith'));
   if(this.area!=='biome')return{width:this.area==='tutorial'?PROLOGUE_WIDTH-20:regionStart(this.villageIndex+1)+100,height:WORLD_HEIGHT,margin:35,top:65,left:this.villageIndex<0?35:regionEnd(this.villageIndex)+25};
   const p=this.progress[this.regionIndex];return{width:p.cleared?Math.min(WORLD_WIDTH,regionEnd(this.regionIndex)+ROAD_WIDTH+105):regionEnd(this.regionIndex),height:WORLD_HEIGHT,margin:35,top:65,left:p.bossDead?(this.regionIndex===0?35:regionEnd(this.regionIndex-1)+25):regionStart(this.regionIndex)+35};
  }
+ private activeTerrain():Terrain[]{return this.area==='interior'?interiorObstacles(housePoint(this.villageIndex,this.interiorRole??'smith')):this.terrain;}
+ private seals():number{return this.progress.filter(p=>p.bossDead).length;}
+ private trainingArea():boolean{return this.area==='tutorial'||this.area==='interior'&&this.interiorReturn==='tutorial';}
  private configureCamera():void{
-  const cam=this.cameras.main;cam.setBounds(0,0,WORLD_WIDTH,WORLD_HEIGHT);cam.setZoom(Math.max(this.scale.width<700?.82:1,this.scale.height/WORLD_HEIGHT));
-  if(this.player)cam.startFollow(this.player,true,.11,.11);this.setGuideText();
+  const cam=this.cameras.main;cam.setBounds(0,0,WORLD_WIDTH,WORLD_HEIGHT);cam.setZoom(this.area==='interior'?Math.min(1.7,this.scale.height/380):Math.max(this.scale.width<700?.82:1,this.scale.height/WORLD_HEIGHT));
+  if(this.area==='interior'){const at=housePoint(this.villageIndex,this.interiorRole??'smith');cam.stopFollow();cam.centerOn(at.x,at.y+5);}else if(this.player)cam.startFollow(this.player,true,.11,.11);this.setGuideText();
  }
  private bindControls():void{
   this.listeners=new AbortController();const signal=this.listeners.signal;
@@ -134,7 +155,13 @@ export class GameScene extends Phaser.Scene {
   window.addEventListener('blur',()=>{this.resetInput();if(this.state==='playing')this.togglePause();},{signal});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){this.resetInput();if(this.state==='playing')this.togglePause();}},{signal});
   click('dialog-trade',()=>this.openShop());click('dialog-road',()=>this.say(PEOPLE.find(n=>n.role===this.dialogRole)!.lore));
-  click('dialog-combat',()=>this.say(`Впереди ${REGIONS[Math.min(4,this.villageIndex+1)].bossName}. Красная метка предупреждает об атаке. Меч парирует на ПКМ; копьё делает тяжёлый выпад; секира бьёт вокруг; посох оставляет печать. Смерть вернёт тебя в последнюю посещённую деревню.`));
+  click('dialog-combat',()=>this.say(`Впереди ${REGIONS[Math.min(REGIONS.length-1,this.villageIndex+1)].bossName}. Красная метка предупреждает об атаке. C парирует, а точное парирование открывает ЛКМ-контрудар. Меч также парирует на ПКМ; копьё делает тяжёлый выпад; секира бьёт вокруг; посох оставляет печать. Смерть вернёт тебя в последнюю посещённую деревню.`));
+  click('dialog-delivery',()=>this.talkDelivery());
+  click('travel-open',()=>this.openTravel());click('travel-close',()=>this.closeTravel());
+  this.element('travel-items').addEventListener('click',e=>{const b=e.target instanceof Element?e.target.closest<HTMLButtonElement>('[data-travel]'):null;if(b&&!b.disabled)this.travelTo(Number(b.dataset.travel));},{signal});
+  this.element('skill-items').addEventListener('click',e=>{const b=e.target instanceof Element?e.target.closest<HTMLButtonElement>('[data-skill], [data-skill-toggle]'):null;if(!b||b.disabled)return;if(b.dataset.skill){this.element('skill-message').textContent=learnSkill(this.profile,b.dataset.skill,this.seals());this.syncAchievements();}else if(b.dataset.skillToggle){toggleSkill(this.profile,b.dataset.skillToggle);this.element('skill-message').textContent='Панель изменена. Перезарядка приёма сохраняется.';}this.dirty=true;this.renderSkills();this.updateHUD();},{signal});
+  click('skill-reset',()=>{const points=refundBranch(this.profile,weaponFor(this.profile).style);if(!points)return;this.activeSkill=null;this.attackTime=-1;this.element('skill-message').textContent=`Возвращено ${points} искр. Купленные приёмы сохранены; повторная оплата не нужна.`;this.dirty=true;this.renderSkills();this.updateHUD();});
+  click('achievement-prev',()=>{this.achievementPage=Math.max(0,this.achievementPage-1);this.renderAchievements();});click('achievement-next',()=>{this.achievementPage++;this.renderAchievements();});
   click('dialog-skip',()=>{this.dialogTime=this.dialogTarget.length/78+1;this.element('dialog-text').textContent=this.dialogTarget;});click('dialog-quest',()=>this.talkQuest());
   click('dialog-leave',()=>this.leaveDialog());click('shop-close',()=>{this.element('shop-overlay').hidden=true;this.state='dialog';this.element('dialog-overlay').hidden=false;this.say('Снаряжение останется после смерти. Перед закрытием сохрани путешествие вручную.');});
   for(const tab of ['weapons','armors','upgrades','skins','supplies'] as const)click(`tab-${tab}`,()=>{this.shopTab=tab;this.shopPage=0;this.renderShop();});
@@ -147,12 +174,14 @@ export class GameScene extends Phaser.Scene {
  }
  update(_time:number,delta:number):void{
   const dt=Math.min(delta,40)/1000;
-  const live=this.state==='playing'||this.state==='intro'||this.state==='story';const boss=this.enemies.some(e=>!e.dead&&e.kind==='boss'&&e.region===this.regionIndex);const threat=this.area==='biome'&&this.enemies.some(e=>!e.dead&&e.region===this.regionIndex&&Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)<420);this.audio.update(dt,live,this.weather,this.area==='biome'&&boss?'boss':threat?'combat':'explore');
+  const live=this.state==='playing'||this.state==='intro'||this.state==='story';const boss=this.enemies.some(e=>!e.dead&&e.kind==='boss'&&e.region===this.regionIndex);const threat=this.area==='biome'&&this.enemies.some(e=>!e.dead&&e.region===this.regionIndex&&Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)<420);this.combatMusicLeft=threat?3:Math.max(0,this.combatMusicLeft-dt);this.audio.update(dt,live,this.weather,this.state==='story'?'story':this.area==='village'||this.area==='interior'?'village':this.area==='biome'&&boss?(this.enemies.some(e=>e.kind==='boss'&&!e.dead&&e.phase2&&e.region===this.regionIndex)?'rage':'boss'):this.combatMusicLeft>0?'combat':'explore');
   if(this.checkpointBannerLeft>0){this.checkpointBannerLeft-=dt;if(this.checkpointBannerLeft<=0)this.element('checkpoint-banner').hidden=true;}
+  this.updateAchievementNotice(dt);
   if(Phaser.Input.Keyboard.JustDown(this.keys.H))this.toggleGuide();
   if(Phaser.Input.Keyboard.JustDown(this.keys.M))this.toggleMap();
   if(Phaser.Input.Keyboard.JustDown(this.keys.TAB)){this.toggleMenu();return;}
   if(this.state==='story'){this.updateStory(dt);return;}if(this.state==='choice'||this.state==='confirm')return;
+  if(this.state==='travel'){if(Phaser.Input.Keyboard.JustDown(this.keys.ESC))this.closeTravel();return;}
   if(this.state==='menu'){if(Phaser.Input.Keyboard.JustDown(this.keys.ESC))this.toggleMenu();return;}
   if(this.state==='map'){if(Phaser.Input.Keyboard.JustDown(this.keys.ESC))this.toggleMap();return;}
   if(this.state==='dialog'){this.dialogTime+=dt;this.element('dialog-text').textContent=this.dialogTarget.slice(0,Math.floor(this.dialogTime*78));if(Phaser.Input.Keyboard.JustDown(this.keys.ESC))this.leaveDialog();return;}
@@ -165,56 +194,56 @@ export class GameScene extends Phaser.Scene {
   if(this.state==='dying'){this.deathLeft-=dt;this.animationTime+=dt;this.player.setAngle(Math.min(85,(.8-this.deathLeft)*110)).setAlpha(Math.max(.2,this.deathLeft/.8));this.armorSprite.setVisible(false);if(this.deathLeft<=0)this.respawn();return;}
   if(this.state!=='playing')return;
   this.elapsed+=dt;this.animationTime+=dt;this.dirty=true;const p=this.progress[this.regionIndex];if(this.area==='biome'&&!p.cleared)p.elapsed+=dt;
-  if(this.area==='biome')advanceQuests(this.quests[this.regionIndex],dt);this.guardLeft=Math.max(0,this.guardLeft-dt);this.effects=this.effects.filter(e=>(e.life-=dt)>0);
+  if(this.area==='biome')advanceQuests(this.quests[this.regionIndex],dt);this.guardLeft=Math.max(0,this.guardLeft-dt);this.counterLeft=Math.max(0,this.counterLeft-dt);if(this.counterLeft===0)this.counterTarget=-1;this.shieldLeft=Math.max(0,this.shieldLeft-dt);for(const id of Object.keys(this.skillCooldowns) as SkillId[])this.skillCooldowns[id]=Math.max(0,(this.skillCooldowns[id]??0)-dt);this.effects=this.effects.filter(e=>(e.life-=dt)>0);
   this.dodgeLeft=Math.max(0,this.dodgeLeft-dt);this.dodgeWait=Math.max(0,this.dodgeWait-dt);this.hurtLeft=Math.max(0,this.hurtLeft-dt);this.hurtFlash=Math.max(0,this.hurtFlash-dt);this.regenDelay=Math.max(0,this.regenDelay-dt);this.healWait=Math.max(0,this.healWait-dt);this.slowed=Math.max(0,this.slowed-dt);
-  const weapon=attackSpec(this.profile,this.heavyAttack,this.combo);
-  if(this.attackTime>=0){this.attackTime+=dt;if(this.attackTime>=weapon.duration)this.attackTime=-1;}
+  const weapon=this.currentAttackSpec();
+  if(this.attackTime>=0){this.attackTime+=dt;if(this.attackTime>=weapon.duration){this.attackTime=-1;this.activeSkill=null;this.counterStrike=false;}}
   if(this.regenDelay<=0&&this.attackTime<0&&this.dodgeLeft===0)this.stamina=Math.min(stats(this.profile).maxStamina,this.stamina+stats(this.profile).staminaRegen*dt);
   this.updateAim();if(this.keys.J.isDown||this.mouseHeld)this.attack();
   if(Phaser.Input.Keyboard.JustDown(this.keys.SPACE)||Phaser.Input.Keyboard.JustDown(this.keys.SHIFT))this.dodge();
+  if(Phaser.Input.Keyboard.JustDown(this.keys.C))this.parry();for(const [i,key]of ['ONE','TWO','THREE'].entries())if(Phaser.Input.Keyboard.JustDown(this.keys[key]))this.useSkill(i+1);
   if(Phaser.Input.Keyboard.JustDown(this.keys.Q))this.heal();if(Phaser.Input.Keyboard.JustDown(this.keys.R))this.useUltimate();if(Phaser.Input.Keyboard.JustDown(this.keys.E))this.interact();
   if(this.state!=='playing')return;
   this.movePlayer(dt);this.updateAim();if(this.area==='biome')this.updateWeather(dt);
   if(this.area==='biome'&&!p.spawned&&p.elapsed>=REGIONS[this.regionIndex].bossTime)this.spawnBoss();
-  this.updateEnemies(dt);this.updateHazards(dt);this.updateProjectiles(dt);this.resolveAttack();this.updateUltimate(dt);this.collectCoins();this.updateWisp(dt);
+  this.updateWaves(dt);this.updateEnemies(dt);this.updateHazards(dt);this.updateProjectiles(dt);this.resolveAttack();this.updateUltimate(dt);this.collectCoins();this.updateWisp(dt);
   if(this.state!=='playing')return;
   if(this.area==='tutorial'){if(this.lessonIndex===0&&this.player.x>285)this.lessonEvent('move');if(this.tutorialFinished){this.finishTutorial();return;}}
   this.checkProgress();this.updateCamp();this.drawActors();this.drawGates();
-  if(this.guideLeft>0){this.guideLeft-=dt;if(this.guideLeft<=0)this.toggleGuide(false);}
   this.hudLeft-=dt;if(this.hudLeft<=0){this.updateHUD();this.hudLeft=.09;}
  }
-  private drawWorld(): void {
-    const road = this.add.graphics().setDepth(1);
-    for (let i=0;i<REGIONS.length;i++) {
-      const start = regionStart(i), region = REGIONS[i];
-      const key = background(this,REGION_WIDTH,WORLD_HEIGHT,i+1,region.palette);
-      this.add.image(start,0,key).setOrigin(0).setDepth(0);
-      road.lineStyle(86,0xcbb991,.19); road.beginPath(); road.moveTo(start,WORLD_HEIGHT/2);
-      road.lineTo(start+210,WORLD_HEIGHT/2); road.lineTo(start+500,WORLD_HEIGHT*.43); road.lineTo(start+870,WORLD_HEIGHT*.57); road.lineTo(start+REGION_WIDTH,WORLD_HEIGHT/2); road.strokePath();
-      const terrain = regionTerrain(i,start,REGION_WIDTH,WORLD_HEIGHT); this.terrainByRegion.push(terrain); this.terrain.push(...terrain);
-      this.nav.push(makeGrid(terrain,this.regionBounds(i),1,20)); this.bossNav.push(makeGrid(terrain,this.regionBounds(i),1,35));
-      for (const t of terrain) this.add.image(t.x,t.y,t.kind).setOrigin(.5,t.kind==='tree'?.82:t.kind==='stump'?.61:.5)
-        .setDisplaySize(t.kind==='tree'?125:t.kind==='puddle'?t.radius*2.5:82,t.kind==='tree'?125:t.kind==='puddle'?t.radius*2.5:82)
-        .setDepth(t.kind==='puddle'?2:10+t.y*.01);
-      this.add.text(start+106,WORLD_HEIGHT/2-115,`${i+1} · ${region.name}`,{fontFamily:'system-ui',fontSize:'15px',color:'#e8d299',backgroundColor:'#1e3f31',padding:{x:12,y:7}}).setDepth(3);
-      
-    }
-    for(let i=-1;i<REGIONS.length-1;i++){
-      const center=villagePosition(i),left=i<0?0:regionEnd(i),width=i<0?PROLOGUE_WIDTH:ROAD_WIDTH;
-      this.add.image(left,0,background(this,width,WORLD_HEIGHT,31+i,REGIONS[0].palette)).setOrigin(0).setDepth(0);
-      road.lineStyle(100,0xd3bf86,.24);road.lineBetween(left,550,left+width,550);
-      this.add.text(center.x,450,VILLAGE_NAMES[i+1],{fontFamily:'system-ui',fontSize:'22px',color:'#f3e1ac',backgroundColor:'#163a30',padding:{x:15,y:8}}).setOrigin(.5).setDepth(10);
-      for(const [n,person]of PEOPLE.entries()){
-        const x=center.x+person.offset,y=550+(n%2?75:0);this.add.image(x,390+(n%2?15:0),'hut').setDisplaySize(128,128).setDepth(10);
-        const sprite=this.add.image(x,y,person.texture).setDisplaySize(80,80).setDepth(25);this.villagers.push({village:i,role:person.role,sprite});if(i>=0&&person.role==='smith')this.merchants.push(sprite);
-        this.add.text(x,y+48,`${person.name} · ${person.job}`,{fontFamily:'system-ui',fontSize:'12px',color:'#f0e1b3',backgroundColor:'#15362acc',padding:{x:6,y:3}}).setOrigin(.5).setDepth(26);
-      }
-      this.fires.push(this.add.image(center.x+15,655,'fire').setDisplaySize(64,64).setDepth(15));
-      this.add.text(left+width-90,500,'ВОСТОК →',{fontFamily:'system-ui',fontSize:'13px',color:'#cfdfc9'}).setOrigin(.5).setDepth(11);
-    }
+ private drawWorld():void{
+  const road=this.add.graphics().setDepth(1);
+  for(let i=0;i<REGIONS.length;i++){
+   const start=regionStart(i),region=REGIONS[i];this.add.image(start,0,background(this,REGION_WIDTH,WORLD_HEIGHT,i+1,region.palette)).setOrigin(0).setDepth(0);
+   road.lineStyle(86,0xcbb991,.19);road.beginPath();road.moveTo(start,550);road.lineTo(start+210,550);road.lineTo(start+500,473);road.lineTo(start+870,627);road.lineTo(start+REGION_WIDTH,550);road.strokePath();
+   biomeGround(this,start,i,REGION_WIDTH,WORLD_HEIGHT,region.palette);
+   const terrain=regionTerrain(i,start,REGION_WIDTH,WORLD_HEIGHT);this.terrainByRegion.push(terrain);this.terrain.push(...terrain);
+   this.nav.push(makeGrid(terrain,this.regionBounds(i),1,20));this.bossNav.push(makeGrid(terrain,this.regionBounds(i),1,35));
+   for(const t of terrain){if(Math.abs(t.x-(start+REGION_WIDTH*.65))<1&&Math.abs(t.y-WORLD_HEIGHT*.25)<1)continue;
+    this.add.image(t.x,t.y,t.kind).setOrigin(.5,t.kind==='tree'?.82:t.kind==='stump'?.61:.5).setDisplaySize(t.kind==='tree'?125:t.kind==='puddle'?t.radius*2.5:82,t.kind==='tree'?125:t.kind==='puddle'?t.radius*2.5:82).setDepth(t.kind==='puddle'?2:10+t.y*.01);
+   }
+   this.add.text(start+106,435,`${i+1} · ${region.name}`,{fontFamily:'system-ui',fontSize:'15px',color:'#e8d299',backgroundColor:'#1e3f31',padding:{x:12,y:7}}).setDepth(3);
   }
-
-
+  for(let i=-1;i<REGIONS.length-1;i++){
+   const center=villagePosition(i),left=i<0?0:regionEnd(i),width=i<0?PROLOGUE_WIDTH:ROAD_WIDTH,palette=REGIONS[Math.max(0,i)].palette;
+   this.add.image(left,0,background(this,width,WORLD_HEIGHT,31+i,palette)).setOrigin(0).setDepth(0);
+   road.lineStyle(100,0xd3bf86,.24);road.lineBetween(left,550,left+width,550);road.lineStyle(42,0xcbb691,.30);road.lineBetween(center.x-205,415,center.x-205,950);road.lineBetween(center.x+205,415,center.x+205,950);
+   this.add.text(center.x,480,VILLAGE_NAMES[i+1],{fontFamily:'system-ui',fontSize:'21px',color:'#f3e1ac',backgroundColor:'#163a30',padding:{x:15,y:8}}).setOrigin(.5).setDepth(10);
+   for(const [n,person]of PEOPLE.entries()){
+    const at=housePoint(i,person.role),door={x:at.x,y:at.y+130};
+    const roof=this.add.image(at.x,at.y,`building-${n}`).setDisplaySize(240,303).setDepth(10);
+    const label=this.add.text(door.x,door.y+6,HOUSE_NAMES[person.role],{fontFamily:'system-ui',fontSize:'13px',color:'#f0e1b3',backgroundColor:'#15362acc',padding:{x:7,y:4}}).setOrigin(.5).setDepth(12);
+    this.houses.push({village:i,role:person.role,...at,door,roof,label});this.terrain.push({kind:'ruin',...at,radius:94});
+    const sprite=this.add.image(at.x+15,at.y-27,person.texture).setDisplaySize(86,86).setDepth(25).setVisible(false);this.villagers.push({village:i,role:person.role,sprite});if(i>=0&&person.role==='smith')this.merchants.push(sprite);
+    if(person.role==='smith'){const ember=this.add.image(at.x-56,at.y+40,'fire').setDisplaySize(24,30).setAlpha(.65).setDepth(11);this.tweens.add({targets:ember,alpha:.95,yoyo:true,repeat:-1,duration:450+i*13});}
+   }
+   const detail=this.add.graphics().setDepth(4);detail.lineStyle(4,0xb29c76,.65);for(let n=0;n<7;n++){const x=center.x-97+n*32;detail.lineBetween(x,688,x,726);}detail.lineBetween(center.x-102,705,center.x+102,705);
+   for(const side of [-1,1]){detail.fillStyle(0xead085,.12);detail.fillCircle(center.x+side*142,545,33);detail.lineStyle(3,0x6d563e,1);detail.lineBetween(center.x+side*142,520,center.x+side*142,580);detail.fillStyle(0xf3d796,.85);detail.fillRoundedRect(center.x+side*142-8,515,16,22,4);}
+   this.fires.push(this.add.image(center.x+15,655,'fire').setDisplaySize(64,64).setDepth(15));
+   this.add.text(left+width-90,500,'ВОСТОК →',{fontFamily:'system-ui',fontSize:'13px',color:'#cfdfc9'}).setOrigin(.5).setDepth(11);
+  }
+ }
   private freePosition(index:number,radius:number,away=0): Point {
     const bounds=this.regionBounds(index),terrain=this.terrainByRegion[index];
     for(let n=0;n<100;n++){
@@ -238,6 +267,7 @@ export class GameScene extends Phaser.Scene {
       if(e.path.length)aim=e.path[0];
     }else{e.path=[];e.nextPath=0;}
     const dx=aim.x-e.sprite.x,dy=aim.y-e.sprite.y,len=Math.hypot(dx,dy)||1,travel=Math.min(speed*dt,len);
+    if(e.mode==='chase')e.aim={x:dx/len,y:dy/len};
     const moved=moveCircle(e.sprite,dx/len*travel,dy/len*travel,e.radius,terrain,bounds);e.sprite.setPosition(moved.x,moved.y).setFlipX(dx<0);
   }
   private fullscreen(): void {
@@ -252,6 +282,7 @@ export class GameScene extends Phaser.Scene {
   private resetWeather(): void {this.weather='clear';this.weatherLeft=0;this.weatherNext=12+Math.random()*9;this.wetZones=[];this.strike=null;this.strikeNext=2;this.slowed=0;this.weatherInk?.clear();}
   private groundSpeed(at:Point,player:boolean): number {
     if(player&&this.slowed>0)return .3;
+    if(player&&this.hazards.some(h=>h.kind==='curse'&&h.warning<=0&&Math.hypot(at.x-h.x,at.y-h.y)<h.radius))return .78;
     const wet=this.terrain.some(t=>t.kind==='puddle'&&Math.hypot(at.x-t.x,at.y-t.y)<t.radius)||this.wetZones.some(t=>Math.hypot(at.x-t.x,at.y-t.y)<t.radius);
     return wet?player?Math.min(.96,.68+this.profile.upgrades.boots*.14):.62:1;
   }
@@ -264,21 +295,23 @@ export class GameScene extends Phaser.Scene {
       if(s.phase==='warning'){g.lineStyle(2,0xffd39b,.8);g.strokeCircle(s.x,s.y,LIGHTNING_RADIUS*(1-s.left/LIGHTNING_WARNING));}else{g.lineStyle(6,0xf1fcff,.9);g.beginPath();g.moveTo(s.x-10,s.y-190);g.lineTo(s.x+8,s.y-115);g.lineTo(s.x-10,s.y-85);g.lineTo(s.x,s.y);g.strokePath();}}
   }
 
- private newJourney(training=false):void{this.resetJourney();this.wantsTraining=training;this.dirty=true;this.startVillage(-1,true);this.beginStory(false);}
+ private newJourney(training=false):void{this.resetJourney();this.guideWanted=true;this.wantsTraining=training;this.dirty=true;this.startVillage(-1,true);this.beginStory(false);}
 
  private clearActors():void{
+  this.clearReaper();
+  this.clearInterior();this.counterTarget=-1;this.counterLeft=0;this.counterStrike=false;this.activeSkill=null;this.skillCooldowns={};this.shieldLeft=0;
   for(const q of this.questProps)q.sprite.destroy();this.questProps=[];this.wisp?.destroy();this.wisp=null;this.effects=[];
   for(const e of this.enemies){this.tweens.killTweensOf(e.sprite);e.sprite.destroy();e.shadow.destroy();}for(const c of this.coins)c.sprite.destroy();for(const c of this.chests)c.sprite.destroy();
   this.enemies=[];this.coins=[];this.chests=[];this.projectiles=[];this.hazards=[];this.ultimateLeft=0;
  }
  private startRegion(index:number,respawn=false,preserve=false):void{
-  this.area='biome';this.regionIndex=index;this.element('training-panel').hidden=true;
-  if(!preserve){this.progress[index]={coins:0,elapsed:0,spawned:false,bossDead:false,cleared:false};const old=this.quests[index];this.quests[index]=newQuests(index).map(q=>old?.find(v=>v.id===q.id&&v.complete)??q);
+  this.clearInterior();this.area='biome';this.regionIndex=index;this.configureCamera();this.waveClock=WAVE_FIRST;this.waveNumber=0;this.combatMusicLeft=0;this.element('training-panel').hidden=true;
+  if(!preserve){this.progress[index]={coins:0,elapsed:0,spawned:false,bossDead:false,cleared:false,income:this.progress[index]?.income??0,rewarded:this.progress[index]?.rewarded??false};const old=this.quests[index];this.quests[index]=newQuests(index).map(q=>old?.find(v=>v.id===q.id&&v.complete)??q);
    for(const e of this.enemies.filter(e=>e.region===index)){this.tweens.killTweensOf(e.sprite);e.sprite.destroy();e.shadow.destroy();}this.enemies=this.enemies.filter(e=>e.region!==index);
    for(const c of this.coins.filter(c=>c.region===index))c.sprite.destroy();this.coins=this.coins.filter(c=>c.region!==index);
    for(const group of REGIONS[index].roster)for(let n=0;n<group.count;n++)this.spawnEnemy(group.kind,index,n);for(let n=0;n<7;n++)this.spawnCoin(index,n===0);
   }
-  this.projectiles=[];this.hazards=[];this.effects=[];this.guardLeft=0;this.combo=0;this.lastAttack=this.elapsed-10;this.healWait=0;this.regenDelay=0;this.resetWeather();this.resetInput();this.mouse=null;this.attackTime=-1;this.ultimateLeft=0;this.ultimate=0;
+  this.projectiles=[];this.hazards=[];this.effects=[];this.guardLeft=0;this.counterLeft=0;this.counterTarget=-1;this.counterStrike=false;this.activeSkill=null;this.shieldLeft=0;this.combo=0;this.lastAttack=this.elapsed-10;this.healWait=0;this.regenDelay=0;this.resetWeather();this.resetInput();this.mouse=null;this.attackTime=-1;this.ultimateLeft=0;this.ultimate=0;
   this.dodgeLeft=0;this.dodgeWait=0;this.hurtLeft=2;this.hurtFlash=0;this.face=0;this.movement={x:1,y:0};this.armed=preserve&&this.progress[index].coins>=REGIONS[index].awaken;this.profile.blade=this.armed;
   this.player.setTexture(this.profile.skin).setAlpha(1).clearTint().setAngle(0).setScale(72/128).setFlipX(false);
   if(respawn)this.player.setPosition(regionStart(index)+100,588);const at=clampPoint(this.player,this.playerBounds());this.player.setPosition(at.x,at.y);this.cameras.main.centerOn(at.x,at.y);
@@ -288,21 +321,35 @@ export class GameScene extends Phaser.Scene {
 
  private beginIntro(resume:boolean):void{
   this.audio.unlock();this.state='intro';this.introLeft=INTRO_DURATION;this.introBroken=false;this.introResume=resume;this.resetInput();this.armed=true;
-  this.element('intro-overlay').hidden=false;this.element('intro-tag').textContent=REGIONS[this.regionIndex].name;
-  this.element('intro-title').textContent=resume?'Новая земля. Та же древняя аура.':'Ты пришёл с оружием.';
-  this.element('intro-text').textContent=`${weaponFor(this.profile).name} хранит твою силу. Но туман уже сомкнулся за спиной.`;
-  this.checkpointBannerLeft=0;this.element('checkpoint-banner').hidden=true;this.drawActors();
+  this.clearReaper();this.reaper.setVisible(true).setAlpha(0).setPosition(this.player.x+270,this.player.y-145);
+  const w=weaponFor(this.profile);this.stolenWeapon.setTexture(w.id).setTint(w.color).setDisplaySize(w.style==='spear'?126:106,w.style==='spear'?126:106).setOrigin(.20,.89);
+  this.element('intro-overlay').hidden=false;this.syncGuide();this.element('intro-tag').textContent=REGIONS[this.regionIndex].name;
+  this.element('intro-title').textContent=resume?'Страж следующей печати.':'В тумане кто-то ждёт тебя.';
+  this.element('intro-text').textContent=`${w.name} хранит твою память. Призрак печати пришёл разорвать её связь с оружием.`;
+  this.checkpointBannerLeft=0;this.element('checkpoint-banner').hidden=true;this.audio.play('howl');this.drawActors();
  }
+ private clearReaper():void{this.reaper?.setVisible(false).setAlpha(0);this.stolenWeapon?.setVisible(false);this.reaperInk?.clear();}
  private updateIntro(dt:number):void{
-  this.introLeft-=dt;this.animationTime+=dt;
-  if(this.introLeft<INTRO_DURATION-1.5&&!this.introBroken){this.introBroken=true;this.armed=false;this.profile.blade=false;this.audio.play('crack');this.cameras.main.shake(240,.005);this.particles(this.player.x+25,this.player.y,24,0xa6eaf1);
-   this.element('intro-title').textContent='Аура места разрушила оружие.';this.element('intro-text').textContent=`Собери ${REGIONS[this.regionIndex].awaken} осколков собственной души. Они восстановят выбранное оружие. Нежить не даст сделать это спокойно.`;
+  this.introLeft-=dt;this.animationTime+=dt;const t=INTRO_DURATION-this.introLeft;
+  const approach=Math.min(1,t/1.5),ease=1-(1-approach)**3,leave=Math.max(0,t-3.3);
+  this.reaper.setPosition(this.player.x+270-175*ease+leave*38,this.player.y-145+85*ease-leave*28+Math.sin(t*4)*7).setAlpha(Math.min(1,t/.65)*Math.max(0,1-leave/2.7)).setRotation(Math.sin(t*2)*.035);
+  if(t>=WEAPON_BREAK_AT&&!this.introBroken){this.introBroken=true;this.armed=false;this.profile.blade=false;this.stolenWeapon.setVisible(false);this.audio.play('crack');this.cameras.main.shake(240,.005);this.particles(this.reaper.x+43,this.reaper.y-24,32,0xa6eaf1);
+   this.element('intro-title').textContent='Он расколол оружие, но не твою клятву.';this.element('intro-text').textContent=`Собери ${REGIONS[this.regionIndex].awaken} осколков собственной души. Они восстановят выбранное оружие. Разорви печать босса, чтобы вернуть силу и продолжить путь к семье.`;
   }
-  this.drawActors();this.drawGates();if(this.introLeft<=0)this.finishIntro();
+  this.drawActors();this.drawGates();const g=this.reaperInk;g.clear();
+  if(t<5.9){const fade=this.reaper.alpha;g.fillStyle(0x12132a,.13*fade);g.fillEllipse(this.reaper.x,this.reaper.y+44,165,75);g.lineStyle(2,0x9dcfe9,.24*fade);g.strokeEllipse(this.reaper.x,this.reaper.y+52,116,36);
+   for(let i=0;i<9;i++){const a=t*1.6+i*.7,x=this.reaper.x+Math.cos(a)*(50+i*5),y=this.reaper.y+Math.sin(a*.8)*(30+i*3);g.fillStyle(i%2?0x94d6e0:0x50678e,.2*fade);g.fillCircle(x,y,3+i*.7);}
+  }
+  if(t>=WEAPON_STEAL_AT&&!this.introBroken){const f=Math.min(1,(t-WEAPON_STEAL_AT)/(WEAPON_BREAK_AT-WEAPON_STEAL_AT)),hand={x:this.reaper.x+45,y:this.reaper.y-24};this.sword.setVisible(false);
+   this.stolenWeapon.setVisible(true).setPosition(Phaser.Math.Linear(this.player.x+22,hand.x,f),Phaser.Math.Linear(this.player.y+5,hand.y,f)-Math.sin(f*Math.PI)*32).setRotation(.98+f*2.6).setAlpha(1);
+   g.lineStyle(3,0xbceef6,.5);g.beginPath();g.moveTo(this.player.x,this.player.y-12);for(let n=1;n<=12;n++){const u=n/12,v=1-u;g.lineTo(v*v*this.player.x+2*v*u*(this.player.x+90)+u*u*hand.x,v*v*(this.player.y-12)+2*v*u*(this.player.y-75)+u*u*hand.y);}g.strokePath();
+   if(t>=1.5){this.element('intro-title').textContent='Призрак вырывает твою силу.';this.element('intro-text').textContent='Он ломает любое оружие, которое ты принёс. Его нельзя остановить клинком: сначала верни себе осколки памяти.';}
+  }
+  if(this.introLeft<=0)this.finishIntro();
  }
  private finishIntro():void{
-  if(this.state!=='intro')return;this.armed=false;this.profile.blade=false;this.element('intro-overlay').hidden=true;this.state='playing';this.resetInput();this.hurtLeft=2;
-  this.toast('Туман сомкнулся. Смерть вернёт тебя в последнюю посещённую деревню.');if(!this.introResume){this.toggleGuide(true);this.guideLeft=18;}this.updateHUD();
+  if(this.state!=='intro')return;this.clearReaper();this.sword.setVisible(false);this.armed=false;this.profile.blade=false;this.element('intro-overlay').hidden=true;this.state='playing';this.resetInput();this.hurtLeft=2;
+  this.toast('Туман сомкнулся. Верни силу и победи хозяина печати.');this.syncGuide();this.updateHUD();
  }
  private reachCheckpoint(name:string):void{
   this.element('checkpoint-name').textContent=name;this.element('checkpoint-banner').hidden=false;this.checkpointBannerLeft=2.7;this.audio.play('checkpoint');
@@ -311,22 +358,31 @@ export class GameScene extends Phaser.Scene {
   const index=this.regionIndex,done={...this.progress[index]},tutorial=this.area==='tutorial';
   if(tutorial){this.hp=stats(this.profile).maxHP;this.player.setPosition(210,550);this.state='playing';this.player.setAlpha(1).setAngle(0);this.hurtLeft=2;this.toast('Учебный костёр вернул тебя. Продолжай текущий урок.');return;}
   this.startRegion(index,true);if(done.cleared)this.progress[index]=done;
-  this.startVillage(this.lastVillage,true);this.toast('Ты вернулся в последнюю посещённую деревню. Купи снаряжение или поговори с лекарем перед новой попыткой.');
+  this.startVillage(this.lastVillage,true);this.syncAchievements();this.toast('Ты вернулся в последнюю посещённую деревню. Купи снаряжение или поговори с лекарем перед новой попыткой.');
  }
 
  private spawnEnemy(kind:EnemyKind,index:number,variant=0,point?:Point):Enemy{
-  const r=REGIONS[index],boss=kind==='boss',pos=point??this.freePosition(index,boss?34:20,310);
-  const key=boss?r.bossTexture:kind;
-  const hp=boss?r.bossHP:kind==='skeleton'?64+index*14:kind==='zombie'?94+index*18:kind==='necromancer'?78+index*18:kind==='vampire'?92+index*20:138+index*24;
-  const size=boss?148:kind==='dragon'?103:kind==='zombie'?83:78;
-  const sprite=this.add.image(pos.x,pos.y,key).setDisplaySize(size,size).setDepth(20+pos.y*.01);
-  const shadow=this.add.ellipse(pos.x,pos.y+(boss?36:21),boss?66:kind==='dragon'?53:35,boss?22:14,0x092a27,.32).setDepth(8);
+  const r=REGIONS[index],boss=kind==='boss',pos=point??this.freePosition(index,boss?34:20,310),key=boss?r.bossTexture:kind;
+  const baseHP:Record<EnemyKind,number>={skeleton:64,zombie:94,necromancer:78,vampire:92,dragon:138,wraith:100,knight:140,boss:r.bossHP};
+  const hp=boss?r.bossHP:baseHP[kind]+index*(kind==='skeleton'?14:kind==='dragon'||kind==='knight'?24:18),size=boss?148:kind==='dragon'?103:kind==='zombie'||kind==='knight'?83:78;
+  const sprite=this.add.image(pos.x,pos.y,key).setDisplaySize(size,size).setDepth(20+pos.y*.01),shadow=this.add.ellipse(pos.x,pos.y+(boss?36:21),boss?66:kind==='dragon'?53:35,boss?22:14,0x092a27,.32).setDepth(8);
   const e:Enemy={id:this.nextId++,region:index,kind,variant,sprite,shadow,hp,maxHP:hp,radius:boss?34:kind==='dragon'?25:20,
-   damage:boss?23+index*6:kind==='skeleton'?14+index*3:kind==='zombie'?17+index*4:kind==='vampire'?13+index*4:kind==='dragon'?16+index*4:11+index*3,
-   reward:boss?BOSS_REWARD+index*10:kind==='skeleton'?5+index:kind==='zombie'?6+index*2:kind==='dragon'?12+index*2:9+index*2,
-   speed:r.speed*(boss?.95:kind==='zombie'?.70:kind==='necromancer'?.72:kind==='vampire'?1.18:kind==='dragon'?.88:1),
-   mode:'chase',clock:2.1+variant*.28,nextPath:0,path:[],aim:{x:1,y:0},target:{...pos},hasHit:false,stun:0,flash:0,phase2:false,dead:false,move:'slash',moveIndex:variant,training:false};
+   damage:boss?23+index*4:kind==='skeleton'?14+index*2:kind==='zombie'||kind==='knight'?17+index*2:kind==='vampire'||kind==='dragon'?16+index*2:11+index*2,
+   reward:boss?BOSS_REWARD+index*13:kind==='skeleton'?5+index:kind==='zombie'?6+index*2:kind==='dragon'?12+index*2:9+index*2,
+   speed:r.speed*(boss?.95:kind==='zombie'?.70:kind==='necromancer'?.72:kind==='vampire'?1.18:kind==='dragon'?.88:kind==='knight'?.90:1),
+   mode:'chase',clock:1.7+variant*.22,nextPath:0,path:[],aim:{x:1,y:0},target:{...pos},hasHit:false,stun:0,flash:0,phase2:false,dead:false,move:'slash',moveIndex:variant,training:false,chain:0,bleed:0,bleedTick:1};
   this.enemies.push(e);return e;
+ }
+ private updateWaves(dt:number):void{
+  this.pruneLeft-=dt;if(this.pruneLeft<=0){this.pruneLeft=1;this.enemies=this.enemies.filter(e=>{if(!e.dead||e.sprite.visible)return true;e.sprite.destroy();e.shadow.destroy();return false;});}
+  if(this.area!=='biome'||this.progress[this.regionIndex].bossDead)return;
+  this.waveClock-=dt;const active=this.enemies.filter(e=>e.region===this.regionIndex&&!e.dead&&e.kind!=='boss').length,cap=Math.min(MAX_MINIONS,12+this.regionIndex);
+  if(this.waveClock>0&&active>0)return;this.waveClock=Math.max(5,9-this.regionIndex*.45);this.waveNumber++;
+  const roster=REGIONS[this.regionIndex].roster.flatMap(g=>Array.from({length:g.count},()=>g.kind));
+  for(let n=0;n<Math.min(WAVE_SIZE,cap-active);n++){
+   const kind=roster[(this.waveNumber*3+n)%roster.length],at=this.freePosition(this.regionIndex,kind==='dragon'?25:20,240),e=this.spawnEnemy(kind,this.regionIndex,this.waveNumber+n,at);e.stun=.95;e.clock=1.2;
+   this.hazards.push({...at,region:this.regionIndex,radius:32,warning:.9,left:1.2,damage:0,kind:'ring',fired:false});this.particles(at.x,at.y,5,REGIONS[this.regionIndex].fog);
+  }
  }
  private spawnBoss():void{
   const p=this.progress[this.regionIndex];if(p.spawned||p.bossDead)return;p.spawned=true;
@@ -347,20 +403,44 @@ export class GameScene extends Phaser.Scene {
   const len=Math.hypot(x,y);if(len>.05){x/=Math.max(1,len);y/=Math.max(1,len);this.movement={x:x/(Math.hypot(x,y)||1),y:y/(Math.hypot(x,y)||1)};if(this.attackTime<0&&!this.mouse)this.face=Math.atan2(y,x);}
   if(this.dodgeLeft>0){x=this.dodgeVector.x;y=this.dodgeVector.y;}
   const speed=stats(this.profile).speed*(this.dodgeLeft>0?2.7:this.attackTime>=0?.40:1)*this.groundSpeed(this.player,true);
-  const before={x:this.player.x,y:this.player.y},moved=moveCircle(before,x*speed*dt,y*speed*dt,PLAYER_RADIUS,this.terrain,this.playerBounds());this.player.setPosition(moved.x,moved.y);
+  const before={x:this.player.x,y:this.player.y},moved=moveCircle(before,x*speed*dt,y*speed*dt,PLAYER_RADIUS,this.activeTerrain(),this.playerBounds());this.player.setPosition(moved.x,moved.y);
   this.velocity=dt>0?{x:(moved.x-before.x)/dt,y:(moved.y-before.y)/dt}:{x:0,y:0};
-  this.audio.footstep(this.groundSpeed(this.player,true)<1?'water':REGIONS[this.regionIndex].ground,Math.hypot(this.velocity.x,this.velocity.y)>15&&this.dodgeLeft<=0);
+  this.audio.footstep(this.groundSpeed(this.player,true)<1?'water':this.area==='interior'?'stone':REGIONS[this.regionIndex].ground,Math.hypot(this.velocity.x,this.velocity.y)>15&&this.dodgeLeft<=0);
   if(this.dodgeLeft>0&&Math.floor(this.animationTime*45)%3===0){const ghost=this.add.image(this.player.x,this.player.y,this.profile.skin).setDisplaySize(72,72).setAlpha(.20).setFlipX(this.player.flipX).setDepth(9);this.tweens.add({targets:ghost,alpha:0,duration:150,onComplete:()=>ghost.destroy()});}
+ }
+ private currentAttackSpec():ReturnType<typeof attackSpec>&{pulses:number}{
+  if(this.counterStrike)return{reach:170,arc:.70,cost:20,windup:.10,activeEnd:.27,duration:.58,multiplier:2.6,step:0,pulses:1};
+  if(this.activeSkill)return skillAttack(this.activeSkill);
+  const a=attackSpec(this.profile,this.heavyAttack,this.combo);
+  if(weaponFor(this.profile).style==='axe'&&!this.heavyAttack&&this.combo===1)return{...a,arc:.50,reach:a.reach+12,multiplier:1.35,pulses:1};
+  return{...a,pulses:1};
  }
  private attack():void{
   if(this.state!=='playing')return;const w=weaponFor(this.profile);
   if(!this.armed){if(!this.mouseHeld)this.toast(`Нужно ${REGIONS[this.regionIndex].awaken} осколков силы, чтобы восстановить оружие.`);return;}
-  if(this.attackTime>=0||this.dodgeLeft>0||this.guardLeft>0||this.stamina<w.cost||this.ultimateLeft>0)return;
-  this.updateAim();this.combo=this.elapsed-this.lastAttack<1.2?(this.combo+1)%3:0;this.lastAttack=this.elapsed;this.heavyAttack=false;
-  this.attackTime=0;this.attackAngle=this.face;this.attackHits.clear();this.attackFired=false;this.stamina-=w.cost;this.regenDelay=STAMINA_DELAY;
+  if(this.attackTime>=0||this.dodgeLeft>0||this.guardLeft>0||this.ultimateLeft>0)return;
+  const counter=this.enemies.find(e=>e.id===this.counterTarget&&!e.dead);
+  if(counter&&this.counterLeft>0&&this.stamina>=20&&Math.hypot(counter.sprite.x-this.player.x,counter.sprite.y-this.player.y)<240&&clearLine(this.player,counter.sprite,3,this.activeTerrain(),this.playerBounds())){
+   this.face=Math.atan2(counter.sprite.y-this.player.y,counter.sprite.x-this.player.x);const distance=Math.hypot(counter.sprite.x-this.player.x,counter.sprite.y-this.player.y),step=Math.min(70,Math.max(0,distance-95)),at=moveCircle(this.player,Math.cos(this.face)*step,Math.sin(this.face)*step,PLAYER_RADIUS,this.activeTerrain(),this.playerBounds());this.player.setPosition(at.x,at.y);
+   this.counterStrike=true;this.strikeTarget=counter.id;this.counterLeft=0;this.counterTarget=-1;this.activeSkill=null;this.heavyAttack=false;this.stamina-=20;
+  }else{
+   if(this.stamina<w.cost)return;this.updateAim();this.combo=this.elapsed-this.lastAttack<1.2?(this.combo+1)%3:0;this.lastAttack=this.elapsed;this.heavyAttack=false;this.activeSkill=null;this.counterStrike=false;this.strikeTarget=-1;this.stamina-=w.cost;
+  }
+  this.attackTime=0;this.attackAngle=this.face;this.attackHits.clear();this.attackFired=false;this.attackPulse=-1;this.regenDelay=STAMINA_DELAY;
+ }
+ private parry():void{
+  if(this.state!=='playing'||!this.armed||this.attackTime>=0||this.dodgeLeft>0||this.guardLeft>0||this.ultimateLeft>0||this.stamina<12)return;
+  this.updateAim();this.stamina-=12;this.regenDelay=STAMINA_DELAY;this.mouseHeld=false;this.guardLeft=PARRY_DURATION;this.addEffect('ring',this.player,0xffe3a1,45);
+ }
+ private useSkill(key:number):void{
+  const w=weaponFor(this.profile),skill=SKILL_TREE.find(s=>s.style===w.style&&s.key===key);
+  if(!skill||!this.profile.skills.includes(skill.id)||this.profile.disabledSkills.includes(skill.id)){this.toast('Приём не установлен. Tab → Навыки: изучи его или вставь в панель.');return;}
+  if(this.state!=='playing'||!this.armed||this.attackTime>=0||this.dodgeLeft>0||this.guardLeft>0||this.ultimateLeft>0||(this.skillCooldowns[skill.id]??0)>0)return;
+  const a=skillAttack(skill.id);if(this.stamina<a.cost){this.toast('Недостаточно выносливости.');return;}
+  this.updateAim();this.stamina-=a.cost;this.activeSkill=skill.id;this.counterStrike=false;this.heavyAttack=false;this.skillCooldowns[skill.id]=skill.cooldown;this.attackTime=0;this.attackAngle=this.face;this.attackPulse=-1;this.attackHits.clear();this.attackFired=false;this.regenDelay=STAMINA_DELAY;
  }
  private dodge():void{
-  if(this.state!=='playing'||this.dodgeWait>0||this.stamina<DODGE_COST)return;const w=attackSpec(this.profile,this.heavyAttack,this.combo);
+  if(this.state!=='playing'||this.dodgeWait>0||this.stamina<DODGE_COST)return;const w=this.currentAttackSpec();
   if(this.attackTime>=0&&this.attackTime<w.activeEnd)return;
   this.attackTime=-1;this.dodgeLeft=DODGE_TIME;this.dodgeWait=stats(this.profile).dodgeCooldown;
   this.dodgeVector=Math.hypot(this.velocity.x,this.velocity.y)>5?this.movement:{x:Math.cos(this.face),y:Math.sin(this.face)};
@@ -373,38 +453,63 @@ export class GameScene extends Phaser.Scene {
   this.flasks--;this.hp=Math.min(stats(this.profile).maxHP,this.hp+FLASK_HEAL);this.healWait=1.1;this.audio.play('heal');this.particles(this.player.x,this.player.y,12,0xbdd785);this.updateHUD();this.lessonEvent('heal');
  }
  private resolveAttack():void{
-  const w=weaponFor(this.profile),a=attackSpec(this.profile,this.heavyAttack,this.combo);if(this.attackTime<a.windup||this.attackTime>a.activeEnd)return;
-  if(!this.attackFired){this.attackFired=true;this.audio.play(w.type==='magic'?'cast':w.type==='thrust'?'thrust':w.type==='sweep'?'axe':'slash');this.addEffect(this.heavyAttack&&w.style==='axe'?'ring':w.style==='spear'?'thrust':'slash',this.player,w.color,a.reach,this.attackAngle);
-   if(a.step){const moved=moveCircle(this.player,Math.cos(this.attackAngle)*a.step,Math.sin(this.attackAngle)*a.step,PLAYER_RADIUS,this.terrain,this.playerBounds());this.player.setPosition(moved.x,moved.y);}
-   if(w.type==='magic'){
-    if(this.heavyAttack){const target=this.mouse?this.cameras.main.getWorldPoint(this.mouse.x,this.mouse.y):{x:this.player.x+Math.cos(this.attackAngle)*220,y:this.player.y+Math.sin(this.attackAngle)*220};const d=Math.hypot(target.x-this.player.x,target.y-this.player.y)||1,point=clampPoint({x:this.player.x+(target.x-this.player.x)*Math.min(1,340/d),y:this.player.y+(target.y-this.player.y)*Math.min(1,340/d)},this.playerBounds());
-     if(clearLine(this.player,point,3,this.terrain,this.playerBounds()))this.hazards.push({...point,region:this.regionIndex,radius:92,warning:.65,left:1.10,damage:stats(this.profile).damage*a.multiplier,kind:'sigil',fired:false});
-    }else{const shots=w.id==='runicstaff'?3:1;for(let n=0;n<shots;n++)this.shoot(this.player,this.attackAngle+(n-(shots-1)/2)*.15,520,stats(this.profile).damage*a.multiplier,true,this.regionIndex,w.color,65);}return;
+  const w=weaponFor(this.profile),a=this.currentAttackSpec();if(this.attackTime<a.windup||this.attackTime>a.activeEnd)return;
+  const pulse=Math.min(a.pulses-1,Math.floor((this.attackTime-a.windup)/Math.max(.01,a.activeEnd-a.windup)*a.pulses));
+  if(pulse!==this.attackPulse){this.attackPulse=pulse;this.attackHits.clear();this.audio.play(this.counterStrike?'parry':w.type==='magic'?'cast':w.type==='thrust'?'thrust':w.type==='sweep'?'axe':'slash');
+   this.addEffect(this.activeSkill==='axe_leap'||this.activeSkill==='staff_ward'||this.heavyAttack&&w.style==='axe'?'ring':w.style==='spear'||this.activeSkill==='axe_fault'?'thrust':'slash',this.player,this.counterStrike?0xffe7a1:w.color,a.reach,this.attackAngle+(pulse%2?.18:-.18));
+  }
+  if(!this.attackFired){this.attackFired=true;
+   if(a.step){
+    let step=a.step;
+    if(step>0&&a.arc<1)for(const e of this.enemies){
+     if(e.dead||e.region!==this.regionIndex||!slashConnects(this.player,this.attackAngle,e.sprite,e.radius,step+e.radius,.55))continue;
+     step=Math.min(step,Math.max(0,Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)-e.radius-PLAYER_RADIUS-4));
+    }
+    const moved=moveCircle(this.player,Math.cos(this.attackAngle)*step,Math.sin(this.attackAngle)*step,PLAYER_RADIUS,this.activeTerrain(),this.playerBounds());this.player.setPosition(moved.x,moved.y);
+   }
+   if(w.type==='magic'&&!this.counterStrike){
+    if(this.activeSkill==='staff_ward'){this.shieldLeft=3;for(const e of this.enemies)if(!e.dead&&e.region===this.regionIndex&&Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)<130+e.radius&&clearLine(this.player,e.sprite,3,this.activeTerrain(),this.playerBounds()))this.hitEnemy(e,stats(this.profile).damage*a.multiplier,85);}
+    else if(this.heavyAttack||this.activeSkill==='staff_star'){
+     const target=this.mouse?this.cameras.main.getWorldPoint(this.mouse.x,this.mouse.y):{x:this.player.x+Math.cos(this.attackAngle)*220,y:this.player.y+Math.sin(this.attackAngle)*220},d=Math.hypot(target.x-this.player.x,target.y-this.player.y)||1,range=this.activeSkill==='staff_star'?420:340,point=clampPoint({x:this.player.x+(target.x-this.player.x)*Math.min(1,range/d),y:this.player.y+(target.y-this.player.y)*Math.min(1,range/d)},this.playerBounds());
+     if(clearLine(this.player,point,3,this.activeTerrain(),this.playerBounds()))this.hazards.push({...point,region:this.regionIndex,radius:this.activeSkill==='staff_star'?150:92,warning:this.activeSkill==='staff_star'?.9:.65,left:1.4,damage:stats(this.profile).damage*a.multiplier,kind:'sigil',fired:false});
+    }else{const shots=this.activeSkill==='staff_fan'?5:w.id==='runicstaff'?3:1;for(let n=0;n<shots;n++)this.shoot(this.player,this.attackAngle+(n-(shots-1)/2)*.17,520,stats(this.profile).damage*a.multiplier,true,this.regionIndex,w.color,this.activeSkill==='staff_fan'?35:65);}return;
    }
   }
-  if(w.type==='magic')return;
-  for(const e of [...this.enemies]){if(e.dead||this.attackHits.has(e.id)||e.region!==this.regionIndex||(this.area==='tutorial')!==e.training||!slashConnects(this.player,this.attackAngle,e.sprite,e.radius,a.reach,a.arc)||!clearLine(this.player,e.sprite,3,this.terrain,this.playerBounds()))continue;
-   this.attackHits.add(e.id);this.hitEnemy(e,stats(this.profile).damage*a.multiplier,w.type==='sweep'?this.heavyAttack?80:52:22);
+  if(w.type==='magic'&&!this.counterStrike)return;
+  for(const e of [...this.enemies]){if(e.dead||this.attackHits.has(e.id)||e.region!==this.regionIndex||this.counterStrike&&e.id!==this.strikeTarget||this.trainingArea()!==e.training||!slashConnects(this.player,this.attackAngle,e.sprite,e.radius,a.reach,a.arc)||!clearLine(this.player,e.sprite,3,this.activeTerrain(),this.playerBounds()))continue;
+   this.attackHits.add(e.id);this.hitEnemy(e,stats(this.profile).damage*a.multiplier,this.counterStrike?65:w.type==='sweep'?this.heavyAttack?80:52:22);
+   if(this.activeSkill==='axe_cleave'&&!e.dead){e.bleed=3;e.bleedTick=1;}
+   if(this.counterStrike){this.profile.counterWins++;this.syncAchievements();this.particles(e.sprite.x,e.sprite.y,22,0xffe8a3);this.cameras.main.shake(80,.003);this.popup(e.sprite.x,e.sprite.y-80,'КОНТРУДАР','#ffe6a0');this.lessonEvent('counter');}
   }
  }
-
  private hitEnemy(e:Enemy,amount:number,knockback=25):void{
-  if(e.dead)return;const damage=Math.round(amount);e.hp=Math.max(0,e.hp-damage);e.flash=.15;e.stun=e.kind==='boss'?.035:e.kind==='dragon'?.12:.23;e.nextPath=0;
-  if(e.kind!=='boss'){e.mode='recover';e.clock=.36;const dx=e.sprite.x-this.player.x,dy=e.sprite.y-this.player.y,len=Math.hypot(dx,dy)||1,moved=moveCircle(e.sprite,dx/len*knockback,dy/len*knockback,e.radius,this.terrainByRegion[e.region],this.enemyBounds(e));e.sprite.setPosition(moved.x,moved.y);}
+  if(e.dead)return;
+  const front=Math.abs(Phaser.Math.Angle.Wrap(Math.atan2(this.player.y-e.sprite.y,this.player.x-e.sprite.x)-Math.atan2(e.aim.y,e.aim.x)))<1.05;
+  const shield=e.kind==='knight'&&e.mode==='chase'&&e.stun<=0&&front&&!this.counterStrike&&this.activeSkill!=='axe_cleave';
+  const damage=Math.max(1,Math.round(amount*(shield?.38:1)));e.hp=Math.max(0,e.hp-damage);e.flash=.15;e.stun=shield?.03:e.kind==='boss'?.035:e.kind==='dragon'?.12:.23;e.nextPath=0;
+  if(shield){this.audio.play('parry');this.addEffect('ring',e.sprite,0xaad7e5,30);}else if(e.kind!=='boss'){e.mode='recover';e.clock=.36;const dx=e.sprite.x-this.player.x,dy=e.sprite.y-this.player.y,len=Math.hypot(dx,dy)||1,moved=moveCircle(e.sprite,dx/len*knockback,dy/len*knockback,e.radius,this.terrainByRegion[e.region],this.enemyBounds(e));e.sprite.setPosition(moved.x,moved.y);}
   this.ultimate=Math.min(ULTIMATE_MAX,this.ultimate+5);this.audio.play('hit');this.particles(e.sprite.x,e.sprite.y,5,0xbfe9d8);this.popup(e.sprite.x,e.sprite.y-28,String(damage),'#d9f1e5');if(this.profile.weapon==='dawnblade')this.hp=Math.min(stats(this.profile).maxHP,this.hp+2);this.onQuestEvent('hit');this.lessonEvent('hit');
   if(e.hp<=0)this.killEnemy(e);
  }
  private killEnemy(e:Enemy):void{
-  if(e.dead)return;e.dead=true;this.kills++;if(!e.training&&e.kind==='necromancer'){const q=this.lines.find(q=>q.id==='bell')!;if(q.accepted&&!q.claimed)q.kills=Math.min(2,q.kills+1);}this.score+=e.reward*40;if(!e.training)this.grantCoins(e.reward,e.region,e.kind!=='boss');this.onQuestEvent('kill');this.lessonEvent('kill');
-  this.hp=Math.min(stats(this.profile).maxHP,this.hp+this.profile.upgrades.recovery*2);
-  this.popup(e.sprite.x,e.sprite.y-50,e.training?'Учебная победа':`+${e.reward} ◈`,'#baf3ec');this.tweens.add({targets:e.sprite,angle:e.sprite.flipX?-85:85,alpha:0,scaleX:e.sprite.scaleX*.7,scaleY:e.sprite.scaleY*.7,duration:430,onComplete:()=>{e.sprite.setVisible(false);e.shadow.setVisible(false);}});
-  this.particles(e.sprite.x,e.sprite.y,12,0xade2df);
-  if(e.kind==='boss'){this.progress[e.region].bossDead=true;this.toast(`${REGIONS[e.region].bossName} побеждён. +${e.reward} осколков души.`);this.checkProgress();}
+  if(e.dead)return;e.dead=true;this.kills++;if(!e.training&&e.kind==='necromancer'){const q=this.lines.find(q=>q.id==='bell')!;if(q.accepted&&!q.claimed)q.kills=Math.min(2,q.kills+1);}this.score+=e.reward*40;
+  let paid=0;if(!e.training){if(e.kind==='boss'){const p=this.progress[e.region];p.bossDead=true;if(!p.rewarded){p.rewarded=true;paid=this.grantCoins(e.reward,e.region,false);this.profile.skillPoints++;}}else paid=this.grantCoins(e.reward,e.region);}
+  this.onQuestEvent('kill');this.lessonEvent('kill');this.hp=Math.min(stats(this.profile).maxHP,this.hp+this.profile.upgrades.recovery*2);
+  this.popup(e.sprite.x,e.sprite.y-50,e.training?'Учебная победа':paid?`+${paid} ◈`:'Сила биома +','#baf3ec');this.tweens.add({targets:e.sprite,angle:e.sprite.flipX?-85:85,alpha:0,scaleX:e.sprite.scaleX*.7,scaleY:e.sprite.scaleY*.7,duration:430,onComplete:()=>{e.sprite.setVisible(false);e.shadow.setVisible(false);}});this.particles(e.sprite.x,e.sprite.y,12,0xade2df);
+  this.syncAchievements();
+  if(e.kind==='boss'){if(paid)this.popup(e.sprite.x,e.sprite.y-105,'+1 ИСКРА МАСТЕРСТВА','#ffe0a0');this.toast(`Ты разорвал печать! ${REGIONS[e.region].bossName} побеждён. Награда: ${paid} осколков${paid?', +1 искра':''}. Tab → Навыки: выбери новый приём.`);this.checkProgress();}
  }
- private damagePlayer(amount:number,source:Point,magic=false):void{
-  if(this.state!=='playing'||this.hurtLeft>0||this.dodgeLeft>0)return;if(this.guardLeft>0&&!magic&&Math.abs(Phaser.Math.Angle.Wrap(Math.atan2(source.y-this.player.y,source.x-this.player.x)-this.face))<1.1){this.guardLeft=0;this.ultimate=Math.min(100,this.ultimate+18);this.audio.play('parry');this.addEffect('ring',this.player,0xffedab,70);for(const e of this.enemies)if(!e.dead&&Math.hypot(e.sprite.x-source.x,e.sprite.y-source.y)<65){e.stun=e.kind==='boss'?.28:.9;e.mode='recover';e.clock=e.stun;}this.toast('Парирование! Теперь твой удар.');return;}const s=stats(this.profile),damage=Math.max(2,Math.round(amount*s.armor*(magic?s.ward:1)));
-  this.hp=Math.max(0,this.hp-damage);this.hurtLeft=HURT_PROTECTION;this.hurtFlash=.22;this.attackTime=-1;this.onQuestEvent('hurt');this.wispFear=1.4;this.audio.play('hurt');
-  const dx=this.player.x-source.x,dy=this.player.y-source.y,len=Math.hypot(dx,dy)||1,moved=moveCircle(this.player,dx/len*25,dy/len*25,PLAYER_RADIUS,this.terrain,this.playerBounds());this.player.setPosition(moved.x,moved.y);
+ private damagePlayer(amount:number,source:Point,magic=false,attacker?:Enemy):void{
+  if(this.state!=='playing'||this.hurtLeft>0||this.dodgeLeft>0)return;
+  const front=Math.abs(Phaser.Math.Angle.Wrap(Math.atan2(source.y-this.player.y,source.x-this.player.x)-this.face))<1.1;
+  if(this.guardLeft>0&&!magic&&front){
+   const perfect=this.guardLeft>=PARRY_DURATION-PERFECT_PARRY;this.guardLeft=0;
+   if(perfect&&attacker&&!attacker.dead){this.counterTarget=attacker.id;this.counterLeft=COUNTER_WINDOW;attacker.stun=attacker.kind==='boss'?.65:1.15;attacker.mode='recover';attacker.clock=attacker.stun;this.ultimate=Math.min(100,this.ultimate+18);this.audio.play('parry');this.addEffect('ring',this.player,0xffedab,70);this.toast('Точное парирование! ЛКМ - контрудар по отмеченному врагу.');return;}
+   amount*=.45;this.audio.play('parry');this.addEffect('ring',this.player,0xe3cf99,45);
+  }
+  const a=stats(this.profile),damage=Math.max(2,Math.round(amount*a.armor*(magic?a.ward:1)*(this.shieldLeft>0?.65:1)));
+  this.hp=Math.max(0,this.hp-damage);this.hurtLeft=HURT_PROTECTION;this.hurtFlash=.22;this.attackTime=-1;this.counterLeft=0;this.counterTarget=-1;this.onQuestEvent('hurt');this.wispFear=1.4;this.audio.play('hurt');
+  const dx=this.player.x-source.x,dy=this.player.y-source.y,len=Math.hypot(dx,dy)||1,moved=moveCircle(this.player,dx/len*25,dy/len*25,PLAYER_RADIUS,this.activeTerrain(),this.playerBounds());this.player.setPosition(moved.x,moved.y);
   this.cameras.main.shake(100,.0035);this.particles(this.player.x,this.player.y,7,0xd99591);this.popup(this.player.x,this.player.y-38,`-${damage}`,'#f0b0aa');
   this.updateHUD();if(this.hp<=0){this.deaths++;this.state='dying';this.deathLeft=.8;this.resetInput();this.sword.setVisible(false);this.armorSprite.setVisible(false);this.toast('Ты пал. Костёр хранит твоё эхо.');}
  }
@@ -424,15 +529,15 @@ export class GameScene extends Phaser.Scene {
   if(before>0&&this.ultimateLeft===0)this.ultimate=Math.min(100,this.ultimate);
  }
  private startEnemyAttack(e:Enemy):void{
-  const moves:EnemyAttack[]=e.kind==='boss'?REGIONS[e.region].bossMoves:e.kind==='skeleton'?['slash','charge']:e.kind==='zombie'?['slash','poison']:e.kind==='necromancer'?['fan','summon']:e.kind==='vampire'?['blink','slash','fan']:['breath','charge','fan'];
-  e.move=moves[e.moveIndex%moves.length];e.moveIndex++;e.target=this.predict(e);
+  const moves:Record<Exclude<EnemyKind,'boss'>,EnemyAttack[]>={skeleton:['slash','combo','snipe'],zombie:['combo','poison','slam'],necromancer:['fan','summon','curse','snipe'],vampire:['blink','combo','fan','nova'],dragon:['breath','charge','meteor'],wraith:['blink','curse','nova'],knight:['combo','snipe','charge','quake']};
+  const choices=e.training?['slash'] as EnemyAttack[]:e.kind==='boss'?REGIONS[e.region].bossMoves:moves[e.kind];e.move=choices[e.moveIndex%choices.length];e.moveIndex++;e.chain=0;e.target=this.predict(e);
   if(e.move==='blink'){const at=clampPoint({x:e.target.x-Math.cos(this.face)*100,y:e.target.y-Math.sin(this.face)*100},this.enemyBounds(e));e.target=freePoint(at,e.radius,this.terrainByRegion[e.region],this.enemyBounds(e))?at:{x:this.player.x,y:this.player.y};}
   const dx=e.target.x-e.sprite.x,dy=e.target.y-e.sprite.y,len=Math.hypot(dx,dy)||1;e.aim={x:dx/len,y:dy/len};e.mode='windup';e.hasHit=false;
-  const complex=['summon','meteor','breath','blink','poison'].includes(e.move);e.clock=(e.kind==='boss'?(complex?1.15:.78):complex?.84:.54)*(e.phase2?.78:1);
+  const complex=['summon','meteor','breath','blink','poison','nova','snipe','curse','quake'].includes(e.move);e.clock=e.training?.9:(e.kind==='boss'?(complex?1.15:.84):complex?.92:.62)*(e.phase2?.78:1);
  }
  private updateEnemies(dt:number):void{
   for(const e of [...this.enemies]){
-   if(e.dead||e.region!==this.regionIndex||this.area==='village'||(this.area==='tutorial')!==e.training)continue;e.stun=Math.max(0,e.stun-dt);e.flash=Math.max(0,e.flash-dt);e.nextPath-=dt;if(e.stun>0)continue;e.clock-=dt;
+   if(e.dead||e.region!==this.regionIndex||this.area!=='biome'&&this.area!=='tutorial'||(this.area==='tutorial')!==e.training)continue;e.stun=Math.max(0,e.stun-dt);e.flash=Math.max(0,e.flash-dt);e.nextPath-=dt;if(e.bleed>0){e.bleed-=dt;e.bleedTick-=dt;if(e.bleedTick<=0){e.bleedTick=1;e.hp=Math.max(0,e.hp-stats(this.profile).damage*.18);e.flash=.1;this.particles(e.sprite.x,e.sprite.y,3,0xe3a287);if(e.hp===0)this.killEnemy(e);}}if(e.dead)continue;if(e.stun>0)continue;e.clock-=dt;
    const bounds=this.enemyBounds(e),distance=Math.hypot(this.player.x-e.sprite.x,this.player.y-e.sprite.y);
    if(this.player.x<bounds.left!||this.player.x>bounds.width-bounds.margin||distance>1100)continue;
    const slow=this.groundSpeed(e.sprite,false);
@@ -441,55 +546,53 @@ export class GameScene extends Phaser.Scene {
    if(e.mode==='charge'){
     const speed=(e.kind==='boss'?(e.phase2?480:415):e.kind==='vampire'?405:e.kind==='dragon'?370:300)*slow;
     const moved=moveCircle(e.sprite,e.aim.x*speed*dt,e.aim.y*speed*dt,e.radius,this.terrainByRegion[e.region],bounds);e.sprite.setPosition(moved.x,moved.y).setFlipX(e.aim.x<0);
-    if(!e.hasHit&&Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)<e.radius+PLAYER_RADIUS+9&&clearLine(e.sprite,this.player,3,this.terrainByRegion[e.region],bounds)){this.damagePlayer(e.damage,e.sprite);e.hasHit=true;}
+    if(!e.hasHit&&Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)<e.radius+PLAYER_RADIUS+9&&clearLine(e.sprite,this.player,3,this.terrainByRegion[e.region],bounds)){this.damagePlayer(e.damage,e.sprite,false,e);e.hasHit=true;}
     if(e.clock<=0){e.mode='recover';e.clock=e.kind==='boss'?(e.phase2?.64:.95):.85;}continue;
    }
    if(e.mode==='recover'){if(e.clock<=0){e.mode='chase';e.clock=e.kind==='boss'?(e.phase2?.8:1.2):e.kind==='necromancer'?1.9:Math.max(.5,.88-e.region*.06);}continue;}
-   const ranged=e.kind==='necromancer'||e.kind==='dragon'||e.kind==='boss'&&(REGIONS[e.region].bossTexture==='necromancer'||REGIONS[e.region].bossTexture==='dragon');
+   const ranged=e.kind==='necromancer'||e.kind==='dragon'||e.kind==='wraith'||e.kind==='boss'&&(REGIONS[e.region].bossTexture==='necromancer'||REGIONS[e.region].bossTexture==='dragon');
    if(ranged&&distance<200){const dx=e.sprite.x-this.player.x,dy=e.sprite.y-this.player.y,len=Math.hypot(dx,dy)||1;this.walkEnemy(e,clampPoint({x:e.sprite.x+dx/len*150,y:e.sprite.y+dy/len*150},bounds),e.speed*slow,dt);}
    else if(!ranged||distance>350){let target=this.predict(e);if(e.kind==='skeleton'&&distance>120){const a=Math.atan2(target.y-e.sprite.y,target.x-e.sprite.x),side=Math.sin(e.id*3+this.elapsed*.8)*55;target=clampPoint({x:target.x-Math.sin(a)*side,y:target.y+Math.cos(a)*side},bounds);}this.walkEnemy(e,target,e.speed*(e.phase2?1.14:1)*slow,dt);}
-   const reach=e.kind==='boss'?ranged?580:320:e.kind==='necromancer'||e.kind==='dragon'?520:e.kind==='vampire'?300:e.kind==='zombie'?125:100;
+   const reach=e.kind==='boss'?ranged?580:320:e.kind==='necromancer'||e.kind==='dragon'?520:e.kind==='wraith'?400:e.kind==='vampire'?300:e.kind==='knight'?210:e.kind==='zombie'?125:110;
    if(e.clock<=0&&distance<reach)this.startEnemyAttack(e);
   }
  }
  private recoverEnemy(e:Enemy,seconds=1):void{e.mode='recover';e.clock=seconds*(e.phase2?.75:1);}
  private executeEnemyAttack(e:Enemy):void{
-  const angle=Math.atan2(e.aim.y,e.aim.x),r=REGIONS[e.region];
-  if(e.move==='charge'){e.mode='charge';e.clock=e.kind==='boss'?.62:.37;this.audio.play('dash');return;}
-  if(e.move==='slash'){
-   const reach=e.kind==='boss'?143:e.kind==='zombie'?86:92;
-   if(slashConnects(e.sprite,angle,this.player,PLAYER_RADIUS,reach,1.2)&&clearLine(e.sprite,this.player,3,this.terrainByRegion[e.region],this.enemyBounds(e))){
-    const before=this.hp;this.damagePlayer(e.damage,e.sprite);if((e.kind==='vampire'||r.bossTexture==='vampire')&&this.hp<before)e.hp=Math.min(e.maxHP,e.hp+(before-this.hp)*.7);
-   }
+  const angle=Math.atan2(e.aim.y,e.aim.x),r=REGIONS[e.region],boss=e.kind==='boss';
+  if(e.move==='charge'){e.mode='charge';e.clock=boss?.62:.37;this.audio.play('dash');return;}
+  if(e.move==='slash'||e.move==='combo'){
+   const reach=boss?143:e.kind==='zombie'?86:e.kind==='knight'?112:92;
+   this.addEffect('slash',e.sprite,0xf49a8b,reach,angle);
+   if(slashConnects(e.sprite,angle,this.player,PLAYER_RADIUS,reach,1.2)&&clearLine(e.sprite,this.player,3,this.terrainByRegion[e.region],this.enemyBounds(e))){const before=this.hp;this.damagePlayer(e.damage*(e.move==='combo'&&e.chain===2?1.15:1),e.sprite,false,e);if((e.kind==='vampire'||boss&&r.bossTexture==='vampire')&&this.hp<before)e.hp=Math.min(e.maxHP,e.hp+(before-this.hp)*.7);}
    this.audio.play(e.kind==='zombie'||e.kind==='vampire'?'bite':'slash');
+   if(e.stun>.05)return;
+   if(e.move==='combo'&&++e.chain<(boss?3:2)){e.target=this.predict(e);const dx=e.target.x-e.sprite.x,dy=e.target.y-e.sprite.y,len=Math.hypot(dx,dy)||1;e.aim={x:dx/len,y:dy/len};e.mode='windup';e.clock=boss?.38:.44;return;}
   }else if(e.move==='slam'){
-   if(Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)<155+PLAYER_RADIUS&&clearLine(e.sprite,this.player,3,this.terrainByRegion[e.region],this.enemyBounds(e)))this.damagePlayer(e.damage*1.15,e.sprite);
+   if(Math.hypot(e.sprite.x-this.player.x,e.sprite.y-this.player.y)<155+PLAYER_RADIUS&&clearLine(e.sprite,this.player,3,this.terrainByRegion[e.region],this.enemyBounds(e)))this.damagePlayer(e.damage*1.15,e.sprite,false,e);
    this.hazards.push({x:e.sprite.x,y:e.sprite.y,region:e.region,radius:155,warning:0,left:.35,damage:0,kind:'ring',fired:true});this.audio.play('axe');this.particles(e.sprite.x,e.sprite.y,16,0xb9c892);
-  }else if(e.move==='poison'){
-   const targets=e.kind==='boss'?[e.sprite,e.target]:[e.sprite];
-   for(const p of targets)this.hazards.push({x:p.x,y:p.y,region:e.region,radius:e.kind==='boss'?100:72,warning:.5,left:5.5,damage:e.damage*.50,kind:'poison',fired:false});this.audio.play('bite');
-  }else if(e.move==='summon'){this.summonMinions(e,e.kind==='boss'?(e.phase2?3:2):1);this.audio.play('cast');
-  }else if(e.move==='fan'||e.move==='breath'){
-   const count=e.move==='breath'?(e.phase2?7:5):e.kind==='boss'?5:3,spread=e.move==='breath'?.17:.23,color=e.move==='breath'?0xf4ad76:r.bossTexture==='vampire'||e.kind==='vampire'?0xda8db0:0xa6d9b9;
-   for(let n=0;n<count;n++)this.shoot(e.sprite,angle+(n-(count-1)/2)*spread,e.move==='breath'?330:280,e.damage,false,e.region,color,0);
-   this.audio.play(e.move==='breath'?'axe':'cast');
+  }else if(e.move==='poison'||e.move==='curse'){
+   const targets=e.move==='curse'?[e.target]:boss?[e.sprite,e.target]:[e.sprite];for(const p of targets)this.hazards.push({x:p.x,y:p.y,region:e.region,radius:e.move==='curse'||boss?100:72,warning:e.move==='curse'?.9:.5,left:e.move==='curse'?4.5:5.5,damage:e.damage*(e.move==='curse'?.38:.50),kind:e.move==='curse'?'curse':'poison',fired:false});this.audio.play('cast');
+  }else if(e.move==='summon'){this.summonMinions(e,boss?(e.phase2?3:2):1);this.audio.play('cast');
+  }else if(e.move==='fan'||e.move==='breath'||e.move==='nova'||e.move==='snipe'){
+   const count=e.move==='nova'?(e.phase2?14:10):e.move==='snipe'?1:e.move==='breath'?(e.phase2?9:6):boss?(e.phase2?7:5):4;
+   for(let n=0;n<count;n++){const shot=e.move==='nova'?angle+n*Math.PI*2/count:angle+(n-(count-1)/2)*(e.move==='breath'?.16:.23),speed=e.move==='snipe'?490:e.move==='nova'?225:e.move==='breath'?335:290;this.shoot(e.sprite,shot,speed,e.damage*(e.move==='snipe'?1.2:1),false,e.region,e.move==='breath'?0xf4ad76:e.move==='snipe'?0xd0e9f4:0xcf9bdc,0);}this.audio.play('cast');
+  }else if(e.move==='quake'){
+   for(let n=0;n<(boss&&e.phase2?3:1);n++)this.hazards.push({x:e.sprite.x,y:e.sprite.y,region:e.region,radius:20,warning:.55+n*.55,left:2.5+n*.55,damage:e.damage*1.1,kind:'wave',fired:false});this.audio.play('axe');
   }else if(e.move==='blink'){
-   this.particles(e.sprite.x,e.sprite.y,9,0xc7aedc);const at=moveCircle(e.target,0,0,e.radius,this.terrainByRegion[e.region],this.enemyBounds(e));e.sprite.setPosition(at.x,at.y);this.particles(at.x,at.y,9,0xc7aedc);
-   const dx=this.player.x-at.x,dy=this.player.y-at.y,len=Math.hypot(dx,dy)||1;e.aim={x:dx/len,y:dy/len};e.move='slash';e.mode='windup';e.clock=.42;this.audio.play('dash');return;
+   this.particles(e.sprite.x,e.sprite.y,9,0xc7aedc);const at=moveCircle(e.target,0,0,e.radius,this.terrainByRegion[e.region],this.enemyBounds(e));e.sprite.setPosition(at.x,at.y);this.particles(at.x,at.y,9,0xc7aedc);const dx=this.player.x-at.x,dy=this.player.y-at.y,len=Math.hypot(dx,dy)||1;e.aim={x:dx/len,y:dy/len};e.move=boss||e.kind==='vampire'?'combo':'slash';e.chain=0;e.mode='windup';e.clock=.48;this.audio.play('dash');return;
   }else if(e.move==='meteor'){
-   const count=e.phase2?5:3;for(let n=0;n<count;n++){
-    const p=n===0?e.target:clampPoint({x:e.target.x+Math.cos(n*2.4)*125,y:e.target.y+Math.sin(n*2.4)*125},this.enemyBounds(e));
-    this.hazards.push({x:p.x,y:p.y,region:e.region,radius:58,warning:1.15+n*.12,left:1.7+n*.12,damage:e.damage*1.05,kind:'meteor',fired:false});
-   }this.audio.play('cast');
+   const count=e.phase2?6:3;for(let n=0;n<count;n++){const p=n===0?e.target:clampPoint({x:e.target.x+Math.cos(n*2.4)*125,y:e.target.y+Math.sin(n*2.4)*125},this.enemyBounds(e));this.hazards.push({x:p.x,y:p.y,region:e.region,radius:58,warning:1.15+n*.12,left:1.7+n*.12,damage:e.damage*1.05,kind:'meteor',fired:false});}this.audio.play('cast');
   }
-  this.recoverEnemy(e,e.move==='summon'?1.4:e.move==='breath'?1.3:.95);
+  this.recoverEnemy(e,e.move==='summon'?1.4:e.move==='breath'?1.3:e.move==='snipe'?1.2:.95);
  }
  private summonMinions(e:Enemy,count:number):void{
+  if(this.progress[e.region].bossDead||e.training)return;
   const active=this.enemies.filter(v=>v.region===e.region&&!v.dead&&v.kind!=='boss').length;
   const available=Math.min(count,MAX_MINIONS-active);for(let n=0;n<available;n++){
    const angle=n*Math.PI*2/Math.max(1,available),candidate=clampPoint({x:e.sprite.x+Math.cos(angle)*90,y:e.sprite.y+Math.sin(angle)*90},this.enemyBounds(e));
    const p=freePoint(candidate,22,this.terrainByRegion[e.region],this.enemyBounds(e))?candidate:this.freePosition(e.region,22,200);
-   const kind=e.region===1?'zombie':e.region===2?'vampire':'skeleton';const minion=this.spawnEnemy(kind,e.region,n,p);minion.stun=.75;minion.clock=2;
+   const kind=REGIONS[e.region].roster[(n+e.moveIndex)%REGIONS[e.region].roster.length].kind;const minion=this.spawnEnemy(kind,e.region,n,p);minion.stun=.75;minion.clock=2;
    this.hazards.push({...p,region:e.region,radius:30,warning:.7,left:1,damage:0,kind:'ring',fired:false});this.particles(p.x,p.y,8,0xb5ccef);
   }
  }
@@ -500,23 +603,26 @@ export class GameScene extends Phaser.Scene {
   for(const p of this.projectiles){p.life-=dt;const before={x:p.x,y:p.y};p.x+=p.vx*dt;p.y+=p.vy*dt;
    if(!clearLine(before,p,3,this.terrainByRegion[p.region],this.regionBounds(p.region)))p.life=0;if(p.life<=0)continue;
    if(p.friendly){const target=this.enemies.find(e=>!e.dead&&e.region===p.region&&!p.hits.has(e.id)&&Math.hypot(e.sprite.x-p.x,e.sprite.y-p.y)<e.radius+p.radius);
-    if(target){p.hits.add(target.id);this.hitEnemy(target,p.damage,22);if(p.blast>0){this.particles(p.x,p.y,12,p.color);for(const e of this.enemies)if(e!==target&&!e.dead&&e.region===p.region&&Math.hypot(e.sprite.x-p.x,e.sprite.y-p.y)<p.blast+e.radius)this.hitEnemy(e,p.damage*.70,18);}p.life=0;}
+    if(target){p.hits.add(target.id);this.hitEnemy(target,p.damage,22);if(p.blast>0){this.particles(p.x,p.y,12,p.color);for(const e of this.enemies)if(e!==target&&!e.dead&&e.region===p.region&&Math.hypot(e.sprite.x-p.x,e.sprite.y-p.y)<p.blast+e.radius&&clearLine(p,e.sprite,3,this.terrainByRegion[p.region],this.regionBounds(p.region)))this.hitEnemy(e,p.damage*.70,18);}p.life=0;}
    }else if(Math.hypot(p.x-this.player.x,p.y-this.player.y)<PLAYER_RADIUS+p.radius){this.damagePlayer(p.damage,p,true);p.life=0;}
   }this.projectiles=this.projectiles.filter(p=>p.life>0);
  }
  private updateHazards(dt:number):void{
   for(const h of this.hazards){h.left-=dt;const before=h.warning;h.warning-=dt;if(h.warning>0)continue;
-   if(h.kind==='sigil'&&!h.fired){h.fired=true;this.addEffect('ring',h,weaponFor(this.profile).color,h.radius);for(const e of this.enemies)if(!e.dead&&e.region===h.region&&Math.hypot(e.sprite.x-h.x,e.sprite.y-h.y)<h.radius+e.radius&&clearLine(h,e.sprite,3,this.terrain,this.playerBounds()))this.hitEnemy(e,h.damage,40);}
+   if(h.kind==='sigil'&&!h.fired){h.fired=true;this.addEffect('ring',h,weaponFor(this.profile).color,h.radius);for(const e of this.enemies)if(!e.dead&&e.region===h.region&&Math.hypot(e.sprite.x-h.x,e.sprite.y-h.y)<h.radius+e.radius&&clearLine(h,e.sprite,3,this.activeTerrain(),this.playerBounds()))this.hitEnemy(e,h.damage,40);}
    if(h.kind==='meteor'&&!h.fired){h.fired=true;this.audio.play('thunder');this.particles(h.x,h.y,14,0xffc699);if(Math.hypot(h.x-this.player.x,h.y-this.player.y)<h.radius+PLAYER_RADIUS)this.damagePlayer(h.damage,h,true);}
-   if(h.kind==='poison'&&h.left>0&&Math.hypot(h.x-this.player.x,h.y-this.player.y)<h.radius+PLAYER_RADIUS){this.damagePlayer(h.damage,h,true);}
+   if((h.kind==='poison'||h.kind==='curse')&&h.left>0&&Math.hypot(h.x-this.player.x,h.y-this.player.y)<h.radius+PLAYER_RADIUS)this.damagePlayer(h.damage,h,true);
+   if(h.kind==='wave'){h.radius+=180*dt;const d=Math.hypot(h.x-this.player.x,h.y-this.player.y);if(!h.fired&&Math.abs(d-h.radius)<PLAYER_RADIUS+12){this.damagePlayer(h.damage,h,true);if(this.hurtLeft>0)h.fired=true;}}
    if(before>0&&h.kind==='ring')h.fired=true;
   }this.hazards=this.hazards.filter(h=>h.left>0);
  }
- private grantCoins(value:number,index:number,countsForGoal=true):void{
-  this.profile.coins+=value;this.score+=value*100;this.ultimate=Math.min(ULTIMATE_MAX,this.ultimate+Math.min(12,value*3));
-  if(countsForGoal&&index===this.regionIndex&&this.area!=='village')this.progress[index].coins+=value;
-  if(!this.armed&&this.progress[this.regionIndex].coins>=(this.area==='tutorial'?3:REGIONS[this.regionIndex].awaken)){this.armed=true;this.profile.blade=true;this.particles(this.player.x,this.player.y,24,weaponFor(this.profile).color);this.audio.play('checkpoint');this.toast(`СИЛА ВОССТАНОВЛЕНА · ${weaponFor(this.profile).name}. Наводи мышью и сражайся!`);}
-  this.checkProgress();this.updateHUD();
+ private grantCoins(value:number,index:number,countsForGoal=true):number{
+  const p=this.progress[index],paid=countsForGoal&&this.area==='biome'?Math.max(0,Math.min(value,REGION_INCOME[index]-p.income)):value;
+  if(countsForGoal&&this.area==='biome'){p.income+=paid;if(p.income===REGION_INCOME[index]&&p.income-paid<REGION_INCOME[index])this.toast('Запас осколков для кошелька в этом биоме исчерпан. Сила оружия растёт, новые награды ждут у босса и дальше.');}
+  this.profile.coins+=paid;this.score+=value*100;this.ultimate=Math.min(ULTIMATE_MAX,this.ultimate+Math.min(12,value*3));
+  if(countsForGoal&&index===this.regionIndex&&(this.area==='biome'||this.area==='tutorial'))p.coins+=value;
+  if(!this.armed&&p.coins>=(this.area==='tutorial'?3:REGIONS[this.regionIndex].awaken)){this.armed=true;this.profile.blade=true;this.particles(this.player.x,this.player.y,24,weaponFor(this.profile).color);this.audio.play('checkpoint');this.toast(`СИЛА ВОССТАНОВЛЕНА · ${weaponFor(this.profile).name}. Наводи мышью и сражайся!`);}
+  this.checkProgress();this.updateHUD();return paid;
  }
  private collectCoins():void{
   for(const c of [...this.coins]){
@@ -526,31 +632,46 @@ export class GameScene extends Phaser.Scene {
   }
  }
  private checkProgress():void{
-  if(this.area==='tutorial')return;
+  if(this.area==='tutorial'||this.area==='interior')return;
   if(this.area==='village'){const next=this.villageIndex+1;if(next<REGIONS.length&&this.player.x>=regionStart(next)+45){const p=this.progress[next];this.startRegion(next,false,p.elapsed>0||p.bossDead);}return;}
-  const p=this.progress[this.regionIndex];if(!p.cleared&&p.coins>=REGIONS[this.regionIndex].coins&&p.bossDead){p.cleared=true;this.drawGates();if(this.regionIndex===4){this.beginStory(true);return;}this.toast('Печать разорвана. Иди на восток в деревню: там ждут кузнец, бронница, лекарь и странник.');}
-  if(p.cleared&&this.regionIndex<4&&this.player.x>=regionEnd(this.regionIndex)+70){this.startVillage(this.regionIndex);return;}
+  const p=this.progress[this.regionIndex];if(!p.cleared&&p.coins>=REGIONS[this.regionIndex].coins&&p.bossDead){p.cleared=true;this.drawGates();if(this.regionIndex===REGIONS.length-1){this.beginStory(true);return;}this.toast('Печать разорвана. Иди на восток в деревню: там ждут кузнец, бронница, лекарь и странник.');}
+  if(p.cleared&&this.regionIndex<REGIONS.length-1&&this.player.x>=regionEnd(this.regionIndex)+70){this.startVillage(this.regionIndex);return;}
   if(p.bossDead&&this.player.x<regionStart(this.regionIndex)-55)this.startVillage(this.regionIndex-1);
  }
 
  private updateCamp():void{
-  this.nearestNPC=-1;this.nearestChest=-1;this.nearestProp=-1;let nearest=INTERACT_DISTANCE;
-  if(this.area!=='biome')this.villagers.forEach((n,i)=>{if(n.village!==this.villageIndex)return;const d=Phaser.Math.Distance.Between(this.player.x,this.player.y,n.sprite.x,n.sprite.y);if(d<nearest){nearest=d;this.nearestNPC=i;}});
-  this.chests.forEach((c,i)=>{if(c.opened||c.region!==this.regionIndex||this.area!=='biome')return;const d=Math.hypot(c.x-this.player.x,c.y-this.player.y);if(d<nearest){nearest=d;this.nearestChest=i;this.nearestNPC=-1;}});
+  this.nearestNPC=-1;this.nearestChest=-1;this.nearestProp=-1;this.nearestHouse=-1;let nearest=INTERACT_DISTANCE;
+  if(this.area==='interior')this.villagers.forEach((n,i)=>{if(n.village!==this.villageIndex||n.role!==this.interiorRole)return;const d=Math.hypot(this.player.x-n.sprite.x,this.player.y-n.sprite.y);if(d<nearest){nearest=d;this.nearestNPC=i;}});
+  if(this.area==='village'||this.area==='tutorial')this.houses.forEach((h,i)=>{if(h.village!==this.villageIndex)return;const d=Math.hypot(this.player.x-h.door.x,this.player.y-h.door.y);if(d<nearest){nearest=d;this.nearestHouse=i;}});
+  this.chests.forEach((c,i)=>{if(c.opened||c.region!==this.regionIndex||this.area!=='biome')return;const d=Math.hypot(c.x-this.player.x,c.y-this.player.y);if(d<nearest){nearest=d;this.nearestChest=i;}});
   this.questProps.forEach((q,i)=>{if(this.area!=='biome')return;const d=Math.hypot(q.point.x-this.player.x,q.point.y-this.player.y);if(d<nearest){nearest=d;this.nearestProp=i;this.nearestChest=-1;}});
-  this.element('interaction').hidden=this.nearestNPC<0&&this.nearestChest<0&&this.nearestProp<0;
-  this.element('interact-button').textContent=this.nearestNPC>=0?`E · ${PEOPLE.find(n=>n.role===this.villagers[this.nearestNPC].role)!.name}: поговорить`:this.nearestProp>=0?'E · Прочесть / забрать':'E · Открыть сундук';
+  const leaving=this.area==='interior'&&this.player.y>housePoint(this.villageIndex,this.interiorRole??'smith').y+70;
+  this.element('interaction').hidden=this.nearestNPC<0&&this.nearestChest<0&&this.nearestProp<0&&this.nearestHouse<0&&!leaving;
+  this.element('interact-button').textContent=leaving?'E · Выйти на улицу':this.nearestNPC>=0?`E · ${PEOPLE.find(n=>n.role===this.villagers[this.nearestNPC].role)!.name}: поговорить`:this.nearestHouse>=0?`E · Войти: ${HOUSE_NAMES[this.houses[this.nearestHouse].role]}`:this.nearestProp>=0?'E · Прочесть / забрать':'E · Открыть сундук';
  }
-
+ private enterHouse(h:House,preserve=false):void{
+  const previous=this.area;this.clearInterior();this.interiorRole=h.role;this.interiorReturn=previous==='tutorial'?'tutorial':this.interiorReturn==='tutorial'&&previous==='interior'?'tutorial':'village';this.area='interior';
+  h.roof.setVisible(false);h.label.setVisible(false);this.interiorShade=this.add.rectangle(0,0,WORLD_WIDTH,WORLD_HEIGHT,0x030d10,.92).setOrigin(0).setDepth(12.5);
+  this.interiorLayer=interiorArt(this,h).setDepth(14);this.villagers.forEach(n=>n.sprite.setVisible(n.village===h.village&&n.role===h.role));
+  if(!preserve)this.player.setPosition(h.x,h.y+85);this.resetInput();this.configureCamera();this.drawActors();this.updateHUD();this.dirty=true;
+ }
+ private clearInterior():void{
+  this.interiorLayer?.destroy(true);this.interiorLayer=null;this.interiorShade?.destroy();this.interiorShade=null;for(const h of this.houses){h.roof.setVisible(true);h.label.setVisible(true);}this.villagers.forEach(n=>n.sprite.setVisible(false));this.interiorRole=null;
+ }
+ private exitHouse():void{
+  const role=this.interiorRole;if(!role)return;const h=this.houses.find(h=>h.role===role&&h.village===this.villageIndex)!;this.clearInterior();this.area=this.interiorReturn;this.player.setPosition(h.door.x,h.door.y+27);this.resetInput();this.configureCamera();this.updateHUD();this.drawActors();
+ }
  private interact():void{
-  if(this.state!=='playing')return;this.updateCamp();if(this.nearestChest>=0){this.openChest(this.chests[this.nearestChest]);return;}if(this.nearestProp>=0){this.touchQuestProp(this.questProps[this.nearestProp]);return;}if(this.nearestNPC<0)return;
+  if(this.state!=='playing')return;this.updateCamp();
+  if(this.area==='interior'&&this.player.y>housePoint(this.villageIndex,this.interiorRole??'smith').y+70){this.exitHouse();return;}
+  if(this.nearestHouse>=0){this.enterHouse(this.houses[this.nearestHouse]);return;}
+  if(this.nearestChest>=0){this.openChest(this.chests[this.nearestChest]);return;}if(this.nearestProp>=0){this.touchQuestProp(this.questProps[this.nearestProp]);return;}if(this.nearestNPC<0)return;
   const npc=this.villagers[this.nearestNPC],person=PEOPLE.find(n=>n.role===npc.role)!;this.dialogRole=npc.role;this.state='dialog';this.resetInput();this.element('interaction').hidden=true;
-  this.element<HTMLImageElement>('merchant-portrait').src=this.textures.getBase64(person.texture);this.element('dialog-name').textContent=`${person.name} · ${person.job}`;this.element('dialog-trade').textContent=npc.role==='smith'?'Оружие':npc.role==='armorer'?'Доспехи':npc.role==='healer'?'Лечение и фляги':'Усиления и облики';
-  this.element('dialog-overlay').hidden=false;this.say(person.lore);this.renderQuestTalk();this.lessonEvent('talk');
+  this.element<HTMLImageElement>('merchant-portrait').src=this.textures.getBase64(person.texture);this.element<HTMLImageElement>('merchant-portrait').alt=`${person.name} · ${person.job}`;this.element('dialog-name').textContent=`${person.name} · ${person.job}`;this.element('dialog-trade').textContent=npc.role==='smith'?'Оружие':npc.role==='armorer'?'Доспехи':npc.role==='healer'?'Лечение и фляги':'Усиления и облики';
+  this.element('dialog-overlay').hidden=false;this.syncGuide();this.say(person.lore);this.renderQuestTalk();this.renderDeliveryTalk();this.lessonEvent('talk');
  }
-
  private say(text:string):void{this.dialogTarget=text;this.dialogTime=0;this.element('dialog-text').textContent='';}
- private leaveDialog():void{this.element('dialog-overlay').hidden=true;this.state='playing';this.resetInput();}
+ private leaveDialog():void{this.element('dialog-overlay').hidden=true;this.state='playing';this.resetInput();this.syncGuide();}
  private onQuestEvent(event:'pickup'|'kill'|'hit'|'hurt'):void{
   if(this.area!=='biome')return;
   for(const q of questEvent(this.quests[this.regionIndex],event)){const pos=this.freePosition(this.regionIndex,25,80);this.spawnChest({...pos,region:this.regionIndex,quest:q.id,opened:false});this.audio.play('loot');this.toast(`Испытание «${q.name}» пройдено. Сундук появился на карте ▣.`);}
@@ -600,16 +721,17 @@ export class GameScene extends Phaser.Scene {
  private itemCards(tab:ShopTab,page:number,shop:boolean):string{
   const cards:string[]=[],p=this.profile;
   if(tab==='supplies'){return SUPPLIES.map(i=>`<article class="shop-card"><span class="upgrade-icon">${i.icon}</span><h3>${i.name}</h3><p>${i.description}</p><button data-item="${i.id}">${i.price} ◈</button></article>`).join('');}
-  if(tab==='upgrades'){for(const u of UPGRADES.slice(page*4,page*4+4)){const rank=p.upgrades[u.id],max=rank>=u.prices.length;
-   cards.push(`<article class="shop-card"><span class="upgrade-icon">${u.icon}</span><h3>${u.name}</h3><p>${u.description}<br>${rank} / ${u.prices.length}</p><button data-item="${u.id}" ${max?'disabled':''}>${max?'Максимум':`${u.prices[rank]} ◈`}</button></article>`);}
+  if(tab==='upgrades'){for(const u of UPGRADES.slice(page*4,page*4+4)){const rank=p.upgrades[u.id],max=rank>=u.prices.length,gate=itemUnlock(u.id,rank),locked=this.seals()<gate;
+   cards.push(`<article class="shop-card"><span class="upgrade-icon">${u.icon}</span><h3>${u.name}</h3><p>${u.description}<br>${rank} / ${u.prices.length}</p><button data-item="${u.id}" ${max||locked||p.coins<u.prices[rank]?'disabled':''}>${max?'Максимум':locked?`${gate} печатей · ${u.prices[rank]} ◈`:`${u.prices[rank]} ◈`}</button></article>`);}
   }else{
    const items=tab==='skins'?SKINS:tab==='weapons'?(shop?WEAPONS.filter(w=>!w.quest):WEAPONS):ARMORS;
    for(const item of items.slice(page*4,page*4+4)){
     const owned=tab==='skins'?p.owned.includes(item.id):tab==='weapons'?p.weapons.some(id=>id===item.id):p.armors.some(id=>id===item.id);
+    const gate=itemUnlock(item.id),locked=shop&&!owned&&this.seals()<gate;
     const selected=(tab==='skins'?p.skin:tab==='weapons'?p.weapon:p.armor)===item.id;
     const info='description'in item?item.description:'Облик героя';
     const picture=tab==='skins'?`<img src="${this.textures.getBase64(item.id)}" alt="">`:tab==='weapons'?`<img src="${this.textures.getBase64(item.id)}" alt="">`:`<span class="upgrade-icon">${'icon'in item?item.icon:'◇'}</span>`;
-    cards.push(`<article class="shop-card">${picture}<h3>${item.name}</h3><p>${info}</p><button ${shop?'data-item':'data-equip'}="${item.id}" ${selected||!shop&&!owned?'disabled':''}>${selected?'Выбрано':owned?'Надеть':shop?`${item.price} ◈`:'quest'in item&&item.quest?'За поручение':'В деревне'}</button></article>`);
+    cards.push(`<article class="shop-card">${picture}<h3>${item.name}</h3><p>${info}</p><button ${shop?'data-item':'data-equip'}="${item.id}" ${selected||!shop&&!owned||locked||shop&&!owned&&p.coins<item.price?'disabled':''}>${selected?'Выбрано':owned?'Надеть':locked?`${gate} печатей · ${item.price} ◈`:shop?`${item.price} ◈`:'quest'in item&&item.quest?'За поручение':'В деревне'}</button></article>`);
    }
   }return cards.join('');
  }
@@ -623,15 +745,38 @@ export class GameScene extends Phaser.Scene {
   this.dirty=true;this.applyEquipment(before);this.renderEquipment();this.updateHUD();
  }
  private toggleMenu():void{
-  if(this.state==='menu'){this.state=this.menuReturn;this.element('menu-overlay').hidden=true;this.resetInput();if(this.state==='paused')this.showPauseModal();return;}
+  if(this.state==='menu'){this.state=this.menuReturn;this.element('menu-overlay').hidden=true;this.resetInput();if(this.state==='paused')this.showPauseModal();this.syncGuide();return;}
   if(this.state!=='playing'&&this.state!=='paused')return;
-  this.menuReturn=this.state;this.state='menu';this.resetInput();this.hideModal();this.toggleGuide(false);this.element('interaction').hidden=true;this.element('menu-overlay').hidden=false;this.renderMenu();
+  this.menuReturn=this.state;this.state='menu';this.resetInput();this.hideModal();this.syncGuide();this.element('interaction').hidden=true;this.element('menu-overlay').hidden=false;this.renderMenu();
  }
  private renderMenu():void{
-  this.updateHUD();this.drawMaps();this.refreshSaveUI();this.element('menu-wallet').textContent=`◈ ${this.profile.coins}`;
-  for(const tab of ['overview','equipment','quests','settings'] as const)this.element(`menu-${tab}`).hidden=tab!==this.menuTab;
+  this.updateHUD();this.drawMaps();this.refreshSaveUI();this.element<HTMLButtonElement>('travel-open').disabled=this.area!=='village'&&this.area!=='interior';this.element('menu-wallet').textContent=`◈ ${this.profile.coins}`;
+  for(const tab of ['overview','equipment','skills','quests','achievements','settings'] as const)this.element(`menu-${tab}`).hidden=tab!==this.menuTab;
   for(const b of document.querySelectorAll<HTMLButtonElement>('[data-menu-tab]'))b.classList.toggle('selected',b.dataset.menuTab===this.menuTab);
-  if(this.menuTab==='equipment')this.renderEquipment();if(this.menuTab==='quests')this.renderQuests();if(this.menuTab==='settings')this.renderAudio();
+  if(this.menuTab==='equipment')this.renderEquipment();if(this.menuTab==='skills')this.renderSkills();if(this.menuTab==='quests')this.renderQuests();if(this.menuTab==='achievements')this.renderAchievements();if(this.menuTab==='settings')this.renderAudio();
+ }
+ private renderSkills():void{
+  const style=weaponFor(this.profile).style,seals=this.seals();this.element('skill-points').textContent=`Искры: ${this.profile.skillPoints} · печати ${seals}/${REGIONS.length}`;
+  this.element<HTMLButtonElement>('skill-reset').disabled=!SKILL_TREE.some(s=>s.style===style&&this.profile.skills.includes(s.id));
+  this.element('skill-weapon').textContent=`Ветка: ${weaponFor(this.profile).name}. Верни искры, чтобы сменить сборку; другая ветка выбирается во «Вещах».`;
+  this.element('skill-items').innerHTML=SKILL_TREE.filter(s=>s.style===style).map(s=>{const known=this.profile.skills.includes(s.id),purchased=this.profile.unlockedSkills.includes(s.id),disabled=this.profile.disabledSkills.includes(s.id),price=purchased?0:s.price,previous=SKILL_TREE.find(p=>p.style===style&&p.tier===s.tier-1),locked=seals<s.seals||!!previous&&!this.profile.skills.includes(previous.id),afford=this.profile.coins>=price&&this.profile.skillPoints>=s.points;return `<article class="skill-card ${known?'complete':''}"><div><b>${s.key}</b><strong>${s.name}</strong></div><p>${s.description}</p><small>${known?`${s.points} искр вложено · ${disabled?'снят с панели':'клавиша '+s.key}`:`${s.seals} печатей · ${s.points} искр · ${price} ◈`}</small><button ${known?'data-skill-toggle':'data-skill'}="${s.id}" ${!known&&(locked||!afford)?'disabled':''}>${known?disabled?'Вставить в панель':'Убрать из панели':locked?'Ветка пока закрыта':purchased?'Вложить искры':'Изучить'}</button></article>`;}).join('');
+ }
+ private syncAchievements(notify=true):void{
+  const eligible=earnedAchievements({bosses:this.progress.map(p=>p.bossDead),counters:this.profile.counterWins,skills:this.profile.unlockedSkills.length,deliveries:this.deliveries.some(q=>q.claimed),promise:this.lines.some(q=>q.claimed),kills:this.kills,returned:this.deaths>0&&this.area==='village',trained:this.tutorialFinished});
+  for(const id of eligible)if(!this.profile.achievements.includes(id)){this.profile.achievements.push(id);if(notify){this.achievementQueue.push(id);this.dirty=true;}}
+ }
+ private updateAchievementNotice(dt:number):void{
+  const notice=this.element('achievement-banner'),visible=this.state==='playing'||this.state==='won';notice.hidden=!visible||this.achievementLeft<=0;
+  if(!visible)return;
+  this.achievementLeft=Math.max(0,this.achievementLeft-dt);
+  if(this.achievementLeft<=0&&this.achievementQueue.length){const id=this.achievementQueue.shift(),a=ACHIEVEMENTS.find(a=>a.id===id)!;this.achievementLeft=4.5;this.element('achievement-name').textContent=a.name;this.element('achievement-detail').textContent=a.boss>=0?'Печать разорвана · искра мастерства получена. Ты стал ближе к семье.':a.description;this.audio.play('achievement');notice.hidden=false;}
+ }
+ private renderAchievements():void{
+  const pages=Math.ceil(ACHIEVEMENTS.length/4);this.achievementPage=Math.max(0,Math.min(pages-1,this.achievementPage));
+  this.element('achievement-progress').textContent=`Твой путь: ${this.seals()}/8 печатей · ${this.profile.achievements.length}/${ACHIEVEMENTS.length} достижений`;
+  this.element<HTMLProgressElement>('achievement-meter').value=this.seals();
+  this.element('achievement-items').innerHTML=ACHIEVEMENTS.slice(this.achievementPage*4,this.achievementPage*4+4).map(a=>{const earned=this.profile.achievements.includes(a.id);return `<article class="achievement-card ${earned?'earned':''}"><b>${earned?a.icon:'◇'}</b><div><strong>${a.name}</strong><small>${earned?'Получено · твоя победа':'Впереди на твоём пути'}</small><p>${a.description}</p></div></article>`;}).join('');
+  this.element('achievement-page').textContent=`${this.achievementPage+1} / ${pages}`;this.element<HTMLButtonElement>('achievement-prev').disabled=this.achievementPage===0;this.element<HTMLButtonElement>('achievement-next').disabled=this.achievementPage===pages-1;
  }
  private renderEquipment():void{
   const items=this.equipmentTab==='weapons'?WEAPONS:this.equipmentTab==='armors'?ARMORS:SKINS,pages=Math.ceil(items.length/4);
@@ -643,6 +788,7 @@ export class GameScene extends Phaser.Scene {
  }
  private renderQuests():void{
   for(const b of document.querySelectorAll<HTMLButtonElement>('[data-quest-view]'))b.classList.toggle('selected',b.dataset.questView===this.questView);
+  if(this.questView==='delivery'){this.element('quest-items').innerHTML=DELIVERIES.map(def=>{const q=this.deliveries.find(q=>q.id===def.id)!,status=q.claimed?'✓ Поручение сдано':q.delivered?'Вернись за наградой':q.accepted?'Посылка в сумке':`Доступно после ${def.seals} печатей`;return `<article class="quest-card ${q.claimed?'complete':''}"><div><strong>${def.name}</strong><span>${status}</span></div><p>${def.description} ${q.accepted&&!q.delivered?'В сумке: '+def.parcel+'. ':''}Награда: ${def.reward} ◈ и искра мастерства.</p></article>`;}).join('');this.element('quest-retry').hidden=true;return;}
   if(this.questView==='story'){
    this.element('quest-items').innerHTML=LINES.map(def=>{const q=this.lines.find(q=>q.id===def.id)!;const status=q.claimed?'✓ Награда получена':!q.accepted?`Поручение в деревне после биома ${def.offered+1}`:lineReady(q,this.progress[def.region].bossDead)?'Вернись к заказчику':q.id==='bell'?`Некроманты ${q.kills}/2 · колокол ${q.artifact?'✓':'○'}`:q.id==='runes'?`Печати ${q.runes}/3`:`Огонёк ${q.escorted?'спасён':'ждёт сопровождения'}`;return `<article class="quest-card ${q.claimed?'complete':''}"><div><strong>${def.name}</strong><span>${status}</span></div><p>${q.accepted?def.description:`Найди ${PEOPLE.find(n=>n.role===def.giver)!.name} и поговори.`} Награда: ${def.rewardName}.</p></article>`;}).join('');this.element('quest-retry').hidden=true;return;
   }
@@ -652,6 +798,7 @@ export class GameScene extends Phaser.Scene {
 
  private renderAudio():void{
   for(const key of ['master','music','effects'] as const)this.element<HTMLInputElement>(`volume-${key}`).value=String(Math.round(this.audio.settings[key]*100));
+  this.element('audio-track').textContent=this.audio.trackTitle;
   this.element('mute-button').textContent=this.audio.settings.muted?'Включить звук':'Выключить звук';
  }
  private refreshSaveUI():void{
@@ -659,10 +806,10 @@ export class GameScene extends Phaser.Scene {
   this.element('save-status').textContent=!this.storageAvailable?'Браузер запретил сохранение.':this.saved?`Ручное сохранение: ${new Date(this.saved.savedAt).toLocaleString('ru-RU')}. Автосохранения нет.`:'Автосохранения нет. Нажми «Сохранить прогресс», чтобы вернуться к этой попытке.';
  }
  private snapshot():Snapshot{
-  return{version:6,manual:true,savedAt:new Date().toISOString(),profile:this.profile,region:this.regionIndex,progress:this.progress,player:{x:this.player.x,y:this.player.y},checkpoint:this.checkpoint,
+  return{version:7,manual:true,savedAt:new Date().toISOString(),profile:this.profile,region:this.regionIndex,progress:this.progress,player:{x:this.player.x,y:this.player.y},checkpoint:this.checkpoint,
    hp:this.hp,stamina:this.stamina,flasks:this.flasks,armed:this.armed,ultimate:this.ultimate,elapsed:this.elapsed,score:this.score,kills:this.kills,deaths:this.deaths,
    enemies:this.enemies.filter(e=>!e.dead).map(e=>({kind:e.kind,region:e.region,x:e.sprite.x,y:e.sprite.y,hp:e.hp,phase2:e.phase2,variant:e.variant,training:e.training})),
-   coins:this.coins.map(c=>({x:c.sprite.x,y:c.sprite.y,region:c.region})),quests:this.quests,chests:this.chests.map(c=>({x:c.x,y:c.y,region:c.region,quest:c.quest,opened:c.opened})),audio:{...this.audio.settings},area:this.area,villageIndex:this.villageIndex,lastVillage:this.lastVillage,lesson:this.lessonIndex,lessonProgress:this.lessonProgress,lines:this.lines,wisp:this.wisp?{x:this.wisp.x,y:this.wisp.y}:null};
+   coins:this.coins.map(c=>({x:c.sprite.x,y:c.sprite.y,region:c.region})),quests:this.quests,chests:this.chests.map(c=>({x:c.x,y:c.y,region:c.region,quest:c.quest,opened:c.opened})),audio:{...this.audio.settings},area:this.area,villageIndex:this.villageIndex,lastVillage:this.lastVillage,lesson:this.lessonIndex,lessonProgress:this.lessonProgress,lines:this.lines,wisp:this.wisp?{x:this.wisp.x,y:this.wisp.y}:null,villages:[...this.campVisits],deliveries:this.deliveries,interiorRole:this.interiorRole,interiorReturn:this.interiorReturn,migrated:false};
  }
  private saveProgress():void{
   if(this.state!=='menu'&&this.state!=='paused'&&this.state!=='won')return;
@@ -670,46 +817,47 @@ export class GameScene extends Phaser.Scene {
   catch{this.storageAvailable=false;this.refreshSaveUI();this.toast('Сохранить не удалось: браузер запретил запись.');}
  }
  private loadProgress():void{
+  this.achievementQueue=[];this.achievementLeft=0;this.element('achievement-banner').hidden=true;
   let saved:Snapshot|null=null;try{saved=parseSave(localStorage.getItem(PROFILE_KEY));}catch{this.storageAvailable=false;}
   if(!saved){this.saved=null;this.refreshSaveUI();this.toast('Ручного сохранения нет или оно повреждено.');return;}
-  this.audio.unlock();this.clearActors();this.saved=saved;this.profile=saved.profile;this.progress=saved.progress;this.quests=saved.quests;this.regionIndex=saved.region;this.area=saved.area;this.villageIndex=saved.villageIndex;this.lastVillage=saved.lastVillage;this.lessonIndex=saved.lesson;this.lessonProgress=saved.lessonProgress;this.lines=saved.lines;this.dirty=false;
+  this.audio.unlock();this.clearActors();this.saved=saved;this.profile=saved.profile;this.progress=saved.progress;this.quests=saved.quests;this.regionIndex=saved.region;this.area=saved.area;this.villageIndex=saved.villageIndex;this.lastVillage=saved.lastVillage;this.lessonIndex=saved.lesson;this.lessonProgress=saved.lessonProgress;this.lines=saved.lines;this.deliveries=saved.deliveries;this.interiorReturn=saved.interiorReturn;this.dirty=false;
   this.hp=Math.max(1,Math.min(stats(this.profile).maxHP,saved.hp));this.stamina=Math.min(stats(this.profile).maxStamina,saved.stamina);this.flasks=Math.min(stats(this.profile).flasks,saved.flasks);
-  this.armed=saved.armed&&(this.area==='village'||this.progress[saved.region].coins>=(this.area==='tutorial'?3:REGIONS[saved.region].awaken));this.profile.blade=this.armed;this.ultimate=saved.ultimate;this.elapsed=saved.elapsed;this.score=saved.score;this.kills=saved.kills;this.deaths=saved.deaths;
-  this.campVisits.clear();for(let i=-1;i<=this.lastVillage;i++)this.campVisits.add(i);
+  this.armed=saved.armed&&(this.area==='village'||this.area==='interior'&&!this.trainingArea()||this.progress[saved.region].coins>=(this.area==='tutorial'?3:REGIONS[saved.region].awaken));this.profile.blade=this.armed;this.ultimate=saved.ultimate;this.elapsed=saved.elapsed;this.score=saved.score;this.kills=saved.kills;this.deaths=saved.deaths;
+  this.campVisits=new Set(saved.villages);
+  if(this.area==='interior'){const h=this.houses.find(h=>h.village===this.villageIndex&&h.role===saved.interiorRole);if(h){this.enterHouse(h,true);this.interiorReturn=saved.interiorReturn;}else this.area='village';}
   const bounds=this.playerBounds(),at=clampPoint(saved.player,bounds);this.checkpoint={x:villagePosition(this.lastVillage).x+15,y:645};
   this.player.setPosition(at.x,at.y).setTexture(this.profile.skin).setAlpha(1).clearTint().setAngle(0);this.cameras.main.centerOn(at.x,at.y);
-  for(const e of saved.enemies){const enemy=this.spawnEnemy(e.kind,e.region,e.variant,{x:e.x,y:e.y});enemy.hp=Math.min(enemy.maxHP,e.hp);enemy.phase2=e.phase2;enemy.training=e.training;if(e.training&&this.lessonIndex<10){enemy.stun=999;enemy.speed=0;}}
+  for(const e of saved.enemies){const enemy=this.spawnEnemy(e.kind,e.region,e.variant,{x:e.x,y:e.y});enemy.hp=Math.min(enemy.maxHP,e.hp);enemy.phase2=e.phase2;enemy.training=e.training;if(e.training&&this.lessonIndex<10&&this.lessonIndex!==3){enemy.stun=999;enemy.speed=0;}else if(e.training){enemy.damage=5;enemy.speed=65;enemy.clock=.8;}}
   for(const c of saved.coins)this.spawnCoin(c.region,false,c);for(const c of saved.chests)this.spawnChest(c);
   const p=this.progress[this.regionIndex];if(p.spawned&&!p.bossDead&&!this.enemies.some(e=>e.region===this.regionIndex&&e.kind==='boss'))p.spawned=false;
-  this.attackTime=-1;this.dodgeLeft=0;this.dodgeWait=0;this.hurtLeft=1.2;this.hurtFlash=0;this.healWait=0;this.regenDelay=0;this.ultimateLeft=0;this.mouse=null;this.resetInput();this.resetWeather();
+  this.attackTime=-1;this.counterLeft=0;this.counterTarget=-1;this.counterStrike=false;this.activeSkill=null;this.skillCooldowns={};this.shieldLeft=0;this.waveClock=WAVE_FIRST;this.dodgeLeft=0;this.dodgeWait=0;this.hurtLeft=1.2;this.hurtFlash=0;this.healWait=0;this.regenDelay=0;this.ultimateLeft=0;this.mouse=null;this.resetInput();this.resetWeather();
   this.audio.setSettings(saved.audio);this.audio.setRegion(this.regionIndex);for(const id of ['menu-overlay','map-overlay','shop-overlay','dialog-overlay','loot-overlay','intro-overlay'])this.element(id).hidden=true;
-  this.hideModal();this.state='playing';this.element('training-panel').hidden=this.area!=='tutorial';if(this.area==='tutorial')this.renderLesson();this.makeQuestProps(saved.wisp);this.toggleGuide(false);this.drawGates();this.drawActors();this.updateHUD();this.refreshSaveUI();
+  this.hideModal();this.state='playing';this.configureCamera();this.element('training-panel').hidden=!this.trainingArea();if(this.trainingArea())this.renderLesson();this.makeQuestProps(saved.wisp);this.guideWanted=true;this.syncGuide();this.dirty=false;this.drawGates();this.drawActors();this.updateHUD();this.refreshSaveUI();
   if(this.progress.every(v=>v.cleared)){this.state='won';this.showModal('СЕМЬЯ СПАСЕНА','Дом снова ждёт тебя.','Это сохранение завершённого путешествия. Можно начать новое.','Новое путешествие ↗',false);this.showStats();this.element('modal-save').hidden=false;}
-  this.toast('Загружено ручное сохранение.');
+  this.syncAchievements(false);this.toast(saved.migrated?'Сохранение v6 перенесено в расширенный мир. Для записи версии v7 нажми «Сохранить прогресс».':'Загружено ручное сохранение.');
  }
  private setGuideText():void{
-  const hint=this.element('overlay').querySelector('.control-hint');
-  if(hint)hint.textContent='WASD - идти · ЛКМ / ПКМ - приёмы · Пробел - рывок · Q - лечить · R - умение · Tab - меню';
-  const grid=this.element('guide').querySelector('.guide-grid');
-  if(grid)grid.innerHTML='<span><b>WASD / стрелки</b> движение</span><span><b>Мышь · ЛКМ / ПКМ</b> удар / второй приём</span><span><b>Space / Shift</b> уклонение</span><span><b>Q / R</b> лечение / умение</span><span><b>E / M</b> взаимодействие / карта</span><span><b>Tab / Esc · H · P</b> меню · справка · пауза</span>';
+  const hint=this.element('overlay').querySelector('.control-hint');if(hint)hint.textContent='WASD - идти · мышь - прицел · ЛКМ / ПКМ - приёмы · C - парирование · Tab - меню';
+  const grid=this.element('guide').querySelector('.guide-grid');if(grid)grid.innerHTML='<span><b>WASD / стрелки</b> движение</span><span><b>Мышь + ЛКМ</b> удар по прицелу</span><span><b>ПКМ</b> второй приём оружия</span><span><b>C</b> парирование · затем ЛКМ</span><span><b>Space / Shift</b> уклонение</span><span><b>1 / 2 / 3 · R</b> навыки · абсолютное умение</span><span><b>Q · E · M</b> фляга · действие · карта</span><span><b>Tab / Esc · H · P</b> меню · справка · пауза</span>';
  }
- private toggleGuide(show?:boolean):void{const g=this.element('guide');g.hidden=show===undefined?!g.hidden:!show;if(!g.hidden)this.guideLeft=0;}
+ private syncGuide():void{this.element('guide').hidden=!this.guideWanted||this.state!=='playing';if(this.state!=='playing'&&this.state!=='won')this.element('achievement-banner').hidden=true;}
+ private toggleGuide(show?:boolean):void{this.guideWanted=show??!this.guideWanted;this.syncGuide();}
  private toggleMap():void{
-  if(this.state==='map'){this.state=this.mapReturn;this.element('map-overlay').hidden=true;if(this.state==='menu')this.element('menu-overlay').hidden=false;return;}
-  if(this.state!=='playing'&&this.state!=='paused'&&this.state!=='menu')return;this.mapReturn=this.state;this.state='map';this.lessonEvent('map');this.resetInput();this.element('menu-overlay').hidden=true;this.element('map-overlay').hidden=false;this.drawMaps();
+  if(this.state==='map'){this.state=this.mapReturn;this.element('map-overlay').hidden=true;if(this.state==='menu')this.element('menu-overlay').hidden=false;this.syncGuide();return;}
+  if(this.state!=='playing'&&this.state!=='paused'&&this.state!=='menu')return;this.mapReturn=this.state;this.state='map';this.lessonEvent('map');this.resetInput();this.element('menu-overlay').hidden=true;this.element('map-overlay').hidden=false;this.syncGuide();this.drawMaps();
  }
  private drawMaps():void{
   const draw=(id:string,large:boolean)=>{const canvas=this.element<HTMLCanvasElement>(id),ctx=canvas.getContext('2d');if(!ctx)return;
    const w=canvas.width,h=canvas.height,pad=large?30:7,sx=(w-pad*2)/WORLD_WIDTH,sy=(h-pad*2)/WORLD_HEIGHT;ctx.clearRect(0,0,w,h);ctx.fillStyle='#102c24';ctx.fillRect(0,0,w,h);
    const point=(p:Point)=>({x:pad+p.x*sx,y:pad+p.y*sy});
    for(let i=0;i<REGIONS.length;i++){const p=point({x:regionStart(i),y:70}),width=REGION_WIDTH*sx,height=960*sy;
-    ctx.fillStyle=i<=this.regionIndex?REGIONS[i].palette.ground:'#1c342b';ctx.fillRect(p.x,p.y,width,height);ctx.strokeStyle=this.progress[i].cleared?'#b9d78a':i===this.regionIndex?'#b1e9df':'#456254';ctx.lineWidth=large?2:1;ctx.strokeRect(p.x,p.y,width,height);
-    if(large){ctx.fillStyle=i<=this.regionIndex?'#e0ead6':'#779085';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText(`${i+1}. ${REGIONS[i].name.split(' ').slice(0,2).join(' ')}`,p.x+width/2,19);ctx.font='10px system-ui';ctx.fillText(this.progress[i].cleared?'Пройдено':i===this.regionIndex?`${this.progress[i].coins}/${REGIONS[i].coins} ◈`:'Не исследовано',p.x+width/2,h-7);}
+    ctx.fillStyle=i<=this.regionIndex||this.progress[i].cleared?REGIONS[i].palette.ground:'#1c342b';ctx.fillRect(p.x,p.y,width,height);ctx.strokeStyle=this.progress[i].cleared?'#b9d78a':i===this.regionIndex?'#b1e9df':'#456254';ctx.lineWidth=large?2:1;ctx.strokeRect(p.x,p.y,width,height);
+    if(large){ctx.fillStyle=i<=this.regionIndex?'#e0ead6':'#779085';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText(`${i+1} · ${REGIONS[i].name.split(' ')[0]}`,p.x+width/2,19,width-4);ctx.font='10px system-ui';ctx.fillText(this.progress[i].cleared?'Пройдено':i===this.regionIndex?`${this.progress[i].coins}/${REGIONS[i].coins} ◈`:'Не исследовано',p.x+width/2,h-7);}
    }
    ctx.strokeStyle='#bcb18588';ctx.lineWidth=large?6:3;ctx.beginPath();const left=point({x:0,y:550}),right=point({x:WORLD_WIDTH,y:550});ctx.moveTo(left.x,left.y);ctx.lineTo(right.x,right.y);ctx.stroke();
    if(large)for(const t of this.terrain){if(t.x>regionEnd(this.regionIndex))continue;const p=point(t);ctx.fillStyle=t.kind==='puddle'?'#5b9291':'#263f30';ctx.beginPath();ctx.arc(p.x,p.y,Math.max(1,t.radius*sx),0,Math.PI*2);ctx.fill();}
    for(const c of this.coins){if(c.region!==this.regionIndex)continue;const p=point(c.sprite);ctx.fillStyle='#a8eeee';ctx.beginPath();ctx.arc(p.x,p.y,large?3:1.5,0,Math.PI*2);ctx.fill();}
-   for(let i=-1;i<=this.lastVillage;i++){const p=point(villagePosition(i));ctx.fillStyle='#f5c78d';ctx.fillRect(p.x-3,p.y-4,6,8);}
+   for(const i of this.campVisits){const p=point(villagePosition(i));ctx.fillStyle='#f5c78d';ctx.fillRect(p.x-3,p.y-4,6,8);}
    this.merchants.forEach((m,i)=>{if(i>this.regionIndex)return;const p=point(m);ctx.fillStyle=this.progress[i].cleared?'#efd7ac':'#778b79';ctx.fillRect(p.x-3,p.y-4,6,8);});
    for(const c of this.chests){if(c.opened||c.region!==this.regionIndex)continue;const p=point(c);ctx.fillStyle='#d5bdf2';ctx.fillRect(p.x-4,p.y-4,8,8);ctx.strokeStyle='#fff2d0';ctx.lineWidth=1;ctx.strokeRect(p.x-4,p.y-4,8,8);}
    for(const e of this.enemies)if(e.kind==='boss'&&!e.dead&&e.region===this.regionIndex){const p=point(e.sprite);ctx.fillStyle='#e38d9a';ctx.beginPath();ctx.arc(p.x,p.y,large?6:3,0,Math.PI*2);ctx.fill();}
@@ -719,8 +867,8 @@ export class GameScene extends Phaser.Scene {
   };draw('minimap',false);if(!this.element('map-overlay').hidden){draw('world-map',true);this.element('map-regions').innerHTML=REGIONS.map((r,i)=>`<span class="${i===this.regionIndex?'current':''}">${this.progress[i].cleared?'✓':i+1} · ${r.name}</span>`).join('');}
  }
  private togglePause():void{
-  if(this.state==='playing'){this.state='paused';this.resetInput();this.showPauseModal();}
-  else if(this.state==='paused'){this.state='playing';this.hideModal();this.resetInput();}
+  if(this.state==='playing'){this.state='paused';this.resetInput();this.syncGuide();this.showPauseModal();}
+  else if(this.state==='paused'){this.state='playing';this.hideModal();this.resetInput();this.syncGuide();}
  }
  private showPauseModal():void{this.showModal('ПРИВАЛ','Мир ждёт тебя.','Время остановлено. Tab открывает вещи, задания и карту. Для следующего запуска сохрани прогресс вручную.','Снять паузу ↗',false);this.element('restart-button').hidden=false;this.element('modal-save').hidden=false;}
  private primaryAction():void{
@@ -755,7 +903,7 @@ export class GameScene extends Phaser.Scene {
   g.fillStyle(color,alpha);g.fillPoints(points.map(p=>new Phaser.Math.Vector2(p.x,p.y)),true);g.lineStyle(2,color,Math.min(.9,alpha*4));g.beginPath();g.arc(at.x,at.y,radius,angle-arc,angle+arc,false);g.strokePath();
  }
  private drawActors():void{
-  const t=this.animationTime,item=weaponFor(this.profile),spec=attackSpec(this.profile,this.heavyAttack,this.combo),w={...item,...spec},moving=Math.hypot(this.velocity.x,this.velocity.y)>10,run=moving?Math.sin(t*18):Math.sin(t*3)*.2;
+  const t=this.animationTime,item=weaponFor(this.profile),spec=this.currentAttackSpec(),w={...item,...spec},moving=Math.hypot(this.velocity.x,this.velocity.y)>10,run=moving?Math.sin(t*18):Math.sin(t*3)*.2;
   this.player.setFlipX(Math.cos(this.face)<0).setAngle(this.dodgeLeft>0?Math.sin(this.face)*22:this.attackTime>=0?Math.sin(this.attackTime/w.duration*Math.PI)*-10:run*3);
   this.player.setScale(72/128*(this.attackTime>=0?1.025:1),72/128*(this.dodgeLeft>0?.82:1+run*.025));this.player.setDepth(20+this.player.y*.01);
   this.playerShadow.setPosition(this.player.x,this.player.y+22).setScale(this.dodgeLeft>0?1.3:1);
@@ -773,17 +921,19 @@ export class GameScene extends Phaser.Scene {
   this.sword.setPosition(this.player.x+Math.cos(swing)*extension,this.player.y+Math.sin(swing)*extension+7).setRotation(swing+.98).setDepth(this.player.depth+1).setAlpha(this.attackTime>=0||this.state==='intro'?1:.7);
   const g=this.combatInk;g.clear();
   for(const fx of this.effects){const fade=fx.life/fx.max,reach=fx.radius*(1+(1-fade)*.25);g.lineStyle(9*fade+1,fx.color,fade*.65);if(fx.kind==='ring')g.strokeCircle(fx.x,fx.y,reach);else if(fx.kind==='thrust')g.lineBetween(fx.x,fx.y,fx.x+Math.cos(fx.angle)*reach,fx.y+Math.sin(fx.angle)*reach);else{g.beginPath();g.arc(fx.x,fx.y,reach,fx.angle-.8,fx.angle+.8,false);g.strokePath();}}
+  if(this.counterLeft>0){const e=this.enemies.find(e=>e.id===this.counterTarget&&!e.dead);if(e){g.lineStyle(3,0xffe4a0,.8);g.strokeCircle(e.sprite.x,e.sprite.y,e.radius+20+Math.sin(t*16)*3);g.lineBetween(this.player.x,this.player.y,e.sprite.x,e.sprite.y);}}
+  if(this.shieldLeft>0){g.lineStyle(3,0xb1e8ec,.6);g.strokeCircle(this.player.x,this.player.y,43+Math.sin(t*5)*3);}
   if(this.guardLeft>0)this.cone(g,this.player,this.face,60,1.1,0xffe3a1,.22);
   if(this.area==='tutorial'&&this.lessonIndex===0){g.lineStyle(3,0xe9dc91,.8);g.strokeCircle(305,550,26+Math.sin(t*4)*3);}
   if(this.mouse&&this.state==='playing'){const at=this.cameras.main.getWorldPoint(this.mouse.x,this.mouse.y);g.lineStyle(1,0xb7f0e9,.62);g.strokeCircle(at.x,at.y,6);g.lineBetween(at.x-10,at.y,at.x-3,at.y);g.lineBetween(at.x+3,at.y,at.x+10,at.y);}
   if(this.attackTime>=0){const active=this.attackTime>=w.windup&&this.attackTime<=w.activeEnd,alpha=active?.50:this.attackTime<w.windup?.08:Math.max(0,.24*(1-(this.attackTime-w.activeEnd)/(w.duration-w.activeEnd)));
-   if(w.type==='thrust'){g.lineStyle(active?10:2,w.color,alpha);g.lineBetween(this.player.x,this.player.y,this.player.x+Math.cos(this.attackAngle)*w.reach,this.player.y+Math.sin(this.attackAngle)*w.reach);}
+   if(w.type==='thrust'||this.activeSkill==='axe_fault'){g.lineStyle(active?10:2,w.color,alpha);g.lineBetween(this.player.x,this.player.y,this.player.x+Math.cos(this.attackAngle)*w.reach,this.player.y+Math.sin(this.attackAngle)*w.reach);}
    else if(w.type==='magic'){g.lineStyle(2,w.color,.65);g.strokeCircle(this.player.x+Math.cos(swing)*60,this.player.y+Math.sin(swing)*60,8+Math.sin(t*18)*3);}
    else{g.lineStyle(active?10:3,w.color,alpha);g.beginPath();g.arc(this.player.x,this.player.y,w.reach*.8,this.attackAngle-w.arc,this.attackAngle+w.arc,false);g.strokePath();if(active){g.lineStyle(2,0xf5ffeb,.85);g.lineBetween(this.player.x+Math.cos(swing)*22,this.player.y+Math.sin(swing)*22,this.player.x+Math.cos(swing)*w.reach,this.player.y+Math.sin(swing)*w.reach);}}
   }
   if(this.ultimateLeft>0){g.lineStyle(5,w.color,this.ultimateLeft/.86*.75);if(w.style==='spear')g.lineBetween(this.player.x,this.player.y,this.player.x+Math.cos(this.ultimateAngle)*440,this.player.y+Math.sin(this.ultimateAngle)*440);else g.strokeCircle(this.player.x,this.player.y,(w.style==='axe'?150:185)*(1-this.ultimateLeft/.86*.4));}
-  for(const h of this.hazards){const warning=h.warning>0,color=h.kind==='sigil'?weaponFor(this.profile).color:h.kind==='poison'?0x9eba71:h.kind==='ring'?0xb7a5e3:warning?0xf38e83:0xffc485;
-   g.fillStyle(color,warning?.10:.19);g.fillCircle(h.x,h.y,h.radius);g.lineStyle(warning?2:3,color,.7);g.strokeCircle(h.x,h.y,h.radius);
+  for(const h of this.hazards){const warning=h.warning>0,color=h.kind==='sigil'?weaponFor(this.profile).color:h.kind==='poison'?0x9eba71:h.kind==='curse'?0xb19cdb:h.kind==='wave'?0xe5ca9e:h.kind==='ring'?0xb7a5e3:warning?0xf38e83:0xffc485;
+   g.fillStyle(color,warning?.10:.19);if(h.kind!=='wave')g.fillCircle(h.x,h.y,h.radius);g.lineStyle(warning?2:3,color,.7);g.strokeCircle(h.x,h.y,h.radius);
    if(warning){g.lineStyle(1,0xf2e6bb,.55);g.strokeCircle(h.x,h.y,h.radius*(1-Math.min(1,h.warning/1.7)));}
    else if(h.kind==='meteor'){g.lineStyle(5,0xffdcba,.8);g.lineBetween(h.x-5,h.y-80,h.x,h.y);}
   }
@@ -791,11 +941,12 @@ export class GameScene extends Phaser.Scene {
    e.sprite.setAngle(e.mode==='windup'?Math.sin(t*24)*3:bounce*3).setScale(size/128,size/128*(1+bounce*.033)).setDepth(20+e.sprite.y*.01);
    e.shadow.setPosition(e.sprite.x,e.sprite.y+e.radius).setVisible(true);if(e.flash>0)e.sprite.setTint(0xdfffe1);else if(e.stun>0)e.sprite.setTint(0x99d1e4);else if(e.mode==='windup')e.sprite.setTint(0xf1beb6);else e.sprite.clearTint();
    if(e.mode==='windup'){const angle=Math.atan2(e.aim.y,e.aim.x);
-    if(e.move==='slam'||e.move==='poison'){const radius=e.move==='slam'?155:e.kind==='boss'?100:72;g.lineStyle(2,0xf78f81,.8);g.fillStyle(0xe28d77,.10);g.fillCircle(e.sprite.x,e.sprite.y,radius);g.strokeCircle(e.sprite.x,e.sprite.y,radius);}
+    if(e.move==='slam'||e.move==='poison'||e.move==='quake'||e.move==='nova'){const radius=e.move==='nova'?190:e.move==='quake'?160:e.move==='slam'?155:e.kind==='boss'?100:72;g.lineStyle(2,0xf78f81,.8);g.fillStyle(0xe28d77,.10);g.fillCircle(e.sprite.x,e.sprite.y,radius);g.strokeCircle(e.sprite.x,e.sprite.y,radius);}
+    else if(e.move==='curse'){g.lineStyle(2,0xc9a0e9,.85);g.fillStyle(0x9d70bd,.12);g.fillCircle(e.target.x,e.target.y,100);g.strokeCircle(e.target.x,e.target.y,100);g.lineBetween(e.sprite.x,e.sprite.y,e.target.x,e.target.y);}
     else if(e.move==='blink'){g.lineStyle(2,0xd991b8,.8);g.fillStyle(0xb8698e,.12);g.fillCircle(e.target.x,e.target.y,58);g.strokeCircle(e.target.x,e.target.y,58);g.lineBetween(e.sprite.x,e.sprite.y,e.target.x,e.target.y);}
     else if(e.move==='summon'||e.move==='meteor'){g.lineStyle(2,e.move==='summon'?0xb9aad8:0xf2a98a,.8);g.strokeCircle(e.sprite.x,e.sprite.y,58);for(let n=0;n<6;n++){const a=t*1.5+n*Math.PI/3;g.fillStyle(0xdbc8ea,.6);g.fillCircle(e.sprite.x+Math.cos(a)*58,e.sprite.y+Math.sin(a)*58,3);}}
     else if(e.move==='fan'||e.move==='breath')this.cone(g,e.sprite,angle,240,e.move==='breath'?.55:.60,0xf0968c,.13);
-    else if(e.move==='slash')this.cone(g,e.sprite,angle,e.kind==='boss'?143:92,1.2,0xf08c85,.15);
+    else if(e.move==='slash'||e.move==='combo')this.cone(g,e.sprite,angle,e.kind==='boss'?143:92,1.2,0xf08c85,.15);
     else{g.lineStyle(3,0xf0968c,.65);g.lineBetween(e.sprite.x,e.sprite.y,e.sprite.x+e.aim.x*240,e.sprite.y+e.aim.y*240);g.strokeCircle(e.sprite.x,e.sprite.y,e.radius+8);}
    }
    if(e.hp<e.maxHP&&e.kind!=='boss'&&e.region===this.regionIndex){g.fillStyle(0x102a22,.8);g.fillRect(e.sprite.x-22,e.sprite.y-e.radius-28,44,4);g.fillStyle(0xcc9e9a,.9);g.fillRect(e.sprite.x-22,e.sprite.y-e.radius-28,44*e.hp/e.maxHP,4);}
@@ -821,31 +972,34 @@ export class GameScene extends Phaser.Scene {
   this.element('hp-text').textContent=`${Math.ceil(this.hp)} / ${s.maxHP}`;this.element('hp-fill').style.width=`${Math.max(0,this.hp)/s.maxHP*100}%`;
   this.element('stamina-text').textContent=`${Math.floor(this.stamina)}`;this.element('stamina-fill').style.width=`${this.stamina/s.maxStamina*100}%`;
   this.element('flask-count').textContent=`Фляги: ${this.flasks}`;this.element('weapon-label').textContent=this.armed?w.name:`Оружие: сила ${Math.min(p.coins,r.awaken)}/${r.awaken}`;
-  this.element('region-number').textContent=`БИОМ ${this.regionIndex+1} / 5`;this.element('region-name').textContent=r.name;this.element('coin-goal').textContent=`Сила биома: ${Math.min(p.coins,r.coins)} / ${r.coins}`;this.element('region-lore').textContent=r.lore;
+  this.element('region-number').textContent=`БИОМ ${this.regionIndex+1} / ${REGIONS.length}`;this.element('region-name').textContent=r.name;this.element('coin-goal').textContent=`Сила биома: ${Math.min(p.coins,r.coins)} / ${r.coins}`;this.element('region-lore').textContent=r.lore;
   this.element('compact-souls').textContent=!this.armed?`◈ ${Math.min(p.coins,r.awaken)} / ${r.awaken} · оружие`:`◈ ${Math.min(p.coins,r.coins)} / ${r.coins}`;
   const seconds=Math.max(0,Math.ceil(r.bossTime-p.elapsed));this.element('boss-timer').textContent=p.bossDead?'Хозяин повержен':p.spawned?'Босс пробудился':`Босс ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
-  const objective=this.area==='village'?'Деревня безопасна. E - разговор и покупки, Tab - вещи и сохранение. Выход в следующий биом справа.':this.area==='tutorial'?LESSONS[Math.min(this.lessonIndex,LESSONS.length-1)].hint:p.cleared?'Туман рассеялся. Восточная стоянка открыта.':!this.armed?`Верни ${r.awaken} осколков силы, чтобы восстановить ${w.name.toLowerCase()}.`:p.bossDead?`Собери силу биома: ${p.coins} / ${r.coins}.`:p.spawned?`Собери ${r.coins} силы и победи хозяина биома.`:`Собирай силу, выполняй испытания. Хозяин проснётся через ${seconds} с.`;
-  this.element('quest-text').textContent=objective;this.element('guide-objective').textContent=objective;
-  const boss=this.enemies.find(e=>e.kind==='boss'&&e.region===this.regionIndex&&!e.dead);this.element('boss-hud').hidden=!boss;
-  if(boss){const names:Record<EnemyAttack,string>={slash:'удар',charge:'рывок',slam:'волна',poison:'яд',summon:'призыв',fan:'чары',blink:'прыжок',meteor:'печати',breath:'дыхание'};
+  const objective=this.area==='interior'?`Внутри: ${HOUSE_NAMES[this.interiorRole??'smith']}. E у жителя - разговор, E у двери - выйти.`:this.area==='village'?'Деревня безопасна. Войди в дверь дома на E. Tab - вещи, навыки, дорога и сохранение. Выход в следующий биом справа.':this.area==='tutorial'?LESSONS[Math.min(this.lessonIndex,LESSONS.length-1)].hint:p.cleared?'Туман рассеялся. Восточная стоянка открыта.':!this.armed?`Верни ${r.awaken} осколков силы, чтобы восстановить ${w.name.toLowerCase()}.`:p.bossDead?`Собери силу биома: ${p.coins} / ${r.coins}.`:p.spawned?`Собери ${r.coins} силы и победи хозяина биома.`:`Собирай силу, выполняй испытания. Хозяин проснётся через ${seconds} с.`;
+  this.element('quest-text').textContent=objective;this.element('guide-objective').textContent=objective;this.element('guide-objective').hidden=this.trainingArea();
+  const boss=this.enemies.find(e=>e.kind==='boss'&&e.region===this.regionIndex&&!e.dead);this.element('boss-hud').hidden=!boss||this.area!=='biome';
+  if(boss){const names:Record<EnemyAttack,string>={slash:'удар',charge:'рывок',slam:'волна',poison:'яд',summon:'призыв',fan:'чары',blink:'прыжок',meteor:'печати',breath:'дыхание',combo:'серия',nova:'кольцо чар',snipe:'прицельный выстрел',quake:'волны земли',curse:'проклятие'};
    this.element('boss-name').textContent=`${r.bossName}${boss.phase2?' · II':''}${boss.mode==='windup'?` · ${names[boss.move]}`:''}`;this.element('boss-hp-text').textContent=`${Math.ceil(boss.hp)} / ${boss.maxHP}`;this.element('boss-hp-fill').style.width=`${Math.max(0,boss.hp)/boss.maxHP*100}%`;
   }
-  if(this.area!=='biome'){this.element('boss-hud').hidden=true;this.element('boss-timer').textContent=this.area==='tutorial'?'Обучение · без таймера':'Безопасная деревня';this.element('compact-souls').textContent=this.area==='tutorial'?`Урок ${this.lessonIndex+1}/${LESSONS.length}`:'Подготовка к пути';this.element('region-number').textContent=this.area==='tutorial'?'ПРЕДБИОМ':'ПОСЕЛЕНИЕ';this.element('region-name').textContent=VILLAGE_NAMES[this.villageIndex+1];this.element('quest-text').textContent=this.area==='tutorial'?LESSONS[this.lessonIndex]?.hint??'Обучение завершено':'Поговори с жителями, купи снаряжение и иди на восток. Семью держат за пятью печатями.';this.element('region-lore').textContent='Кузнец · бронница · лекарь · странник. Смерть вернёт тебя к последней посещённой деревне.';this.element('coin-goal').textContent='Цель: спасти семью';this.element('weapon-label').textContent=weaponFor(this.profile).name;}
+  if(this.area!=='biome'){this.element('boss-hud').hidden=true;this.element('boss-timer').textContent=this.area==='tutorial'?'Обучение · без таймера':'Безопасная деревня';this.element('compact-souls').textContent=this.area==='tutorial'?`Урок ${this.lessonIndex+1}/${LESSONS.length}`:'Подготовка к пути';this.element('region-number').textContent=this.area==='tutorial'?'ПРЕДБИОМ':'ПОСЕЛЕНИЕ';this.element('region-name').textContent=VILLAGE_NAMES[this.villageIndex+1];this.element('quest-text').textContent=this.area==='tutorial'?LESSONS[this.lessonIndex]?.hint??'Обучение завершено':'Поговори с жителями, купи снаряжение и иди на восток. Семью держат за восемью печатями.';this.element('region-lore').textContent='Кузнец · бронница · лекарь · странник. Смерть вернёт тебя к последней посещённой деревне.';this.element('coin-goal').textContent='Цель: спасти семью';this.element('weapon-label').textContent=weaponFor(this.profile).name;}
   this.element('weather-label').textContent=this.slowed>0?'Молния · замедление':this.weather==='clear'?'Ясно':`${this.weather==='rain'?'Дождь':'Гроза'} · ${Math.ceil(this.weatherLeft)} с`;
+  this.syncGuide();this.element('counter-ready').hidden=this.counterLeft<=0||this.state!=='playing';
+  this.element('guide-skills').textContent=SKILL_TREE.filter(s=>s.style===w.style&&this.profile.skills.includes(s.id)&&!this.profile.disabledSkills.includes(s.id)).map(s=>`${s.key} · ${s.name}${(this.skillCooldowns[s.id]??0)>0?' ('+Math.ceil(this.skillCooldowns[s.id]??0)+' с)':''}`).join(' · ')||'Приёмы изучаются в Tab → Навыки после побед над боссами.';
   this.element('ultimate-ready').hidden=!this.armed||this.ultimate<ULTIMATE_MAX;
   let target:Point|null=null,label='';
-  if(p.cleared&&this.regionIndex<4){const m=this.merchants[this.regionIndex];target=this.player.x<m.x+60?m:{x:regionStart(this.regionIndex+1)+70,y:550};label=this.player.x<m.x+60?'Костёр и лавка Бруна':'Следующий биом';}
+  if(p.cleared&&this.regionIndex<REGIONS.length-1){const m=this.merchants[this.regionIndex];target=this.player.x<m.x+60?villagePosition(this.regionIndex):{x:regionStart(this.regionIndex+1)+70,y:550};label=this.player.x<m.x+60?'Костёр и деревня':'Следующий биом';}
   else if(p.coins<r.coins){const c=this.coins.filter(c=>c.region===this.regionIndex).sort((a,b)=>Math.hypot(a.sprite.x-this.player.x,a.sprite.y-this.player.y)-Math.hypot(b.sprite.x-this.player.x,b.sprite.y-this.player.y))[0];if(c)target=c.sprite;label='Ближайший осколок души';}
   else if(boss){target=boss.sprite;label='Победи хозяина биома';}else label=`Хозяин проснётся через ${seconds} с`;
   if(this.area!=='biome'){target={x:regionStart(this.villageIndex+1)+80,y:550};label=this.area==='tutorial'?LESSONS[this.lessonIndex]?.title??'В биом':'Восток · следующий биом';}
   this.element('navigation-text').textContent=label;this.element('direction-arrow').hidden=!target;if(target)this.element('direction-arrow').style.transform=`rotate(${Math.atan2(target.y-this.player.y,target.x-this.player.x)*180/Math.PI}deg)`;
  }
  private resetJourney():void{
-  this.clearActors();this.profile=newProfile();this.progress=REGIONS.map(()=>({coins:0,elapsed:0,spawned:false,bossDead:false,cleared:false}));this.quests=REGIONS.map((_,i)=>newQuests(i));this.lines=newLines();this.campVisits.clear();this.regionIndex=0;this.villageIndex=-1;this.lastVillage=-1;this.elapsed=0;this.score=0;this.kills=0;this.deaths=0;this.ultimate=0;this.combo=0;this.lastAttack=-10;this.attackTime=-1;this.healWait=0;this.regenDelay=0;this.lessonIndex=0;this.lessonProgress=0;this.tutorialFinished=false;this.guardLeft=0;this.dirty=false;
-  for(const id of ['dialog-overlay','shop-overlay','map-overlay','menu-overlay','loot-overlay','intro-overlay','story-overlay','training-overlay','confirm-overlay','training-panel'])this.element(id).hidden=true;this.toggleGuide(false);this.hideModal();
+  this.achievementQueue=[];this.achievementLeft=0;this.achievementPage=0;this.element('achievement-banner').hidden=true;
+  this.clearActors();this.profile=newProfile();this.progress=REGIONS.map(()=>({coins:0,elapsed:0,spawned:false,bossDead:false,cleared:false,income:0,rewarded:false}));this.quests=REGIONS.map((_,i)=>newQuests(i));this.lines=newLines();this.deliveries=newDeliveries();this.campVisits.clear();this.regionIndex=0;this.villageIndex=-1;this.lastVillage=-1;this.elapsed=0;this.score=0;this.kills=0;this.deaths=0;this.ultimate=0;this.combo=0;this.lastAttack=-10;this.attackTime=-1;this.healWait=0;this.regenDelay=0;this.lessonIndex=0;this.lessonProgress=0;this.tutorialFinished=false;this.guardLeft=0;this.dirty=false;
+  for(const id of ['dialog-overlay','shop-overlay','map-overlay','menu-overlay','loot-overlay','intro-overlay','story-overlay','training-overlay','confirm-overlay','travel-overlay','training-panel'])this.element(id).hidden=true;this.element('guide').hidden=true;this.hideModal();
  }
  private showTitle():void{
-  this.state='ready';this.dirty=false;this.toggleGuide(false);this.element('training-panel').hidden=true;this.showModal('RAID COIN · v6.0','За тех, кого любишь.','Дракон похитил семью лиса и расколол его силу. Пройди пять печатей, верни оружие и освободи близких.','Новая игра ↗',true);this.element('load-start').textContent='Продолжить путешествие';this.refreshSaveUI();
+  this.state='ready';this.dirty=false;this.element('guide').hidden=true;this.element('training-panel').hidden=true;this.showModal('RAID COIN · v7.1','За тех, кого любишь.','Дракон похитил семью лиса и расколол его силу. Пройди восемь печатей, верни оружие и освободи близких.','Новая игра ↗',true);this.element('load-start').textContent='Продолжить путешествие';this.refreshSaveUI();
  }
  private askTraining():void{this.hideModal();this.state='choice';this.element('training-overlay').hidden=false;}
  private requestNew():void{if(this.dirty)this.confirmExit('new');else this.askTraining();}
@@ -857,65 +1011,90 @@ export class GameScene extends Phaser.Scene {
   this.element('confirm-overlay').hidden=true;for(const id of ['menu-overlay','shop-overlay','dialog-overlay','map-overlay','loot-overlay'])this.element(id).hidden=true;this.dirty=false;this.hideModal();if(this.confirmTarget==='new')this.askTraining();else this.showTitle();
  }
  private startVillage(index:number,revive=false):void{
-  this.area='village';this.villageIndex=index;this.lastVillage=index;this.state='playing';this.armed=true;this.profile.blade=true;this.projectiles=[];this.hazards=[];this.attackTime=-1;this.ultimateLeft=0;this.guardLeft=0;this.resetWeather();this.resetInput();this.sword.setVisible(true);this.element('training-panel').hidden=true;this.wisp?.setVisible(false);
+  this.clearInterior();this.area='village';this.villageIndex=index;this.lastVillage=index;this.regionIndex=Math.min(REGIONS.length-1,index+1);this.state='playing';this.armed=true;this.profile.blade=true;this.projectiles=[];this.hazards=[];this.attackTime=-1;this.ultimateLeft=0;this.guardLeft=0;this.counterLeft=0;this.counterTarget=-1;this.counterStrike=false;this.activeSkill=null;this.shieldLeft=0;this.resetWeather();this.resetInput();this.sword.setVisible(true);this.element('training-panel').hidden=true;this.wisp?.setVisible(false);
   const center=villagePosition(index);this.checkpoint={x:center.x+15,y:center.y+95};
   if(revive){this.player.setPosition(this.checkpoint.x,this.checkpoint.y).setAlpha(1).setAngle(0).clearTint();this.hp=stats(this.profile).maxHP;this.stamina=stats(this.profile).maxStamina;this.flasks=stats(this.profile).flasks;this.hurtLeft=2;}
   if(!this.campVisits.has(index)){this.campVisits.add(index);this.hp=stats(this.profile).maxHP;this.stamina=stats(this.profile).maxStamina;this.flasks=stats(this.profile).flasks;this.reachCheckpoint(VILLAGE_NAMES[index+1]);}
   else if(revive)this.reachCheckpoint(`Возрождение · ${VILLAGE_NAMES[index+1]}`);
-  this.cameras.main.centerOn(this.player.x,this.player.y);this.drawGates();this.drawActors();this.updateHUD();
+  this.audio.setRegion(this.regionIndex);this.configureCamera();this.cameras.main.centerOn(this.player.x,this.player.y);this.syncGuide();this.drawGates();this.drawActors();this.updateHUD();
+ }
+ private openTravel():void{
+  if(this.state!=='menu'||this.area!=='village'&&this.area!=='interior'){this.toast('Переход доступен только из безопасной деревни.');return;}
+  this.state='travel';this.element('menu-overlay').hidden=true;this.element('travel-overlay').hidden=false;
+  this.element('travel-items').innerHTML=[...this.campVisits].sort((a,b)=>a-b).map(i=>{const fare=3+Math.abs(i-this.villageIndex)*2,here=i===this.villageIndex;return `<article class="travel-card"><strong>${VILLAGE_NAMES[i+1]}</strong><small>${here?'Ты здесь':`Дорога: ${fare} ◈`}</small><button data-travel="${i}" ${here||this.profile.coins<fare?'disabled':''}>${here?'Текущая деревня':'Отправиться'}</button></article>`;}).join('');
+ }
+ private closeTravel():void{this.state='menu';this.element('travel-overlay').hidden=true;this.element('menu-overlay').hidden=false;this.renderMenu();}
+ private travelTo(index:number):void{
+  if(this.state!=='travel'||!this.campVisits.has(index)||index===this.villageIndex)return;const fare=3+Math.abs(index-this.villageIndex)*2;if(this.profile.coins<fare)return;
+  this.profile.coins-=fare;this.element('travel-overlay').hidden=true;this.startVillage(index);this.player.setPosition(this.checkpoint.x,this.checkpoint.y);this.cameras.main.centerOn(this.player.x,this.player.y);this.dirty=true;this.reachCheckpoint(VILLAGE_NAMES[index+1]);this.toast('Дорога пройдена. Лечение у Ивы; смерть вернёт к этому костру.');this.updateHUD();
+ }
+ private renderDeliveryTalk():void{
+  const def=DELIVERIES.find(d=>{const q=this.deliveries.find(q=>q.id===d.id)!;return !q.claimed&&this.seals()>=d.seals&&(d.giver===this.dialogRole&&d.from===this.villageIndex||q.accepted&&!q.delivered&&d.receiver===this.dialogRole&&d.to===this.villageIndex);}),b=this.element<HTMLButtonElement>('dialog-delivery');b.disabled=!def;
+  const q=def&&this.deliveries.find(q=>q.id===def.id)!;b.textContent=!def?'Доставок пока нет':q?.delivered?'Награда за доставку':q?.accepted&&def.receiver===this.dialogRole?'Передать посылку':q?.accepted?'О доставке':'Взять доставку';
+ }
+ private talkDelivery():void{
+  const def=DELIVERIES.find(d=>{const q=this.deliveries.find(q=>q.id===d.id)!;return !q.claimed&&this.seals()>=d.seals&&(d.giver===this.dialogRole&&d.from===this.villageIndex||q.accepted&&!q.delivered&&d.receiver===this.dialogRole&&d.to===this.villageIndex);});if(!def)return;const q=this.deliveries.find(q=>q.id===def.id)!;
+  if(q.delivered&&def.giver===this.dialogRole){q.claimed=true;this.profile.coins+=def.reward;this.profile.skillPoints++;this.audio.play('loot');this.say(`${def.response} Награда: ${def.reward} осколков и искра мастерства. Спасибо, что вернулся.`);}
+  else if(q.accepted&&def.receiver===this.dialogRole&&def.to===this.villageIndex){q.delivered=true;this.say(`${def.response} Теперь вернись к ${PEOPLE.find(p=>p.role===def.giver)!.name} за наградой.`);}
+  else{q.accepted=true;this.say(`${def.name}. ${def.description} Посылка «${def.parcel}» в твоей сумке. Из деревни открой Tab → Путь → Дорога между деревнями.`);}
+  this.syncAchievements();this.dirty=true;this.renderDeliveryTalk();
  }
  private enemyBounds(e:Enemy):Bounds{return e.training?{width:PROLOGUE_WIDTH-20,height:WORLD_HEIGHT,margin:35,top:65,left:35}:this.regionBounds(e.region);}
  private secondaryAttack():void{
-  if(this.state!=='playing'||!this.armed||this.attackTime>=0||this.dodgeLeft>0||this.guardLeft>0||this.ultimateLeft>0)return;const w=weaponFor(this.profile),a=attackSpec(this.profile,true);if(this.stamina<a.cost)return;
-  this.updateAim();this.stamina-=a.cost;this.regenDelay=STAMINA_DELAY;this.mouseHeld=false;
-  if(w.style==='sword'){this.guardLeft=.22;this.audio.play('parry');this.lessonEvent('parry');this.addEffect('ring',this.player,0xffe3a1,55);return;}
-  this.heavyAttack=true;this.attackTime=0;this.attackAngle=this.face;this.attackFired=false;this.attackHits.clear();this.combo=0;
+  if(weaponFor(this.profile).style==='sword'){this.parry();return;}
+  if(this.state!=='playing'||!this.armed||this.attackTime>=0||this.dodgeLeft>0||this.guardLeft>0||this.ultimateLeft>0)return;
+  const a=attackSpec(this.profile,true);if(this.stamina<a.cost)return;this.updateAim();this.stamina-=a.cost;this.regenDelay=STAMINA_DELAY;this.mouseHeld=false;this.activeSkill=null;this.counterStrike=false;this.heavyAttack=true;this.attackTime=0;this.attackAngle=this.face;this.attackFired=false;this.attackPulse=-1;this.attackHits.clear();this.combo=0;
  }
  private addEffect(kind:'slash'|'ring'|'thrust',at:Point,color:number,radius:number,angle=this.face):void{this.effects.push({x:at.x,y:at.y,kind,color,radius,angle,life:.32,max:.32});}
  private buyItem(id:string):string{
-  const item=SUPPLIES.find(i=>i.id===id);if(!item)return purchase(this.profile,id);
+  const item=SUPPLIES.find(i=>i.id===id);if(!item)return purchase(this.profile,id,this.seals());
   if(id==='heal-service'&&this.hp>=stats(this.profile).maxHP)return 'Здоровье уже полное.';if(id==='refill'&&this.flasks>=stats(this.profile).flasks)return 'Все фляги наполнены.';if(id==='rest-service'&&this.hp>=stats(this.profile).maxHP&&this.flasks>=stats(this.profile).flasks)return 'Ты уже готов к пути.';if(this.profile.coins<item.price)return 'Не хватает осколков.';
   this.profile.coins-=item.price;if(id==='heal-service')this.hp=Math.min(stats(this.profile).maxHP,this.hp+50);else if(id==='refill')this.flasks++;else{this.hp=stats(this.profile).maxHP;this.flasks=stats(this.profile).flasks;}this.audio.play('heal');return `${item.name}: готово.`;
  }
- private beginStory(closing:boolean):void{this.storyClosing=closing;this.storyIndex=0;this.storyTime=0;this.state='story';this.resetInput();this.hideModal();this.element('story-overlay').hidden=false;this.element('training-overlay').hidden=true;this.renderStoryText();this.drawStory();}
+ private beginStory(closing:boolean):void{this.storyClosing=closing;this.storyIndex=0;this.storyTime=0;this.state='story';this.resetInput();this.hideModal();this.element('story-overlay').hidden=false;this.syncGuide();this.element('training-overlay').hidden=true;this.renderStoryText();this.drawStory();}
  private renderStoryText():void{const frames=this.storyClosing?ENDING:OPENING,frame=frames[this.storyIndex];this.element('story-title').textContent=frame.title;this.element('story-text').textContent=frame.text;this.element('story-page').textContent=`${this.storyIndex+1} / ${frames.length}`;this.element('story-next').textContent=this.storyIndex===frames.length-1?'В путь ↗':'Дальше ↗';}
  private advanceStory():void{const frames=this.storyClosing?ENDING:OPENING;if(this.storyIndex>=frames.length-1){this.finishStory();return;}this.storyIndex++;this.storyTime=0;this.renderStoryText();}
- private updateStory(dt:number):void{this.storyTime+=dt;this.drawStory();if(this.storyTime>=8)this.advanceStory();}
+ private updateStory(dt:number):void{this.storyTime+=dt;this.drawStory();if(this.storyTime>=12)this.advanceStory();}
  private finishStory():void{
-  this.element('story-overlay').hidden=true;if(this.storyClosing){this.state='won';this.showModal('СЕМЬЯ СПАСЕНА','Дом снова ждёт тебя.','Пять печатей разорваны. Дракон побеждён, семья и украденная казна возвращены. Сохрани завершённый путь по кнопке.','Новая игра ↗',false);this.showStats();this.element('modal-save').hidden=false;return;}
+  this.element('story-overlay').hidden=true;if(this.storyClosing){this.state='won';this.showModal('СЕМЬЯ СПАСЕНА','Дом снова ждёт тебя.','Восемь печатей разорваны. Дракон побеждён, семья и украденная казна возвращены. Сохрани завершённый путь по кнопке.','Новая игра ↗',false);this.showStats();this.element('modal-save').hidden=false;return;}
   if(this.wantsTraining)this.beginTutorial();else{this.player.setPosition(regionStart(0)+100,588);this.startRegion(0,true);this.beginIntro(false);}
  }
  private drawStory():void{
-  const canvas=this.element<HTMLCanvasElement>('story-canvas'),c=canvas.getContext('2d');if(!c)return;const width=canvas.width,height=canvas.height,t=this.storyTime,frame=(this.storyClosing?ENDING:OPENING)[this.storyIndex],raid=frame.scene==='raid',home=frame.scene==='home'||frame.scene==='rescue';
-  c.clearRect(0,0,width,height);const sky=c.createLinearGradient(0,0,0,height);sky.addColorStop(0,raid?'#321b33':'#244642');sky.addColorStop(1,home?'#8e9e70':'#183c36');c.fillStyle=sky;c.fillRect(0,0,width,height);
-  c.fillStyle='#ecdca366';c.beginPath();c.arc(740,70,45,0,Math.PI*2);c.fill();for(let i=0;i<15;i++){c.fillStyle=i%2?'#163831':'#1b4236';c.beginPath();c.moveTo(i*80-30,height);c.lineTo(i*80+20,95+(i%3)*28);c.lineTo(i*80+95,height);c.fill();}
-  c.fillStyle='#55705a';c.beginPath();c.ellipse(width/2,height,600,135,0,0,Math.PI*2);c.fill();
-  const sprite=(key:string,x:number,y:number,size:number,alpha=1)=>{c.save();c.globalAlpha=alpha;c.drawImage(this.textures.get(key).getSourceImage() as CanvasImageSource,x-size/2,y-size/2,size,size);c.restore();};
-  if(home){sprite('hut',260,205,230);sprite('fox',410,255+Math.sin(t*3)*2,115);sprite('fox-moon',520,248,105);sprite('fox-ember',580,278,65);sprite('fox',635,278,60);sprite('chest',190,300,65);for(let i=0;i<12;i++){c.fillStyle='#e8d99688';c.beginPath();c.arc(70+i*74,200+Math.sin(t+i)*45,2,0,Math.PI*2);c.fill();}}
-  else if(raid){sprite('hut',200,245,200);sprite('fox',320,295,115);const lift=Math.min(1,t/5);sprite('dragon',700-t*9,95+Math.sin(t*2)*10,250);sprite('fox-moon',660,280-lift*140,95,1-lift*.5);sprite('fox',710,310-lift*160,58,1-lift*.5);sprite('fox-ember',755,310-lift*170,58,1-lift*.5);for(let i=0;i<10;i++)sprite('soul',230+i*50,300-lift*(90+i*9),22);c.strokeStyle='#f8a685aa';c.lineWidth=3;c.beginPath();c.moveTo(675,150);c.lineTo(615,220);c.lineTo(650,205);c.lineTo(565,300);c.stroke();}
-  else{sprite('fox',260+t*5,280,120);sprite('merchant',450,280,105);for(let i=0;i<5;i++){c.strokeStyle=['#83ccb1','#e8ca87','#c39ed8','#e5a480','#8cc7db'][i];c.lineWidth=3;c.beginPath();c.arc(580+i*55,210+Math.sin(t+i)*6,20,0,Math.PI*2);c.stroke();c.font='20px system-ui';c.fillStyle='#e9e0bf';c.fillText(String(i+1),575+i*55,217+Math.sin(t+i)*6);}sprite('dragon',800,90,110,.55);}
-  const shade=c.createLinearGradient(0,190,0,height);shade.addColorStop(0,'#071e1700');shade.addColorStop(1,'#071e17aa');c.fillStyle=shade;c.fillRect(0,0,width,height);
+  const canvas=this.element<HTMLCanvasElement>('story-canvas'),c=canvas.getContext('2d');if(!c)return;
+  const width=canvas.width,height=canvas.height,t=this.storyTime,frame=(this.storyClosing?ENDING:OPENING)[this.storyIndex],panel=this.storyClosing?0:this.storyIndex,raid=frame.scene==='raid',ghost=frame.scene==='oath';
+  const atlas=this.textures.get('story-atlas').getSourceImage() as CanvasImageSource,zoom=1+Math.min(.065,t*.005),cropW=768/zoom,cropH=cropW*height/width,sx=panel%2*768+(768-cropW)/2+Math.sin(t*.14)*5,sy=Math.floor(panel/2)*512+(512-cropH)/2;
+  c.clearRect(0,0,width,height);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(atlas,sx,sy,cropW,cropH,0,0,width,height);
+  // Небольшой параллакс, пепел и свечение дополняют рисунок, текст остаётся вне кадра.
+  for(let i=0;i<28;i++){const x=(i*97+t*(raid?-15:ghost?8:4))%width,y=(i*61-t*(raid?20:8)+height*2)%height;c.globalAlpha=.20+Math.sin(t*1.5+i)*.13;c.fillStyle=raid?'#ffa97e':ghost?'#9beaff':'#ffdfa1';c.beginPath();c.arc(x,y,raid?1.8:1.3,0,Math.PI*2);c.fill();}
+  c.globalAlpha=1;
+  if(raid){c.fillStyle=`rgba(204,51,32,${.03+.025*Math.sin(t*3)})`;c.fillRect(0,0,width,height);}
+  if(ghost){const pulse=.12+.05*Math.sin(t*3);c.fillStyle=`rgba(112,222,255,${pulse})`;c.beginPath();c.ellipse(width*.57,height*.56,55+Math.sin(t*2)*5,35,0,0,Math.PI*2);c.fill();}
+  if(frame.scene==='road'){for(let i=0;i<REGIONS.length;i++){const x=width*.48+i*55,y=height*.88+Math.sin(t+i)*2;c.strokeStyle=['#83ccb1','#e8ca87','#c39ed8','#e5a480','#8cc7db','#b18bcc','#d4d4c9','#c38aa1'][i];c.lineWidth=2;c.beginPath();c.arc(x,y,13,0,Math.PI*2);c.stroke();c.fillStyle='#f4e7c8';c.font='bold 13px system-ui';c.textAlign='center';c.fillText(String(i+1),x,y+4);}}
+  const shade=c.createLinearGradient(0,0,0,height);shade.addColorStop(0,'#07101522');shade.addColorStop(.6,'#07101500');shade.addColorStop(1,'#07101570');c.fillStyle=shade;c.fillRect(0,0,width,height);
  }
  private beginTutorial():void{
-  this.area='tutorial';this.villageIndex=-1;this.player.setPosition(200,550);this.armed=false;this.profile.blade=false;this.progress[0].coins=0;this.state='playing';this.lessonIndex=0;this.lessonProgress=0;this.element('training-panel').hidden=false;this.prepareLesson();this.renderLesson();this.reachCheckpoint('Учебный двор Бруна');this.updateHUD();
+  this.area='tutorial';this.villageIndex=-1;this.player.setPosition(200,550);this.armed=false;this.profile.blade=false;this.progress[0].coins=0;this.state='playing';this.lessonIndex=0;this.lessonProgress=0;this.element('training-panel').hidden=false;this.interiorReturn='tutorial';this.toggleGuide(true);this.prepareLesson();this.renderLesson();this.reachCheckpoint('Учебный двор Бруна');this.updateHUD();
  }
- private lessonEvent(event:string):void{if(this.area!=='tutorial'||this.tutorialFinished||LESSONS[this.lessonIndex]?.event!==event)return;this.lessonProgress++;if(this.lessonProgress>=LESSONS[this.lessonIndex].target){this.lessonIndex++;this.lessonProgress=0;if(this.lessonIndex>=LESSONS.length){this.tutorialFinished=true;return;}this.prepareLesson();}this.renderLesson();}
+ private lessonEvent(event:string):void{if(!this.trainingArea()||this.tutorialFinished||LESSONS[this.lessonIndex]?.event!==event)return;this.lessonProgress++;if(this.lessonProgress>=LESSONS[this.lessonIndex].target){this.lessonIndex++;this.lessonProgress=0;if(this.lessonIndex>=LESSONS.length){this.tutorialFinished=true;return;}this.prepareLesson();}this.renderLesson();}
  private prepareLesson():void{
   if(this.lessonIndex===1)for(const x of [375,435,495])this.spawnCoin(0,false,{x,y:550});
   if(this.lessonIndex===2){const e=this.spawnEnemy('skeleton',0,0,{x:640,y:550});e.training=true;e.stun=999;e.speed=0;e.hp=e.maxHP=600;}
+  if(this.lessonIndex===3){const e=this.enemies.find(e=>e.training&&!e.dead);if(e){e.stun=0;e.damage=5;e.speed=65;e.clock=.7;e.mode='chase';}}
+  if(this.lessonIndex===4){const e=this.enemies.find(e=>e.training&&!e.dead);if(e){e.stun=999;e.speed=0;}}
   if(this.lessonIndex===5){this.hp=Math.max(1,this.hp-45);this.toast('Учебная рана. Используй Q, чтобы выпить флягу.');}
   if(this.lessonIndex===6)this.ultimate=100;
   if(this.lessonIndex===10){for(const e of this.enemies){this.tweens.killTweensOf(e.sprite);e.sprite.destroy();e.shadow.destroy();}this.enemies=[];this.hp=stats(this.profile).maxHP;this.stamina=stats(this.profile).maxStamina;for(const point of [{x:650,y:760},{x:720,y:530}]){const e=this.spawnEnemy('skeleton',0,0,point);e.training=true;e.hp=e.maxHP=35;e.damage=5;e.speed=115;e.clock=2;}}
  }
  private renderLesson():void{const lesson=LESSONS[Math.min(this.lessonIndex,LESSONS.length-1)];this.element('lesson-title').textContent=`${this.lessonIndex+1}/${LESSONS.length} · ${lesson.title}`;this.element('lesson-hint').textContent=`${lesson.hint} ${lesson.target>1?`(${this.lessonProgress}/${lesson.target})`:''}`;}
  private finishTutorial():void{
-  this.element('training-panel').hidden=true;for(const e of this.enemies.filter(e=>e.training)){this.tweens.killTweensOf(e.sprite);e.sprite.destroy();e.shadow.destroy();}this.enemies=this.enemies.filter(e=>!e.training);for(const c of this.coins)c.sprite.destroy();this.coins=[];this.hp=stats(this.profile).maxHP;this.flasks=stats(this.profile).flasks;this.stamina=stats(this.profile).maxStamina;this.profile.coins=0;this.player.setPosition(regionStart(0)+100,588);this.startRegion(0,true);this.beginIntro(false);this.toast('Обучение завершено. Впереди первая печать и путь к семье.');
+  this.syncAchievements();
+  this.clearInterior();this.element('training-panel').hidden=true;for(const e of this.enemies.filter(e=>e.training)){this.tweens.killTweensOf(e.sprite);e.sprite.destroy();e.shadow.destroy();}this.enemies=this.enemies.filter(e=>!e.training);for(const c of this.coins)c.sprite.destroy();this.coins=[];this.hp=stats(this.profile).maxHP;this.flasks=stats(this.profile).flasks;this.stamina=stats(this.profile).maxStamina;this.profile.coins=0;this.player.setPosition(regionStart(0)+100,588);this.startRegion(0,true);this.beginIntro(false);this.toast('Обучение завершено. Впереди первая печать и путь к семье.');
  }
  private renderQuestTalk():void{const def=LINES.find(d=>d.giver===this.dialogRole&&this.villageIndex>=d.offered&&!this.lines.find(q=>q.id===d.id)!.claimed),button=this.element<HTMLButtonElement>('dialog-quest');button.disabled=!def;button.textContent=!def?'Поручений пока нет':lineReady(this.lines.find(q=>q.id===def.id)!,this.progress[def.region].bossDead)?'Сдать поручение':this.lines.find(q=>q.id===def.id)!.accepted?'О поручении':'Взять поручение';}
  private talkQuest():void{
   const def=LINES.find(d=>d.giver===this.dialogRole&&this.villageIndex>=d.offered&&!this.lines.find(q=>q.id===d.id)!.claimed);if(!def)return;const q=this.lines.find(q=>q.id===def.id)!;
   if(lineReady(q,this.progress[def.region].bossDead)){q.claimed=true;if(def.reward==='emberseal'){if(!this.profile.relics.includes(def.reward))this.profile.relics.push(def.reward);}else{const weapon=WEAPONS.find(w=>w.id===def.reward)!;if(!this.profile.weapons.includes(weapon.id))this.profile.weapons.push(weapon.id);}this.audio.play('loot');this.say(`Ты выполнил обещание. Награда: ${def.rewardName}. Выбери оружие в меню «Вещи». Печать действует сразу.`);this.toast(`Получен уникальный предмет: ${def.rewardName}`);}
-  else{q.accepted=true;this.say(`${def.name}. ${def.description} После победы возвращайся к ${PEOPLE.find(n=>n.role===def.giver)!.name} в любой доступной деревне. Награда: ${def.rewardName}.`);this.makeQuestProps();}this.renderQuestTalk();this.dirty=true;
+  else{q.accepted=true;this.say(`${def.name}. ${def.description} После победы возвращайся к ${PEOPLE.find(n=>n.role===def.giver)!.name} в любой доступной деревне. Награда: ${def.rewardName}.`);this.makeQuestProps();}this.syncAchievements();this.renderQuestTalk();this.dirty=true;
  }
  private freeNear(at:Point):Point{const terrain=this.terrainByRegion[this.regionIndex],bounds=this.regionBounds(this.regionIndex);if(freePoint(at,25,terrain,bounds))return at;const grid=this.nav[this.regionIndex];let result=at,distance=Infinity;grid.free.forEach((free,i)=>{if(!free)return;const p={x:grid.originX+(i%grid.cols+.5)*grid.cell,y:(Math.floor(i/grid.cols)+.5)*grid.cell},d=Phaser.Math.Distance.Between(at.x,at.y,p.x,p.y);if(d<distance){distance=d;result=p;}});return result;}
  private makeQuestProps(wispAt:Point|null=null):void{

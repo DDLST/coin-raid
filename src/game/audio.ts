@@ -1,4 +1,5 @@
-export type Sound = 'slash' | 'thrust' | 'axe' | 'cast' | 'hit' | 'bite' | 'hurt' | 'dash' | 'pickup' | 'heal' | 'checkpoint' | 'crack' | 'thunder' | 'boss' | 'loot' | 'empty' | 'ultimate' | 'howl' | 'parry';
+import {RecordedMusic, type MusicMode} from './soundtrack';
+export type Sound = 'slash' | 'thrust' | 'axe' | 'cast' | 'hit' | 'bite' | 'hurt' | 'dash' | 'pickup' | 'heal' | 'checkpoint' | 'crack' | 'thunder' | 'boss' | 'loot' | 'empty' | 'ultimate' | 'howl' | 'parry' | 'achievement';
 export type AudioSettings = { master: number; music: number; effects: number; muted: boolean };
 export const DEFAULT_AUDIO: AudioSettings = { master: .65, music: .42, effects: .70, muted: false };
 const MELODIES = [
@@ -9,7 +10,7 @@ const MELODIES = [
   [60, 63, 67, 70, 67, 63, 58, 62, 65, 68, 65, 62, 56, 60, 63, 67],
 ];
 const freq = (midi: number) => 440 * 2 ** ((midi - 69) / 12);
-// Музыка и шумовые эффекты синтезируются в браузере, без внешних аудиофайлов.
+// Записи CC0 хранятся в игре. Звуки мира и резервная музыка синтезируются в браузере.
 export class ForestAudio {
   settings: AudioSettings = { ...DEFAULT_AUDIO };
   available = true;
@@ -17,7 +18,8 @@ export class ForestAudio {
   private master!: GainNode;
   private music!: GainNode;
   private guitar!: WaveShaperNode;
-  private mode:'explore'|'combat'|'boss'='explore';
+  private recorded:RecordedMusic|null=null;
+  private mode:MusicMode='explore';
   private ambientLeft=12;
   private effects!: GainNode;
   private rain!: GainNode;
@@ -35,7 +37,7 @@ export class ForestAudio {
       if (!this.context) {
         this.context = new AudioContext(); const c = this.context;
         this.master = c.createGain(); this.music = c.createGain(); this.effects = c.createGain(); this.rain = c.createGain();
-        this.music.connect(this.master); this.effects.connect(this.master); this.rain.connect(this.effects); const compressor=c.createDynamicsCompressor();compressor.threshold.value=-9;compressor.knee.value=12;compressor.ratio.value=4;this.master.connect(compressor).connect(c.destination);
+        this.recorded=new RecordedMusic(c,this.music);this.music.connect(this.master); this.effects.connect(this.master); this.rain.connect(this.effects); const compressor=c.createDynamicsCompressor();compressor.threshold.value=-9;compressor.knee.value=12;compressor.ratio.value=4;this.master.connect(compressor).connect(c.destination);
         this.guitar=c.createWaveShaper();const curve=new Float32Array(4096);for(let i=0;i<curve.length;i++){const x=i*2/(curve.length-1)-1;curve[i]=Math.tanh(x*16)*.55;}this.guitar.curve=curve;this.guitar.oversample='2x';
         const cabinet=c.createBiquadFilter();cabinet.type='lowpass';cabinet.frequency.value=2400;this.guitar.connect(cabinet).connect(this.music);
         this.noise = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
@@ -60,21 +62,22 @@ export class ForestAudio {
     this.effects.gain.setTargetAtTime(this.settings.effects * .7, at, .05);
   }
   setRegion(index: number): void { if (this.region !== index) { this.region = index; this.note = 0; this.nextNote = (this.context?.currentTime ?? 0) + .15; } }
-  update(dt:number,playing:boolean,weather:'clear'|'rain'|'storm',mode:'explore'|'combat'|'boss'='explore'):void{
+  update(dt:number,playing:boolean,weather:'clear'|'rain'|'storm',mode:MusicMode='explore'):void{
     this.stepLeft=Math.max(0,this.stepLeft-dt);const c=this.context;if(!c||c.state!=='running')return;
     if(this.paused!==!playing||this.weather!==weather){this.paused=!playing;this.weather=weather;this.rain.gain.setTargetAtTime(playing&&weather!=='clear'?weather==='storm'?.13:.085:0,c.currentTime,.3);}
-    if(this.mode!==mode){this.mode=mode;this.nextNote=c.currentTime+.06;this.note=0;}
+    const synthMode=mode==='rage'?'boss':mode==='village'||mode==='story'?'explore':mode;this.recorded?.update(dt,playing&&!this.settings.muted,this.region,mode);if(this.mode!==synthMode){this.mode=synthMode;this.nextNote=c.currentTime+.06;this.note=0;}
     if(!playing||this.settings.muted){this.nextNote=c.currentTime+.1;return;}
     this.ambientLeft-=dt;if(this.ambientLeft<=0){this.ambientLeft=18+Math.random()*13;if(mode==='explore'&&(this.region===0||this.region===2))this.play('howl');}
-    const roots=[40,38,39,37,36],root=roots[this.region],bpm=mode==='boss'?174+this.region*3:mode==='combat'?132+this.region*4:92+this.region*3;
+    if(this.recorded&&!this.recorded.failed)return;
+    const index=this.region%5,roots=[40,38,39,37,36],root=roots[index],bpm=mode==='boss'?174+this.region*3:mode==='combat'?132+this.region*4:92+this.region*3;
     const step=60/bpm/2,riffs=[[0,0,3,0,5,0,6,5],[0,0,0,3,0,5,3,1],[0,3,0,6,5,0,3,1],[0,0,6,0,5,3,1,0],[0,0,1,0,6,5,3,1]];
     while(this.nextNote<c.currentTime+.14){const n=this.note,at=this.nextNote,heavy=mode!=='explore';
-      if(heavy){const offset=riffs[this.region][n%8];this.tone(freq(root+offset),step*.78,.075,'sawtooth',this.guitar,at);this.tone(freq(root+offset+7),step*.65,.035,'square',this.guitar,at+.002);this.tone(freq(root+offset-12),step*.92,.090,'sine',this.music,at);
+      if(heavy){const offset=riffs[index][n%8];this.tone(freq(root+offset),step*.78,.075,'sawtooth',this.guitar,at);this.tone(freq(root+offset+7),step*.65,.035,'square',this.guitar,at+.002);this.tone(freq(root+offset-12),step*.92,.090,'sine',this.music,at);
         if(n%4===0||mode==='boss'&&n%2===0)this.tone(128,.18,.20,'sine',this.music,at,42);
         if(n%8===4){this.noiseBurst(.17,.10,1600,'highpass',this.music,at);this.tone(180,.08,.045,'triangle',this.music,at,95);}
         this.noiseBurst(n%8===7?.12:.045,n%2?.024:.017,7500,'highpass',this.music,at);
         if(n%4===0)this.tone(freq(root+24+[0,3,7,5][Math.floor(n/4)%4]),step*1.8,.015,'triangle',this.music,at+.01);
-      }else if(n%2===0){const melody=MELODIES[this.region],key=melody[Math.floor(n/2)%16];this.tone(freq(key),step*3,.055,'sine',this.music,at);this.tone(freq(root-12),step*3,.048,'triangle',this.music,at);if(n%8===0)this.tone(96,.15,.055,'sine',this.music,at,44);if(n%4===2)this.noiseBurst(.055,.009,4500,'highpass',this.music,at);}
+      }else if(n%2===0){const melody=MELODIES[index],key=melody[Math.floor(n/2)%16];this.tone(freq(key),step*3,.055,'sine',this.music,at);this.tone(freq(root-12),step*3,.048,'triangle',this.music,at);if(n%8===0)this.tone(96,.15,.055,'sine',this.music,at,44);if(n%4===2)this.noiseBurst(.055,.009,4500,'highpass',this.music,at);}
       this.note++;this.nextNote+=step;
     }
   }
@@ -98,6 +101,7 @@ export class ForestAudio {
   play(sound: Sound): void {
     if (!this.context || this.context.state !== 'running' || this.settings.muted) return;
     switch (sound) {
+      case 'achievement': [523,659,784,1047].forEach((hz,i)=>this.tone(hz,.45,.035,'triangle',undefined,this.context!.currentTime+i*.09));break;
       case 'howl': this.tone(210,1.9,.024,'triangle',undefined,undefined,340);this.tone(420,1.6,.010,'sine',undefined,this.context.currentTime+.25,540);break;
       case 'parry': this.tone(1240,.27,.07,'triangle',undefined,undefined,640);this.noiseBurst(.12,.22,3200,'highpass');break;
       case 'slash': this.noiseBurst(.16, .21, 4200, 'highpass'); this.tone(480, .10, .025, 'triangle', undefined, undefined, 160); break;
@@ -126,5 +130,6 @@ export class ForestAudio {
     this.noiseBurst(ground === 'water' ? .17 : .07, params[1], params[0]);
     if (ground === 'stone') this.tone(220 + Math.random() * 80, .035, .015, 'triangle');
   }
-  destroy(): void { this.rainSource?.stop(); void this.context?.close(); this.context = null; }
+  get trackTitle():string{return this.recorded?.title??'Резервная синтезированная тема';}
+  destroy(): void {this.recorded?.destroy(); this.rainSource?.stop(); void this.context?.close(); this.context = null; }
 }

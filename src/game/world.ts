@@ -122,7 +122,7 @@ export function clearLine(from: Point, to: Point, radius: number, terrain: Terra
   return true;
 }
 
-// Детали пяти биомов: свободная центральная дорога и боковые участки для боя.
+// Детали восьми биомов: свободная центральная дорога и боковые участки для боя.
 export function regionTerrain(index: number, start: number, width: number, height: number): Terrain[] {
   const base = makeTerrain(index, { width, height, margin: 65, top: 90 }, 1).map(t => ({ ...t, x: t.x + start }));
   const extra: Terrain[] = [];
@@ -132,6 +132,8 @@ export function regionTerrain(index: number, start: number, width: number, heigh
     add(index === 1 || index === 3 ? 'ruin' : 'tree', x, y, index === 1 ? 29 : 25);
   }
   for (const [x, y] of [[.15, .45], [.84, .32], [.8, .74]]) add(index === 1 || index === 3 ? 'rock' : 'stump', x, y, 24);
+  if(index>=4){for(let i=0;i<6;i++)add(index===5?'ruin':'rock',.18+(i%3)*.28,i<3?.19:.82,26+index*2);}
+  add('ruin',.65,.25,54);
   if (index === 2) for (const [x, y] of [[.25,.37],[.57,.73],[.75,.18]]) add('puddle',x,y,66);
   return [...base, ...extra].filter(t => !(Math.abs(t.y-height/2)<85 && (t.x-start<200 || t.x-start>width-200)));
 }

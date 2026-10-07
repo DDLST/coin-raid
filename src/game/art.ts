@@ -5,7 +5,7 @@ export type Palette = {
   ground: string; light: string; grass: string; tree: string; accent: string;
 };
 
-// Рисованные текстуры создаются локально. У игры нет запросов к CDN или файлам картинок.
+// Текстуры и атласы входят в сборку; обращения к внешним CDN не нужны.
 function texture(scene: Phaser.Scene, key: string, draw: (c: CanvasRenderingContext2D) => void): void {
   if (scene.textures.exists(key)) return;
   const result = scene.textures.createCanvas(key, 128, 128);
@@ -329,4 +329,46 @@ export function createVillageArtwork(scene:Phaser.Scene):void{
   texture(scene,'bell',c=>{c.fillStyle='#a99560';c.beginPath();c.moveTo(16,48);c.lineTo(21,18);c.quadraticCurveTo(31,3,43,18);c.lineTo(49,48);c.fill();ellipse(c,32,48,20,6,'#e5ce85');ellipse(c,32,48,13,3,'#6c6455');ellipse(c,32,51,4,7,'#f2e0a6');c.strokeStyle='#eddca6';c.lineWidth=2;c.beginPath();c.arc(32,28,7,0,Math.PI*2);c.stroke();});
   for(let i=0;i<3;i++)texture(scene,`rune-${i}`,c=>{ellipse(c,32,53,22,7,'#102f2544');c.fillStyle='#526b65';c.beginPath();c.moveTo(11,51);c.lineTo(15,12);c.lineTo(26,4);c.lineTo(47,12);c.lineTo(54,52);c.fill();c.strokeStyle=['#d6bae7','#f5c495','#ade2b4'][i];c.lineWidth=3;c.beginPath();if(i===0){c.arc(32,28,11,.5,5.4);c.stroke();}else if(i===1){c.moveTo(32,15);c.lineTo(26,30);c.lineTo(38,29);c.lineTo(30,42);c.stroke();}else{c.moveTo(32,15);c.lineTo(32,42);c.moveTo(19,25);c.lineTo(32,33);c.lineTo(44,24);c.stroke();}});
   texture(scene,'wisp',c=>{const glow=c.createRadialGradient(32,32,1,32,32,30);glow.addColorStop(0,'#fff6bf');glow.addColorStop(.4,'#e7c48488');glow.addColorStop(1,'#e7c48400');ellipse(c,32,32,30,30,glow);ellipse(c,32,32,9,13,'#fff1b1');ellipse(c,28,29,1,2,'#766b52');ellipse(c,36,29,1,2,'#766b52');});
+}
+
+// Атласы загружаются локально; нарезка выполняется движком при создании сцены.
+export function createAtlasArtwork(scene:Phaser.Scene):void{
+ const village=scene.textures.get('village-atlas').getSourceImage() as CanvasImageSource;
+ const keys=['merchant','npc-armorer','npc-healer','npc-trader'];
+ for(let i=0;i<4;i++){
+  if(scene.textures.exists(keys[i]))scene.textures.remove(keys[i]);
+  const npc=scene.textures.createCanvas(keys[i],128,128);if(!npc)throw Error('NPC texture unavailable');
+  npc.getContext().drawImage(village,i*384,485,384,539,20,1,88,125);npc.refresh();
+  const building=scene.textures.createCanvas(`building-${i}`,384,485);if(!building)throw Error('Building texture unavailable');building.getContext().drawImage(village,i*384,0,384,485,0,0,384,485);building.refresh();
+ }
+ const biomes=scene.textures.get('biome-atlas').getSourceImage() as CanvasImageSource;
+ for(let i=0;i<8;i++){const t=scene.textures.createCanvas(`landmark-${i}`,384,512);if(!t)throw Error('Landmark texture unavailable');t.getContext().drawImage(biomes,(i%4)*384,Math.floor(i/4)*512,384,512,0,0,384,512);t.refresh();}
+ texture(scene,'wraith',c=>{const aura=c.createRadialGradient(32,30,2,32,30,30);aura.addColorStop(0,'#c8bcf044');aura.addColorStop(1,'#8f74c800');ellipse(c,32,30,30,30,aura);c.fillStyle='#79708d';c.beginPath();c.moveTo(8,60);c.lineTo(14,22);c.quadraticCurveTo(18,4,32,4);c.quadraticCurveTo(47,5,51,23);c.lineTo(58,60);c.lineTo(47,52);c.lineTo(39,61);c.lineTo(32,54);c.lineTo(23,61);c.lineTo(16,52);c.fill();ellipse(c,32,24,12,14,'#202131');ellipse(c,26,22,3,2,'#c8a3ff');ellipse(c,38,22,3,2,'#c8a3ff');c.strokeStyle='#c2a1ec';c.lineWidth=2;c.beginPath();c.moveTo(18,41);c.lineTo(32,47);c.lineTo(45,39);c.stroke();});
+ texture(scene,'knight',c=>{ellipse(c,32,57,23,5,'#141d2b44');ellipse(c,23,53,8,9,'#465766');ellipse(c,42,53,8,9,'#465766');c.fillStyle='#586b7d';c.fillRect(15,28,32,25);c.strokeStyle='#d3b76f';c.lineWidth=2;c.strokeRect(17,29,28,22);ellipse(c,32,19,18,16,'#667989');c.fillStyle='#263341';c.fillRect(18,17,28,7);ellipse(c,25,20,3,1,'#efb898');ellipse(c,38,20,3,1,'#efb898');c.fillStyle='#93b2c1';c.beginPath();c.moveTo(41,30);c.lineTo(62,31);c.lineTo(58,49);c.lineTo(51,57);c.lineTo(42,48);c.fill();c.strokeStyle='#e5d199';c.lineWidth=2;c.beginPath();c.moveTo(51,35);c.lineTo(51,51);c.moveTo(46,40);c.lineTo(56,40);c.stroke();c.strokeStyle='#dce4d9';c.lineWidth=3;c.beginPath();c.moveTo(9,51);c.lineTo(6,18);c.stroke();c.strokeStyle='#bb9657';c.lineWidth=3;c.beginPath();c.moveTo(1,40);c.lineTo(14,38);c.stroke();});
+}
+
+// Страшные противники и страж оружия используют отдельные кадры рисованного атласа.
+export function createCreepyArtwork(scene:Phaser.Scene):void{
+ const atlas=scene.textures.get('creep-atlas').getSourceImage() as CanvasImageSource;
+ const keys=['skeleton','zombie','necromancer','vampire','dragon','wraith','knight','weapon-reaper'];
+ for(const [i,key]of keys.entries()){
+  if(scene.textures.exists(key))scene.textures.remove(key);
+  const t=scene.textures.createCanvas(key,128,128);if(!t)throw Error('Monster texture unavailable');
+  const c=t.getContext();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(atlas,(i%4)*384,Math.floor(i/4)*512,384,512,16,0,96,128);t.refresh();
+ }
+}
+
+export function biomeGround(scene:Phaser.Scene,start:number,index:number,width:number,height:number,palette:Palette):void{
+ const g=scene.add.graphics().setDepth(2);let seed=4921+index*917;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+ const stone=index===1||index===4||index===5||index===6;
+ if(stone){for(let n=0;n<140;n++){const x=start+90+random()*(width-180),y=100+random()*(height-200);g.fillStyle(index===4?0xbbd8dc:index===5?0x686076:0xa79b84,.12);g.fillRoundedRect(x,y,24+random()*40,15+random()*24,5);g.lineStyle(1,0x142834,.17);g.strokeRoundedRect(x,y,24,16,4);}}
+ if(index===2){g.fillStyle(0x4c7880,.25);for(let n=0;n<14;n++)g.fillEllipse(start+random()*width,120+random()*800,60+random()*80,25+random()*40);}
+ if(index===3){g.lineStyle(2,0xf2965f,.2);for(let n=0;n<22;n++){const x=start+random()*width,y=80+random()*940;g.beginPath();g.moveTo(x,y);g.lineTo(x+19,y+17);g.lineTo(x+9,y+35);g.strokePath();}}
+ if(index===4){g.lineStyle(2,0xcfeaf6,.35);for(let n=0;n<95;n++){const x=start+random()*width,y=80+random()*940;g.lineBetween(x-3,y,x+3,y);g.lineBetween(x,y-3,x,y+3);}}
+ if(index===5){g.lineStyle(2,0xb19ac9,.18);for(let n=0;n<20;n++){const x=start+random()*width,y=90+random()*900;g.strokeCircle(x,y,14);g.lineBetween(x-10,y-10,x+10,y+10);}}
+ if(index===6){g.lineStyle(2,0xb3d4da,.25);for(let n=0;n<15;n++){const x=start+random()*width,y=80+random()*920;g.beginPath();g.moveTo(x,y);g.lineTo(x-10,y+16);g.lineTo(x+8,y+15);g.lineTo(x-2,y+31);g.strokePath();}}
+ if(index===7){g.lineStyle(4,0x9edccb,.22);g.strokeEllipse(start+width*.62,height*.50,230,175);g.lineStyle(2,0xdad3ac,.28);g.strokeEllipse(start+width*.62,height*.50,195,148);}
+ const landmark=scene.add.image(start+width*.65,height*.25,`landmark-${index}`).setOrigin(.5,.85).setDisplaySize(250,334).setDepth(7);
+ if(index===0||index===2||index===7){const lamp=scene.add.ellipse(start+width*.65,height*.18,170,60,parseInt(palette.accent.slice(1),16),.07).setDepth(3);scene.tweens.add({targets:lamp,alpha:.02,duration:1700,yoyo:true,repeat:-1});}
+ landmark.setAlpha(.97);
 }
