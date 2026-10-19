@@ -1,0 +1,635 @@
+{
+  "version": 7,
+  "manual": true,
+  "savedAt": "2026-10-19T00:00:00.000Z",
+  "profile": {
+    "healthLevel": 2,
+    "enduranceLevel": 0,
+    "potions": 0,
+    "trackedQuest": "",
+    "skills": [],
+    "unlockedSkills": [],
+    "disabledSkills": [],
+    "skillPoints": 0,
+    "achievements": [],
+    "counterWins": 0,
+    "coins": 321,
+    "owned": [
+      "fox"
+    ],
+    "skin": "fox",
+    "blade": false,
+    "weapons": [
+      "sword"
+    ],
+    "weapon": "sword",
+    "relics": [],
+    "armors": [
+      "travel"
+    ],
+    "armor": "travel",
+    "upgrades": {
+      "speed": 0,
+      "dash": 0,
+      "boots": 0,
+      "power": 0,
+      "vitality": 0,
+      "armor": 0,
+      "focus": 0,
+      "flask": 0,
+      "magnet": 0,
+      "ward": 0,
+      "spirit": 0,
+      "recovery": 0
+    }
+  },
+  "region": 0,
+  "progress": [
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    },
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    },
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    },
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    },
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    },
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    },
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    },
+    {
+      "coins": 0,
+      "elapsed": 0,
+      "spawned": false,
+      "bossDead": false,
+      "cleared": false,
+      "income": 0,
+      "rewarded": false
+    }
+  ],
+  "player": {
+    "x": 1220,
+    "y": 588
+  },
+  "checkpoint": {
+    "x": 575,
+    "y": 645
+  },
+  "hp": 77,
+  "stamina": 66,
+  "flasks": 1,
+  "armed": false,
+  "ultimate": 0,
+  "elapsed": 0,
+  "score": 0,
+  "kills": 0,
+  "deaths": 0,
+  "enemies": [
+    {
+      "kind": "skeleton",
+      "region": 0,
+      "x": 2178.707406340415,
+      "y": 502.16795429139313,
+      "hp": 64,
+      "phase2": false,
+      "variant": 0,
+      "training": false
+    },
+    {
+      "kind": "skeleton",
+      "region": 0,
+      "x": 1540.9033498062738,
+      "y": 436.23592697914364,
+      "hp": 64,
+      "phase2": false,
+      "variant": 1,
+      "training": false
+    },
+    {
+      "kind": "skeleton",
+      "region": 0,
+      "x": 2008.4656436888986,
+      "y": 901.0881262666339,
+      "hp": 64,
+      "phase2": false,
+      "variant": 2,
+      "training": false
+    },
+    {
+      "kind": "skeleton",
+      "region": 0,
+      "x": 1892.777531851893,
+      "y": 961.2085915392332,
+      "hp": 64,
+      "phase2": false,
+      "variant": 3,
+      "training": false
+    },
+    {
+      "kind": "archer",
+      "region": 0,
+      "x": 2078.1931750598596,
+      "y": 706.6721774302823,
+      "hp": 65,
+      "phase2": false,
+      "variant": 0,
+      "training": false
+    },
+    {
+      "kind": "zombie",
+      "region": 0,
+      "x": 1560.5254106641985,
+      "y": 424.9514843776474,
+      "hp": 94,
+      "phase2": false,
+      "variant": 0,
+      "training": false
+    },
+    {
+      "kind": "zombie",
+      "region": 0,
+      "x": 2064.8634549222807,
+      "y": 828.2249026591669,
+      "hp": 94,
+      "phase2": false,
+      "variant": 1,
+      "training": false
+    },
+    {
+      "kind": "zombie",
+      "region": 0,
+      "x": 2039.7927285285164,
+      "y": 369.19318880263904,
+      "hp": 94,
+      "phase2": false,
+      "variant": 2,
+      "training": false
+    },
+    {
+      "kind": "necromancer",
+      "region": 0,
+      "x": 1590.0386897047517,
+      "y": 350.0814186261085,
+      "hp": 78,
+      "phase2": false,
+      "variant": 0,
+      "training": false
+    }
+  ],
+  "coins": [
+    {
+      "x": 1380,
+      "y": 550,
+      "region": 0
+    },
+    {
+      "x": 1285.5826253370267,
+      "y": 275.9230550086329,
+      "region": 0
+    },
+    {
+      "x": 1363.2387021806624,
+      "y": 675.448388881005,
+      "region": 0
+    },
+    {
+      "x": 2122.3265871849767,
+      "y": 171.3705252312985,
+      "region": 0
+    },
+    {
+      "x": 1716.7773423627154,
+      "y": 142.11822560247984,
+      "region": 0
+    },
+    {
+      "x": 2009.877457332065,
+      "y": 481.36150601901664,
+      "region": 0
+    },
+    {
+      "x": 2262.078519915486,
+      "y": 829.4200218546999,
+      "region": 0
+    }
+  ],
+  "quests": [
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 8 осколков за 50 секунд.",
+        "progress": 0,
+        "target": 8,
+        "elapsed": 0,
+        "limit": 50,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ],
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 9 осколков за 55 секунд.",
+        "progress": 0,
+        "target": 9,
+        "elapsed": 0,
+        "limit": 55,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ],
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 10 осколков за 60 секунд.",
+        "progress": 0,
+        "target": 10,
+        "elapsed": 0,
+        "limit": 60,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ],
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 11 осколков за 65 секунд.",
+        "progress": 0,
+        "target": 11,
+        "elapsed": 0,
+        "limit": 65,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ],
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 12 осколков за 70 секунд.",
+        "progress": 0,
+        "target": 12,
+        "elapsed": 0,
+        "limit": 70,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ],
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 13 осколков за 75 секунд.",
+        "progress": 0,
+        "target": 13,
+        "elapsed": 0,
+        "limit": 75,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ],
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 14 осколков за 80 секунд.",
+        "progress": 0,
+        "target": 14,
+        "elapsed": 0,
+        "limit": 80,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ],
+    [
+      {
+        "id": "sprint",
+        "name": "Сила на время",
+        "description": "Подбери 15 осколков за 85 секунд.",
+        "progress": 0,
+        "target": 15,
+        "elapsed": 0,
+        "limit": 85,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "triple",
+        "name": "Разорвать строй",
+        "description": "Победи 3 любых противников за 12 секунд.",
+        "progress": 0,
+        "target": 3,
+        "elapsed": 0,
+        "limit": 12,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      },
+      {
+        "id": "focus",
+        "name": "Чистая серия",
+        "description": "Попади по врагам 6 раз, не получив урон.",
+        "progress": 0,
+        "target": 6,
+        "elapsed": 0,
+        "limit": 0,
+        "complete": false,
+        "failed": false,
+        "kills": []
+      }
+    ]
+  ],
+  "chests": [],
+  "audio": {
+    "master": 0.65,
+    "music": 0.42,
+    "effects": 0.7,
+    "muted": false
+  },
+  "area": "biome",
+  "villageIndex": -1,
+  "lastVillage": -1,
+  "lesson": 0,
+  "lessonProgress": 0,
+  "lines": [
+    {
+      "id": "bell",
+      "accepted": false,
+      "kills": 0,
+      "artifact": false,
+      "runes": 0,
+      "escorted": false,
+      "claimed": false
+    },
+    {
+      "id": "runes",
+      "accepted": false,
+      "kills": 0,
+      "artifact": false,
+      "runes": 0,
+      "escorted": false,
+      "claimed": false
+    },
+    {
+      "id": "wisp",
+      "accepted": false,
+      "kills": 0,
+      "artifact": false,
+      "runes": 0,
+      "escorted": false,
+      "claimed": false
+    }
+  ],
+  "wisp": null,
+  "villages": [
+    -1
+  ],
+  "deliveries": [
+    {
+      "id": "medicine",
+      "accepted": false,
+      "delivered": false,
+      "claimed": false
+    },
+    {
+      "id": "blueprint",
+      "accepted": false,
+      "delivered": false,
+      "claimed": false
+    }
+  ],
+  "interiorRole": null,
+  "interiorReturn": "village",
+  "migrated": false
+}
