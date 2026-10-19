@@ -1349,33 +1349,33 @@ DOM-разметка игровых окон и идентификаторы, к
 
 Меню, HUD, пауза, справка, начальный экран и подтверждение выхода.
 
-Строк: 472.
+Строк: 518.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
 | `MenuController` | [19](../src/game/ui/MenuController.ts#L19) | Объявление в этом модуле. |
-| `toast` | [21](../src/game/ui/MenuController.ts#L21) | Показывает короткое исчезающее сообщение. |
-| `toggleMenu` | [29](../src/game/ui/MenuController.ts#L29) | Открывает или закрывает меню, сохраняя прежний режим. |
-| `renderMenu` | [49](../src/game/ui/MenuController.ts#L49) | Выбирает вкладку, обновляет кошелёк и вызывает её отрисовку. |
-| `renderSkills` | [74](../src/game/ui/MenuController.ts#L74) | Выводит навыки текущего оружия и условия изучения. |
-| `renderEquipment` | [98](../src/game/ui/MenuController.ts#L98) | Выводит страницы принадлежащих герою вещей. |
-| `renderAudio` | [121](../src/game/ui/MenuController.ts#L121) | Показывает текущие громкости и выключение звука. |
-| `setGuideText` | [131](../src/game/ui/MenuController.ts#L131) | Обновляет краткую справку управления. |
-| `syncGuide` | [141](../src/game/ui/MenuController.ts#L141) | Согласует видимость справки с режимом игры. |
-| `toggleGuide` | [147](../src/game/ui/MenuController.ts#L147) | Включает или убирает справку. |
-| `togglePause` | [152](../src/game/ui/MenuController.ts#L152) | Ставит мир на паузу и продолжает его. |
-| `showPauseModal` | [166](../src/game/ui/MenuController.ts#L166) | Показывает окно привала. |
-| `primaryAction` | [177](../src/game/ui/MenuController.ts#L177) | Обрабатывает главную кнопку: старт, продолжение или исследование после финала. |
-| `showModal` | [193](../src/game/ui/MenuController.ts#L193) | Заполняет общий экран сообщения. |
-| `hideModal` | [209](../src/game/ui/MenuController.ts#L209) | Скрывает общий экран и показывает сцену. |
-| `showStats` | [214](../src/game/ui/MenuController.ts#L214) | Выводит очки, убийства, смерти, время и кошелёк. |
-| `updateHUD` | [220](../src/game/ui/MenuController.ts#L220) | Обновляет HP, выносливость, силу, таймеры, босса и стрелку направления. |
-| `showTitle` | [397](../src/game/ui/MenuController.ts#L397) | Возвращает к начальному экрану и скрывает игровые окна. |
-| `askTraining` | [433](../src/game/ui/MenuController.ts#L433) | Показывает старт с выбором обучения. |
-| `requestNew` | [436](../src/game/ui/MenuController.ts#L436) | Запрашивает новую игру с учётом несохранённых изменений. |
-| `confirmExit` | [441](../src/game/ui/MenuController.ts#L441) | Открывает выбор сохранения перед выходом или новой игрой. |
-| `cancelExit` | [451](../src/game/ui/MenuController.ts#L451) | Возвращает к состоянию до подтверждения. |
-| `commitExit` | [456](../src/game/ui/MenuController.ts#L456) | Исполняет выбранный выход после сохранения или отказа от него. |
+| `toast` | [22](../src/game/ui/MenuController.ts#L22) | Показывает короткое исчезающее сообщение. |
+| `toggleMenu` | [31](../src/game/ui/MenuController.ts#L31) | Открывает или закрывает меню, сохраняя прежний режим. |
+| `renderMenu` | [52](../src/game/ui/MenuController.ts#L52) | Выбирает вкладку, обновляет кошелёк и вызывает её отрисовку. |
+| `renderSkills` | [78](../src/game/ui/MenuController.ts#L78) | Выводит навыки текущего оружия и условия изучения. |
+| `renderEquipment` | [103](../src/game/ui/MenuController.ts#L103) | Выводит страницы принадлежащих герою вещей. |
+| `renderAudio` | [127](../src/game/ui/MenuController.ts#L127) | Показывает текущие громкости и выключение звука. |
+| `setGuideText` | [138](../src/game/ui/MenuController.ts#L138) | Обновляет краткую справку управления. |
+| `syncGuide` | [149](../src/game/ui/MenuController.ts#L149) | Согласует видимость справки с режимом игры. |
+| `toggleGuide` | [156](../src/game/ui/MenuController.ts#L156) | Включает или убирает справку. |
+| `togglePause` | [162](../src/game/ui/MenuController.ts#L162) | Ставит мир на паузу и продолжает его. |
+| `showPauseModal` | [177](../src/game/ui/MenuController.ts#L177) | Показывает окно привала. |
+| `primaryAction` | [189](../src/game/ui/MenuController.ts#L189) | Обрабатывает главную кнопку: старт, продолжение или исследование после финала. |
+| `showModal` | [206](../src/game/ui/MenuController.ts#L206) | Заполняет общий экран сообщения. |
+| `hideModal` | [223](../src/game/ui/MenuController.ts#L223) | Скрывает общий экран и показывает сцену. |
+| `showStats` | [229](../src/game/ui/MenuController.ts#L229) | Выводит очки, убийства, смерти, время и кошелёк. |
+| `updateHUD` | [236](../src/game/ui/MenuController.ts#L236) | Обновляет HP, выносливость, силу, таймеры, босса и стрелку направления. |
+| `showTitle` | [436](../src/game/ui/MenuController.ts#L436) | Возвращает к начальному экрану и скрывает игровые окна. |
+| `askTraining` | [475](../src/game/ui/MenuController.ts#L475) | Показывает старт с выбором обучения. |
+| `requestNew` | [479](../src/game/ui/MenuController.ts#L479) | Запрашивает новую игру с учётом несохранённых изменений. |
+| `confirmExit` | [485](../src/game/ui/MenuController.ts#L485) | Открывает выбор сохранения перед выходом или новой игрой. |
+| `cancelExit` | [496](../src/game/ui/MenuController.ts#L496) | Возвращает к состоянию до подтверждения. |
+| `commitExit` | [502](../src/game/ui/MenuController.ts#L502) | Исполняет выбранный выход после сохранения или отказа от него. |
 
 ### [src/style.css](../src/style.css)
 

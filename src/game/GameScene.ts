@@ -364,7 +364,7 @@ export class GameScene extends Phaser.Scene {
     if (
       this.worldState.area === 'biome' &&
       !p.spawned &&
-      p.elapsed >= REGIONS[this.worldState.regionIndex].bossTime
+      p.coins >= REGIONS[this.worldState.regionIndex].coins
     )
       this.enemies.spawnBoss();
     this.enemies.updateWaves(dt);
