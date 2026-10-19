@@ -325,7 +325,7 @@
 
 Создание противников, волны, поиск пути и обычные вражеские атаки.
 
-Строк: 672.
+Строк: 670.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
@@ -335,12 +335,12 @@
 | `spawnEnemy` | [76](../src/game/enemies/EnemySystem.ts#L76) | Создаёт спрайт и состояние врага по параметрам EnemyConfig. |
 | `updateWaves` | [134](../src/game/enemies/EnemySystem.ts#L134) | Удаляет завершённые спрайты и создаёт новые волны в пределах лимита. |
 | `spawnBoss` | [181](../src/game/enemies/EnemySystem.ts#L181) | Отмечает появление босса в прогрессе, создаёт его и включает бой. |
-| `startEnemyAttack` | [203](../src/game/enemies/EnemySystem.ts#L203) | Выбирает обычный вражеский приём и начинает замах. |
-| `updateEnemies` | [263](../src/game/enemies/EnemySystem.ts#L263) | Обновляет состояние врагов: преследование, замах, рывок, восстановление, эффекты и вторую фазу. |
-| `recoverEnemy` | [424](../src/game/enemies/EnemySystem.ts#L424) | Переводит врага в восстановление после атаки. |
-| `executeEnemyAttack` | [428](../src/game/enemies/EnemySystem.ts#L428) | Исполняет обычный приём: удар, выстрел, призыв, телепортацию и другие действия. |
-| `summonMinions` | [624](../src/game/enemies/EnemySystem.ts#L624) | Создаёт помощников врага с учётом ограничения числа существ. |
-| `enemyBounds` | [661](../src/game/enemies/EnemySystem.ts#L661) | Выбирает границы учебного двора или биома врага. |
+| `startEnemyAttack` | [201](../src/game/enemies/EnemySystem.ts#L201) | Выбирает обычный вражеский приём и начинает замах. |
+| `updateEnemies` | [261](../src/game/enemies/EnemySystem.ts#L261) | Обновляет состояние врагов: преследование, замах, рывок, восстановление, эффекты и вторую фазу. |
+| `recoverEnemy` | [422](../src/game/enemies/EnemySystem.ts#L422) | Переводит врага в восстановление после атаки. |
+| `executeEnemyAttack` | [426](../src/game/enemies/EnemySystem.ts#L426) | Исполняет обычный приём: удар, выстрел, призыв, телепортацию и другие действия. |
+| `summonMinions` | [622](../src/game/enemies/EnemySystem.ts#L622) | Создаёт помощников врага с учётом ограничения числа существ. |
+| `enemyBounds` | [659](../src/game/enemies/EnemySystem.ts#L659) | Выбирает границы учебного двора или биома врага. |
 
 ### [src/game/enemies/EnemyTypes.ts](../src/game/enemies/EnemyTypes.ts)
 

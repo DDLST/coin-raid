@@ -194,9 +194,7 @@ export class EnemySystem {
     this.context.bosses.resetBossCountdown();
     this.context.audio.play('boss');
     this.context.audio.play('scream');
-    this.context.menu.toast(
-      `${REGIONS[worldState.regionIndex].bossName} пробудился. Несколько приёмов, вторая фаза на половине HP.`,
-    );
+    this.context.menu.toast('ФАЗА 2');
     this.context.cameras.main.shake(180, 0.0025);
     this.context.menu.updateHUD();
   }

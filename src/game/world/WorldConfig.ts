@@ -57,7 +57,7 @@ export const REGIONS: Region[] = [
     name: 'Роща забытых',
     coins: 24,
     awaken: 8,
-    bossTime: 45,
+    bossTime: 60,
     roster: [
       { kind: 'skeleton', count: 4 },
       { kind: 'archer', count: 1 },
