@@ -34,8 +34,9 @@ export class BossSystem {
         this.resetBossCountdown();
       return;
     }
-    const left = Math.ceil(
-      REGIONS[worldState.regionIndex].bossTime - journey.progress[worldState.regionIndex].elapsed,
+    const left = Math.max(
+      0,
+      REGIONS[worldState.regionIndex].coins - journey.progress[worldState.regionIndex].coins,
     );
     if (left > 0 && left <= 10 && left !== ui.bossDigit) {
       ui.bossDigit = left;

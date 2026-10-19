@@ -292,16 +292,16 @@
 
 Предупреждения появления и выполнение уникальных приёмов боссов.
 
-Строк: 172.
+Строк: 173.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
 | `BossSystem` | [8](../src/game/enemies/BossSystem.ts#L8) | Объявление в этом модуле. |
 | `resetBossCountdown` | [10](../src/game/enemies/BossSystem.ts#L10) | Скрывает цифры обратного отсчёта. |
 | `updateBossCountdown` | [16](../src/game/enemies/BossSystem.ts#L16) | Показывает последние десять секунд до появления босса. |
-| `startBossAttack` | [48](../src/game/enemies/BossSystem.ts#L48) | Фиксирует цель и план уникального приёма босса. |
-| `executeBossAttack` | [61](../src/game/enemies/BossSystem.ts#L61) | Создаёт опасные зоны по зафиксированному плану. |
-| `drawBossStrike` | [86](../src/game/enemies/BossSystem.ts#L86) | Рисует ту же геометрию, которая используется для попадания. |
+| `startBossAttack` | [49](../src/game/enemies/BossSystem.ts#L49) | Фиксирует цель и план уникального приёма босса. |
+| `executeBossAttack` | [62](../src/game/enemies/BossSystem.ts#L62) | Создаёт опасные зоны по зафиксированному плану. |
+| `drawBossStrike` | [87](../src/game/enemies/BossSystem.ts#L87) | Рисует ту же геометрию, которая используется для попадания. |
 
 ### [src/game/enemies/EnemyConfig.ts](../src/game/enemies/EnemyConfig.ts)
 
