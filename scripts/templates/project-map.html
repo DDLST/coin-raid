@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAID COIN — карта проекта</title>
+    <style>
+      :root {
+        --paper: #f6f4ee;
+        --ink: #182d27;
+        --muted: #66746d;
+        --line: #dce1d8;
+        --accent: #b25d36;
+        --panel: #fffef9;
+        --green: #1c5844;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          15px/1.55 system-ui,
+          -apple-system,
+          Segoe UI,
+          sans-serif;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      button {
+        cursor: pointer;
+      }
+      header {
+        background: var(--ink);
+        color: #fffdf0;
+        padding: 30px 38px 26px;
+        display: flex;
+        gap: 35px;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #b8d4c5;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.15;
+        margin: 8px 0 10px;
+        letter-spacing: -0.025em;
+      }
+      header p {
+        max-width: 650px;
+        margin: 0;
+        color: #c5d5cc;
+        font-size: 14px;
+      }
+      .stat {
+        font-size: 36px;
+        font-weight: 650;
+        line-height: 1.1;
+      }
+      .stat small {
+        font-size: 11px;
+        display: block;
+        color: #bcd1c4;
+        font-weight: 400;
+        margin-top: 8px;
+      }
+      .stats {
+        display: flex;
+        gap: 32px;
+        flex-shrink: 0;
+      }
+      .toolbar {
+        padding: 20px 38px 14px;
+        border-bottom: 1px solid var(--line);
+        background: #fffef8;
+        position: sticky;
+        top: 0;
+        z-index: 4;
+      }
+      .search-row {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+      .search-row input {
+        width: 100%;
+        border: 1px solid #c9d1c6;
+        background: var(--paper);
+        border-radius: 8px;
+        padding: 12px 15px;
+        color: var(--ink);
+        outline: none;
+      }
+      .search-row input:focus {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px #1c584415;
+      }
+      .search-row a {
+        white-space: nowrap;
+        color: var(--green);
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .chips {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .chips button {
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background: transparent;
+        color: var(--green);
+        padding: 4px 13px;
+        font-size: 12px;
+      }
+      .chips button:hover {
+        background: #e7eee4;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 220px minmax(270px, 390px) minmax(400px, 1fr);
+        min-height: calc(100vh - 290px);
+      }
+      aside {
+        padding: 20px 12px 30px 25px;
+        border-right: 1px solid var(--line);
+      }
+      .label {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0 0 12px;
+      }
+      nav button {
+        display: block;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        text-align: left;
+        color: #53645a;
+        border-radius: 6px;
+        padding: 9px 12px;
+        font-size: 13px;
+        margin: 2px 0;
+      }
+      nav button.active {
+        color: var(--green);
+        background: #e2eadf;
+        font-weight: 650;
+      }
+      nav button:hover {
+        background: #ecefe6;
+      }
+      .count {
+        float: right;
+        opacity: 0.55;
+        font-size: 11px;
+      }
+      #list {
+        padding: 20px 16px;
+        border-right: 1px solid var(--line);
+        max-height: calc(100vh - 122px);
+        overflow: auto;
+      }
+      .file {
+        width: 100%;
+        text-align: left;
+        border: 1px solid var(--line);
+        padding: 15px;
+        background: var(--panel);
+        border-radius: 9px;
+        display: block;
+        margin: 0 0 10px;
+        color: var(--ink);
+      }
+      .file:hover {
+        border-color: #8aab93;
+      }
+      .file.active {
+        border-color: var(--green);
+        box-shadow: inset 3px 0 var(--green);
+      }
+      .filename {
+        font-size: 14px;
+        font-weight: 650;
+        overflow-wrap: anywhere;
+      }
+      .filepath {
+        font:
+          10px/1.5 ui-monospace,
+          Consolas,
+          monospace;
+        color: #788679;
+        margin: 3px 0 9px;
+        overflow-wrap: anywhere;
+      }
+      .desc {
+        font-size: 12px;
+        color: #59685f;
+      }
+      .file-meta {
+        font-size: 10px;
+        color: #8b978d;
+        margin-top: 11px;
+      }
+      .reader {
+        padding: 23px 24px 40px;
+        min-width: 0;
+        max-height: calc(100vh - 122px);
+        overflow: auto;
+      }
+      .reader h2 {
+        font-size: 23px;
+        line-height: 1.3;
+        margin: 0 0 12px;
+        overflow-wrap: anywhere;
+      }
+      .reader p {
+        margin: 0 0 12px;
+        color: #5d6b61;
+        font-size: 13px;
+      }
+      .reader code {
+        font-family: ui-monospace, Consolas, monospace;
+      }
+      .welcome {
+        margin-bottom: 20px;
+      }
+      .mechanic {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 15px;
+        background: var(--panel);
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+      .mechanic h3 {
+        font-size: 15px;
+        margin: 0 0 6px;
+      }
+      .mechanic p {
+        font-size: 12px;
+        margin: 0;
+        color: #617064;
+      }
+      .jump {
+        display: inline-block;
+        font:
+          11px ui-monospace,
+          Consolas,
+          monospace;
+        color: var(--green);
+        margin-top: 9px;
+      }
+      .symbol-buttons {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin: 15px 0;
+      }
+      .symbol-buttons button {
+        padding: 4px 8px;
+        border: 1px solid var(--line);
+        background: #fffef8;
+        border-radius: 4px;
+        color: #41634c;
+        font:
+          11px ui-monospace,
+          Consolas,
+          monospace;
+      }
+      .source {
+        background: #182820;
+        border: 1px solid #314438;
+        border-radius: 8px;
+        overflow: auto;
+        padding: 13px 0;
+        color: #e2e6ce;
+        font:
+          12px/1.8 ui-monospace,
+          SFMono-Regular,
+          Consolas,
+          monospace;
+        tab-size: 2;
+      }
+      .source .line {
+        display: block;
+        min-width: max-content;
+        padding: 0 18px 0 0;
+        scroll-margin-top: 150px;
+      }
+      .ln {
+        display: inline-block;
+        width: 54px;
+        text-align: right;
+        padding-right: 15px;
+        color: #748c7d;
+        user-select: none;
+      }
+      .source .line.selected {
+        background: #615c2b;
+        color: #fff2bb;
+      }
+      .pill {
+        display: inline-block;
+        background: #e5ecdf;
+        color: #46643e;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+        margin-bottom: 14px;
+      }
+      .reader-top {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .reader-top button {
+        border: 0;
+        background: transparent;
+        color: var(--green);
+        font-size: 12px;
+        padding: 5px;
+      }
+      #symbol-help {
+        font-size: 12px;
+        padding: 10px 13px;
+        border-left: 3px solid var(--accent);
+        background: #f0ede3;
+        margin: 8px 0 15px;
+        color: #5f5747;
+      }
+      a {
+        color: var(--green);
+      }
+      .empty {
+        color: var(--muted);
+        font-size: 13px;
+        padding: 20px 10px;
+      }
+      .mobile-home {
+        display: none;
+      }
+      footer {
+        font-size: 10px;
+        color: #879383;
+        margin-top: 25px;
+        overflow-wrap: anywhere;
+      }
+      @media (min-width: 1600px) {
+        .layout {
+          grid-template-columns: 240px 430px 1fr;
+        }
+        .source {
+          font-size: 13px;
+        }
+      }
+      @media (max-width: 1100px) {
+        .layout {
+          grid-template-columns: 180px 290px minmax(0, 1fr);
+        }
+        header {
+          padding: 25px;
+        }
+        .toolbar {
+          padding: 15px 25px;
+        }
+        .stats {
+          gap: 20px;
+        }
+        .stat {
+          font-size: 28px;
+        }
+        .reader {
+          padding: 20px 16px;
+        }
+      }
+      @media (max-width: 850px) {
+        .layout {
+          grid-template-columns: 160px 1fr;
+        }
+        .reader {
+          grid-column: 1/-1;
+          border-top: 1px solid var(--line);
+          max-height: none;
+        }
+        #list {
+          max-height: 430px;
+        }
+        .stats {
+          display: none;
+        }
+        header h1 {
+          font-size: 26px;
+        }
+        .search-row a {
+          display: none;
+        }
+        .source {
+          font-size: 11px;
+        }
+        aside {
+          padding-left: 12px;
+        }
+        .toolbar {
+          position: relative;
+        }
+        .reader h2 {
+          font-size: 21px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <div class="eyebrow">RAID COIN / developer atlas</div>
+        <h1>Карта игрового проекта</h1>
+        <p>
+          Выбери механику или найди имя в коде. Здесь связаны игровые правила, файлы, методы и
+          строки исходников.
+        </p>
+      </div>
+      <div class="stats">
+        <div class="stat" id="source-count">—<small>файлов кода</small></div>
+        <div class="stat">8<small>биомов</small></div>
+        <div class="stat">24<small>приёма боссов</small></div>
+      </div>
+    </header>
+    <div class="toolbar">
+      <div class="search-row">
+        <input
+          id="search"
+          type="search"
+          placeholder="HP, урон, сохранение, damagePlayer, имя файла…"
+          aria-label="Поиск по проекту"
+        /><a href="PROJECT_MAP.md">Описание архитектуры ↗</a><a href="MERGE.md">Как замерджить ↗</a>
+      </div>
+      <div class="chips">
+        <button data-query="">Весь проект</button><button data-query="здоровье">Здоровье</button
+        ><button data-query="урон">Урон</button><button data-query="босс">Боссы</button
+        ><button data-query="coins">Деньги</button
+        ><button data-query="сохранение">Сохранения</button
+        ><button data-query="задание">Задания</button><button id="home">Механики ↗</button>
+      </div>
+    </div>
+    <div class="layout">
+      <aside>
+        <p class="label">Игровые системы</p>
+        <nav id="groups"></nav>
+        <footer>
+          Карта работает без сервера.<br />Обновление: npm run docs:map<br /><br /><span
+            id="base"
+          ></span>
+        </footer>
+      </aside>
+      <section id="list" aria-label="Файлы"></section>
+      <main class="reader" id="reader"></main>
+    </div>
+    <script type="application/json" id="project-data">
+      __PROJECT_DATA__
+    </script>
+    <script>
+      'use strict';
+      const data = JSON.parse(document.getElementById('project-data').textContent);
+      const $ = (id) => document.getElementById(id);
+      let currentGroup = '',
+        selectedPath = '';
+      const escape = (value) =>
+        String(value).replace(
+          /[&<>"']/g,
+          (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+        );
+      $('source-count').firstChild.textContent = data.files.filter((f) => f.source !== null).length;
+      $('base').textContent = 'Основа: ' + data.baseCommit.slice(0, 7);
+      function normalize(value) {
+        return String(value).toLocaleLowerCase('ru').replaceAll('ё', 'е');
+      }
+      function listFiles() {
+        const q = normalize($('search').value.trim());
+        const filtered = data.files.filter(
+          (f) =>
+            (!currentGroup || f.group === currentGroup) &&
+            (!q ||
+              normalize(
+                f.path +
+                  ' ' +
+                  f.description +
+                  ' ' +
+                  f.symbols.map((s) => s.name + ' ' + s.description).join(' ') +
+                  ' ' +
+                  (f.source || ''),
+              ).includes(q)),
+        );
+        $('list').innerHTML =
+          '<p class="label">Файлы · ' +
+          filtered.length +
+          '</p>' +
+          filtered
+            .map(
+              (f) =>
+                '<button class="file ' +
+                (selectedPath === f.path ? 'active' : '') +
+                '" data-file="' +
+                escape(f.path) +
+                '"><div class="filename">' +
+                escape(f.path.split('/').pop()) +
+                '</div><div class="filepath">' +
+                escape(f.path) +
+                '</div><div class="desc">' +
+                escape(f.description) +
+                '</div><div class="file-meta">' +
+                escape(
+                  f.source !== null
+                    ? f.lines + ' строк · ' + f.symbols.length + ' объявлений'
+                    : (f.size / 1024 / 1024).toFixed(2) + ' МиБ · ресурс',
+                ) +
+                '</div></button>',
+            )
+            .join('');
+        if (!filtered.length)
+          $('list').innerHTML +=
+            '<p class="empty">Совпадений нет. Измени запрос или выбери весь проект.</p>';
+        renderGroups();
+      }
+      function renderGroups() {
+        $('groups').innerHTML =
+          '<button data-group="" class="' +
+          (!currentGroup ? 'active' : '') +
+          '">Все файлы <span class="count">' +
+          data.files.length +
+          '</span></button>' +
+          Object.entries(data.groups)
+            .map(([id, title]) => {
+              const count = data.files.filter((f) => f.group === id).length;
+              return count
+                ? '<button data-group="' +
+                    id +
+                    '" class="' +
+                    (currentGroup === id ? 'active' : '') +
+                    '">' +
+                    escape(title) +
+                    ' <span class="count">' +
+                    count +
+                    '</span></button>'
+                : '';
+            })
+            .join('');
+      }
+      function showHome() {
+        selectedPath = '';
+        $('reader').innerHTML =
+          '<div class="welcome"><div class="pill">ОТ МЕХАНИКИ К КОДУ</div><h2>Где что менять</h2><p>Нажми на карточку: откроется нужный файл, описание функции и точная строка. Код встроен в эту страницу; подключение к интернету не требуется.</p></div>' +
+          data.mechanics
+            .map(
+              (m, i) =>
+                '<article class="mechanic" tabindex="0" role="button" data-mechanic="' +
+                i +
+                '"><h3>' +
+                escape(m.title) +
+                '</h3><p>' +
+                escape(m.description) +
+                '</p><span class="jump">' +
+                escape(m.file.split('/').pop() + ':' + m.line + ' → ' + m.symbol) +
+                '</span></article>',
+            )
+            .join('');
+        listFiles();
+      }
+      function showFile(path, line) {
+        const f = data.files.find((f) => f.path === path);
+        if (!f) return;
+        selectedPath = path;
+        $('reader').innerHTML =
+          '<div class="reader-top"><div class="pill">' +
+          escape(data.groups[f.group]) +
+          '</div><button id="back-home">← К механикам</button></div><h2>' +
+          escape(f.path.split('/').pop()) +
+          '</h2><p><code>' +
+          escape(f.path) +
+          '</code></p><p>' +
+          escape(f.description) +
+          '</p>' +
+          (f.source !== null
+            ? '<div class="symbol-buttons">' +
+              f.symbols
+                .map(
+                  (s) =>
+                    '<button data-line="' +
+                    s.line +
+                    '" title="' +
+                    escape(s.description) +
+                    '">' +
+                    escape(s.name) +
+                    '</button>',
+                )
+                .join('') +
+              '</div><div id="symbol-help" hidden></div><div class="source" aria-label="Исходный код">' +
+              f.source
+                .split('\n')
+                .map(
+                  (text, i) =>
+                    '<span class="line" id="line-' +
+                    (i + 1) +
+                    '"><span class="ln">' +
+                    (i + 1) +
+                    '</span>' +
+                    escape(text || ' ') +
+                    '</span>',
+                )
+                .join('') +
+              '</div>'
+            : '<p>Это ресурс игры. Его содержимое не включено в просмотр кода. Подключение и назначение описаны выше; сам файл находится по указанному пути в архиве проекта.</p>');
+        listFiles();
+        if (line) jump(line);
+        else $('reader').scrollTop = 0;
+      }
+      function jump(line) {
+        const f = data.files.find((f) => f.path === selectedPath),
+          symbol = f.symbols.find((s) => s.line === Number(line));
+        document
+          .querySelectorAll('.source .selected')
+          .forEach((e) => e.classList.remove('selected'));
+        const el = $('line-' + line);
+        if (el) {
+          el.classList.add('selected');
+          el.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+        if (symbol) {
+          $('symbol-help').hidden = false;
+          $('symbol-help').textContent =
+            symbol.name + ' · строка ' + symbol.line + ' — ' + symbol.description;
+        }
+      }
+      $('search').addEventListener('input', listFiles);
+      $('groups').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-group]');
+        if (b) {
+          currentGroup = b.dataset.group;
+          listFiles();
+        }
+      });
+      $('list').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-file]');
+        if (b) showFile(b.dataset.file);
+      });
+      $('reader').addEventListener('click', (e) => {
+        const m = e.target.closest('[data-mechanic]'),
+          line = e.target.closest('[data-line]');
+        if (m) {
+          const target = data.mechanics[Number(m.dataset.mechanic)];
+          showFile(target.file, target.line);
+        } else if (line) jump(line.dataset.line);
+        else if (e.target.id === 'back-home') showHome();
+      });
+      $('reader').addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-mechanic]')) {
+          e.preventDefault();
+          e.target.click();
+        }
+      });
+      for (const button of document.querySelectorAll('[data-query]'))
+        button.addEventListener('click', () => {
+          $('search').value = button.dataset.query;
+          currentGroup = '';
+          listFiles();
+        });
+      $('home').addEventListener('click', () => {
+        $('search').value = '';
+        currentGroup = '';
+        showHome();
+      });
+      showHome();
+    </script>
+  </body>
+</html>

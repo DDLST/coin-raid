@@ -1,0 +1,866 @@
+[
+  {
+    "kind": "skeleton",
+    "index": 0,
+    "hp": 64,
+    "damage": 14,
+    "reward": 5,
+    "speed": 155,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 0,
+    "hp": 94,
+    "damage": 17,
+    "reward": 6,
+    "speed": 108.5,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 0,
+    "hp": 78,
+    "damage": 11,
+    "reward": 9,
+    "speed": 111.6,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 0,
+    "hp": 92,
+    "damage": 16,
+    "reward": 9,
+    "speed": 182.89999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 0,
+    "hp": 138,
+    "damage": 16,
+    "reward": 12,
+    "speed": 136.4,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 0,
+    "hp": 100,
+    "damage": 11,
+    "reward": 9,
+    "speed": 155,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 0,
+    "hp": 140,
+    "damage": 17,
+    "reward": 9,
+    "speed": 139.5,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 0,
+    "hp": 65,
+    "damage": 14,
+    "reward": 9,
+    "speed": 155,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 0,
+    "hp": 84,
+    "damage": 11,
+    "reward": 9,
+    "speed": 111.6,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 0,
+    "hp": 96,
+    "damage": 16,
+    "reward": 9,
+    "speed": 182.89999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 0,
+    "hp": 155,
+    "damage": 17,
+    "reward": 9,
+    "speed": 117.8,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 0,
+    "hp": 480,
+    "damage": 23,
+    "reward": 45,
+    "speed": 147.25,
+    "radius": 34
+  },
+  {
+    "kind": "skeleton",
+    "index": 1,
+    "hp": 78,
+    "damage": 16,
+    "reward": 6,
+    "speed": 168,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 1,
+    "hp": 112,
+    "damage": 19,
+    "reward": 8,
+    "speed": 117.6,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 1,
+    "hp": 96,
+    "damage": 13,
+    "reward": 11,
+    "speed": 120.96,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 1,
+    "hp": 110,
+    "damage": 18,
+    "reward": 11,
+    "speed": 198.23999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 1,
+    "hp": 162,
+    "damage": 18,
+    "reward": 14,
+    "speed": 147.84,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 1,
+    "hp": 118,
+    "damage": 13,
+    "reward": 11,
+    "speed": 168,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 1,
+    "hp": 164,
+    "damage": 19,
+    "reward": 11,
+    "speed": 151.20000000000002,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 1,
+    "hp": 83,
+    "damage": 16,
+    "reward": 11,
+    "speed": 168,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 1,
+    "hp": 102,
+    "damage": 13,
+    "reward": 11,
+    "speed": 120.96,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 1,
+    "hp": 114,
+    "damage": 18,
+    "reward": 11,
+    "speed": 198.23999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 1,
+    "hp": 173,
+    "damage": 19,
+    "reward": 11,
+    "speed": 127.68,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 1,
+    "hp": 680,
+    "damage": 27,
+    "reward": 58,
+    "speed": 159.6,
+    "radius": 34
+  },
+  {
+    "kind": "skeleton",
+    "index": 2,
+    "hp": 92,
+    "damage": 13.32,
+    "reward": 7,
+    "speed": 181,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 2,
+    "hp": 130,
+    "damage": 15.54,
+    "reward": 10,
+    "speed": 126.69999999999999,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 2,
+    "hp": 114,
+    "damage": 11.1,
+    "reward": 13,
+    "speed": 130.32,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 2,
+    "hp": 128,
+    "damage": 14.8,
+    "reward": 13,
+    "speed": 213.57999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 2,
+    "hp": 186,
+    "damage": 14.8,
+    "reward": 16,
+    "speed": 159.28,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 2,
+    "hp": 136,
+    "damage": 11.1,
+    "reward": 13,
+    "speed": 181,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 2,
+    "hp": 188,
+    "damage": 15.54,
+    "reward": 13,
+    "speed": 162.9,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 2,
+    "hp": 101,
+    "damage": 13.32,
+    "reward": 13,
+    "speed": 181,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 2,
+    "hp": 120,
+    "damage": 11.1,
+    "reward": 13,
+    "speed": 130.32,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 2,
+    "hp": 132,
+    "damage": 14.8,
+    "reward": 13,
+    "speed": 213.57999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 2,
+    "hp": 191,
+    "damage": 15.54,
+    "reward": 13,
+    "speed": 137.56,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 2,
+    "hp": 900,
+    "damage": 22.94,
+    "reward": 71,
+    "speed": 171.95,
+    "radius": 34
+  },
+  {
+    "kind": "skeleton",
+    "index": 3,
+    "hp": 106,
+    "damage": 20,
+    "reward": 8,
+    "speed": 192,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 3,
+    "hp": 148,
+    "damage": 23,
+    "reward": 12,
+    "speed": 134.39999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 3,
+    "hp": 132,
+    "damage": 17,
+    "reward": 15,
+    "speed": 138.24,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 3,
+    "hp": 146,
+    "damage": 22,
+    "reward": 15,
+    "speed": 226.56,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 3,
+    "hp": 210,
+    "damage": 22,
+    "reward": 18,
+    "speed": 168.96,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 3,
+    "hp": 154,
+    "damage": 17,
+    "reward": 15,
+    "speed": 192,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 3,
+    "hp": 212,
+    "damage": 23,
+    "reward": 15,
+    "speed": 172.8,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 3,
+    "hp": 119,
+    "damage": 20,
+    "reward": 15,
+    "speed": 192,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 3,
+    "hp": 138,
+    "damage": 17,
+    "reward": 15,
+    "speed": 138.24,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 3,
+    "hp": 150,
+    "damage": 22,
+    "reward": 15,
+    "speed": 226.56,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 3,
+    "hp": 209,
+    "damage": 23,
+    "reward": 15,
+    "speed": 145.92000000000002,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 3,
+    "hp": 1120,
+    "damage": 35,
+    "reward": 84,
+    "speed": 182.39999999999998,
+    "radius": 34
+  },
+  {
+    "kind": "skeleton",
+    "index": 4,
+    "hp": 120,
+    "damage": 22,
+    "reward": 9,
+    "speed": 196,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 4,
+    "hp": 166,
+    "damage": 25,
+    "reward": 14,
+    "speed": 137.2,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 4,
+    "hp": 150,
+    "damage": 19,
+    "reward": 17,
+    "speed": 141.12,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 4,
+    "hp": 164,
+    "damage": 24,
+    "reward": 17,
+    "speed": 231.28,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 4,
+    "hp": 234,
+    "damage": 24,
+    "reward": 20,
+    "speed": 172.48,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 4,
+    "hp": 172,
+    "damage": 19,
+    "reward": 17,
+    "speed": 196,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 4,
+    "hp": 236,
+    "damage": 25,
+    "reward": 17,
+    "speed": 176.4,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 4,
+    "hp": 137,
+    "damage": 22,
+    "reward": 17,
+    "speed": 196,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 4,
+    "hp": 156,
+    "damage": 19,
+    "reward": 17,
+    "speed": 141.12,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 4,
+    "hp": 168,
+    "damage": 24,
+    "reward": 17,
+    "speed": 231.28,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 4,
+    "hp": 227,
+    "damage": 25,
+    "reward": 17,
+    "speed": 148.96,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 4,
+    "hp": 1400,
+    "damage": 39,
+    "reward": 97,
+    "speed": 186.2,
+    "radius": 34
+  },
+  {
+    "kind": "skeleton",
+    "index": 5,
+    "hp": 134,
+    "damage": 24,
+    "reward": 10,
+    "speed": 201,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 5,
+    "hp": 184,
+    "damage": 27,
+    "reward": 16,
+    "speed": 140.7,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 5,
+    "hp": 168,
+    "damage": 21,
+    "reward": 19,
+    "speed": 144.72,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 5,
+    "hp": 182,
+    "damage": 26,
+    "reward": 19,
+    "speed": 237.17999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 5,
+    "hp": 258,
+    "damage": 26,
+    "reward": 22,
+    "speed": 176.88,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 5,
+    "hp": 190,
+    "damage": 21,
+    "reward": 19,
+    "speed": 201,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 5,
+    "hp": 260,
+    "damage": 27,
+    "reward": 19,
+    "speed": 180.9,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 5,
+    "hp": 155,
+    "damage": 24,
+    "reward": 19,
+    "speed": 201,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 5,
+    "hp": 174,
+    "damage": 21,
+    "reward": 19,
+    "speed": 144.72,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 5,
+    "hp": 186,
+    "damage": 26,
+    "reward": 19,
+    "speed": 237.17999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 5,
+    "hp": 245,
+    "damage": 27,
+    "reward": 19,
+    "speed": 152.76,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 5,
+    "hp": 1650,
+    "damage": 43,
+    "reward": 110,
+    "speed": 190.95,
+    "radius": 34
+  },
+  {
+    "kind": "skeleton",
+    "index": 6,
+    "hp": 148,
+    "damage": 26,
+    "reward": 11,
+    "speed": 208,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 6,
+    "hp": 202,
+    "damage": 29,
+    "reward": 18,
+    "speed": 145.6,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 6,
+    "hp": 186,
+    "damage": 23,
+    "reward": 21,
+    "speed": 149.76,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 6,
+    "hp": 200,
+    "damage": 28,
+    "reward": 21,
+    "speed": 245.44,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 6,
+    "hp": 282,
+    "damage": 28,
+    "reward": 24,
+    "speed": 183.04,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 6,
+    "hp": 208,
+    "damage": 23,
+    "reward": 21,
+    "speed": 208,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 6,
+    "hp": 284,
+    "damage": 29,
+    "reward": 21,
+    "speed": 187.20000000000002,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 6,
+    "hp": 173,
+    "damage": 26,
+    "reward": 21,
+    "speed": 208,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 6,
+    "hp": 192,
+    "damage": 23,
+    "reward": 21,
+    "speed": 149.76,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 6,
+    "hp": 204,
+    "damage": 28,
+    "reward": 21,
+    "speed": 245.44,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 6,
+    "hp": 263,
+    "damage": 29,
+    "reward": 21,
+    "speed": 158.08,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 6,
+    "hp": 1900,
+    "damage": 47,
+    "reward": 123,
+    "speed": 197.6,
+    "radius": 34
+  },
+  {
+    "kind": "skeleton",
+    "index": 7,
+    "hp": 162,
+    "damage": 28,
+    "reward": 12,
+    "speed": 215,
+    "radius": 20
+  },
+  {
+    "kind": "zombie",
+    "index": 7,
+    "hp": 220,
+    "damage": 31,
+    "reward": 20,
+    "speed": 150.5,
+    "radius": 20
+  },
+  {
+    "kind": "necromancer",
+    "index": 7,
+    "hp": 204,
+    "damage": 25,
+    "reward": 23,
+    "speed": 154.79999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "vampire",
+    "index": 7,
+    "hp": 218,
+    "damage": 30,
+    "reward": 23,
+    "speed": 253.7,
+    "radius": 20
+  },
+  {
+    "kind": "dragon",
+    "index": 7,
+    "hp": 306,
+    "damage": 30,
+    "reward": 26,
+    "speed": 189.2,
+    "radius": 25
+  },
+  {
+    "kind": "wraith",
+    "index": 7,
+    "hp": 226,
+    "damage": 25,
+    "reward": 23,
+    "speed": 215,
+    "radius": 20
+  },
+  {
+    "kind": "knight",
+    "index": 7,
+    "hp": 308,
+    "damage": 31,
+    "reward": 23,
+    "speed": 193.5,
+    "radius": 20
+  },
+  {
+    "kind": "archer",
+    "index": 7,
+    "hp": 191,
+    "damage": 28,
+    "reward": 23,
+    "speed": 215,
+    "radius": 20
+  },
+  {
+    "kind": "alchemist",
+    "index": 7,
+    "hp": 210,
+    "damage": 25,
+    "reward": 23,
+    "speed": 154.79999999999998,
+    "radius": 20
+  },
+  {
+    "kind": "shade",
+    "index": 7,
+    "hp": 222,
+    "damage": 30,
+    "reward": 23,
+    "speed": 253.7,
+    "radius": 20
+  },
+  {
+    "kind": "gargoyle",
+    "index": 7,
+    "hp": 281,
+    "damage": 31,
+    "reward": 23,
+    "speed": 163.4,
+    "radius": 20
+  },
+  {
+    "kind": "boss",
+    "index": 7,
+    "hp": 2450,
+    "damage": 51,
+    "reward": 136,
+    "speed": 204.25,
+    "radius": 34
+  }
+]

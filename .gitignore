@@ -6,3 +6,10 @@ dist/
 !.vscode/extensions.json
 
 .offline-build/
+
+# Метки загрузки Windows и временные результаты проверок.
+*:Zone.Identifier
+.test-build/
+test-results/
+playwright-report/
+coverage/
