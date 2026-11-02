@@ -1,6 +1,6 @@
-import { type EnemyKind, type EnemyAttack } from '../world/WorldConfig';
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 import { type Point } from '../world/Navigation';
+import { type EnemyAttack, type EnemyKind } from '../world/WorldLayout';
 import { type BossStrike } from './BossPatterns';
 
 export type EnemyMode = 'chase' | 'windup' | 'charge' | 'recover';

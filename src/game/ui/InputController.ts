@@ -1,17 +1,18 @@
-import { PROFILE_KEY, weaponFor } from '../progression/PlayerProgression';
-import { type MenuTab } from './InterfaceState';
 import Phaser from 'phaser';
-import { resident } from '../village/Residents';
-import { REGIONS } from '../world/WorldConfig';
-import { learnSkill, toggleSkill, refundBranch } from '../progression/Skills';
-import { BRIEFING_CARDS } from '../story/TutorialContent';
+import { BRIEFING_CARDS, GAME_CONFIG, PROFILE_KEY, REGIONS, SKILL_KEYS } from '../Constants';
 import { stats } from '../combat/CombatRules';
-import type { GameScene } from '../GameScene';
+import { type GameScene } from '../GameScene';
+import { weaponFor } from '../progression/PlayerProgression';
+import { learnSkill, refundBranch, toggleSkill } from '../progression/Skills';
+import { resident } from '../village/Residents';
+import { type MenuTab } from './InterfaceState';
 
 /** Привязка DOM-кнопок, клавиатуры и мыши, сброс ввода и полноэкранный режим. */
 export class InputController {
+  private readonly disposers: (() => void)[] = [];
   constructor(private readonly context: GameScene) {}
   bindControls(): void {
+    this.destroy();
     const { hero, worldState, journey, ui } = this.context;
     ui.listeners = new AbortController();
     const signal = ui.listeners.signal;
@@ -23,20 +24,24 @@ export class InputController {
     click('menu-button', () => this.context.menu.toggleMenu());
     click('menu-close', () => this.context.menu.toggleMenu());
     click('pause-button', () => {
-      if (ui.state === 'menu') {
+      if (this.context.flow.state === 'menu') {
         this.context.menu.toggleMenu();
       }
       this.context.menu.togglePause();
     });
     click('help-button', () => {
-      if (ui.state === 'menu') this.context.menu.toggleMenu();
+      if (this.context.flow.state === 'menu') {
+        this.context.menu.toggleMenu();
+      }
       this.context.menu.toggleGuide();
     });
     click('guide-close', () => this.context.menu.toggleGuide(false));
     click('map-button', () => this.context.map.toggleMap());
     click('map-close', () => this.context.map.toggleMap());
     click('fullscreen-button', () => this.fullscreen());
-    ui.keys.F.on('down', () => this.fullscreen());
+    const fullscreen = () => this.fullscreen();
+    ui.keys.F.on('down', fullscreen);
+    this.disposers.push(() => ui.keys.F.off('down', fullscreen));
     click('save-button', () => this.context.saves.saveProgress());
     click('modal-save', () => this.context.saves.saveProgress());
     click('load-button', () => this.context.saves.loadProgress());
@@ -51,17 +56,20 @@ export class InputController {
         this.context.menu.toast('Браузер не разрешает удалить сохранение.');
       }
     });
-    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-menu-tab]'))
+    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-menu-tab]')) {
       b.addEventListener(
         'click',
         () => {
           ui.menuTab = b.dataset.menuTab as MenuTab;
           this.context.menu.renderMenu();
-          if (ui.menuTab === 'equipment') this.context.tutorial.lessonEvent('inventory');
+          if (ui.menuTab === 'equipment') {
+            this.context.tutorial.lessonEvent('inventory');
+          }
         },
         { signal },
       );
-    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-equipment]'))
+    }
+    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-equipment]')) {
       b.addEventListener(
         'click',
         () => {
@@ -71,6 +79,7 @@ export class InputController {
         },
         { signal },
       );
+    }
     click('equipment-prev', () => {
       ui.equipmentPage = Math.max(0, ui.equipmentPage - 1);
       this.context.menu.renderEquipment();
@@ -84,11 +93,13 @@ export class InputController {
       (e) => {
         const b =
           e.target instanceof Element ? e.target.closest<HTMLButtonElement>('[data-equip]') : null;
-        if (b?.dataset.equip) this.context.economy.equip(b.dataset.equip);
+        if (b?.dataset.equip) {
+          this.context.economy.equip(b.dataset.equip);
+        }
       },
       { signal },
     );
-    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-quest-view]'))
+    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-quest-view]')) {
       b.addEventListener(
         'click',
         () => {
@@ -98,6 +109,7 @@ export class InputController {
         },
         { signal },
       );
+    }
     click('quest-prev', () => {
       ui.questPage = Math.max(0, ui.questPage - 1);
       this.context.quests.renderQuests();
@@ -113,11 +125,13 @@ export class InputController {
           e.target instanceof Element
             ? e.target.closest<HTMLButtonElement>('[data-track-quest]')
             : null;
-        if (b?.dataset.trackQuest) this.context.quests.trackQuest(b.dataset.trackQuest);
+        if (b?.dataset.trackQuest) {
+          this.context.quests.trackQuest(b.dataset.trackQuest);
+        }
       },
       { signal },
     );
-    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-map-mode]'))
+    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-map-mode]')) {
       b.addEventListener(
         'click',
         () => {
@@ -130,6 +144,7 @@ export class InputController {
         },
         { signal },
       );
+    }
     this.context.element('map-regions').addEventListener(
       'click',
       (e) => {
@@ -137,7 +152,9 @@ export class InputController {
           e.target instanceof Element
             ? e.target.closest<HTMLButtonElement>('[data-map-region]')
             : null;
-        if (!b || b.disabled) return;
+        if (!b || b.disabled) {
+          return;
+        }
         ui.mapFocusRegion = Number(b.dataset.mapRegion);
         ui.mapFocusVillage = null;
         ui.mapMode = 'local';
@@ -156,7 +173,7 @@ export class InputController {
         this.context.menu.toast('Испытание начнётся после закрытия меню.');
       }
     });
-    for (const key of ['master', 'music', 'effects'] as const)
+    for (const key of ['master', 'music', 'effects'] as const) {
       this.context.element<HTMLInputElement>(`volume-${key}`).addEventListener(
         'input',
         (e) => {
@@ -168,6 +185,7 @@ export class InputController {
         },
         { signal },
       );
+    }
     click('mute-button', () => {
       this.context.audio.unlock();
       this.context.audio.setSettings({
@@ -179,17 +197,23 @@ export class InputController {
     click('interact-button', () => this.context.village.interact());
     click('intro-skip', () => this.context.story.finishIntro());
     click('loot-close', () => {
-      if (ui.lootLeft > 0) return;
+      if (ui.lootLeft > 0) {
+        return;
+      }
       this.context.element('loot-overlay').hidden = true;
-      ui.state = 'playing';
+      this.context.flow.transitionTo('playing');
       this.resetInput();
     });
-    this.context.input.on('pointermove', (p: Phaser.Input.Pointer) => {
-      if (p.wasTouch || ui.state !== 'playing') return;
+    this.bindPointer('pointermove', (p: Phaser.Input.Pointer) => {
+      if (p.wasTouch || this.context.flow.state !== 'playing') {
+        return;
+      }
       ui.mouse = { x: p.x, y: p.y };
     });
-    this.context.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
-      if (ui.state !== 'playing' || p.wasTouch) return;
+    this.bindPointer('pointerdown', (p: Phaser.Input.Pointer) => {
+      if (this.context.flow.state !== 'playing' || p.wasTouch) {
+        return;
+      }
       this.context.audio.unlock();
       ui.mouse = { x: p.x, y: p.y };
       this.context.player.updateAim();
@@ -203,7 +227,7 @@ export class InputController {
       }
     });
     this.context.input.mouse?.disableContextMenu();
-    this.context.input.on('pointerup', () => {
+    this.bindPointer('pointerup', () => {
       ui.mouseHeld = false;
     });
     window.addEventListener(
@@ -217,7 +241,9 @@ export class InputController {
       'blur',
       () => {
         this.resetInput();
-        if (ui.state === 'playing') this.context.menu.togglePause();
+        if (this.context.flow.state === 'playing') {
+          this.context.menu.togglePause();
+        }
       },
       { signal },
     );
@@ -226,7 +252,9 @@ export class InputController {
       () => {
         if (document.hidden) {
           this.resetInput();
-          if (ui.state === 'playing') this.context.menu.togglePause();
+          if (this.context.flow.state === 'playing') {
+            this.context.menu.togglePause();
+          }
         }
       },
       { signal },
@@ -248,7 +276,9 @@ export class InputController {
       (e) => {
         const b =
           e.target instanceof Element ? e.target.closest<HTMLButtonElement>('[data-travel]') : null;
-        if (b && !b.disabled) this.context.village.travelTo(Number(b.dataset.travel));
+        if (b && !b.disabled) {
+          this.context.village.travelTo(Number(b.dataset.travel));
+        }
       },
       { signal },
     );
@@ -259,14 +289,16 @@ export class InputController {
           e.target instanceof Element
             ? e.target.closest<HTMLButtonElement>('[data-skill], [data-skill-toggle]')
             : null;
-        if (!b || b.disabled) return;
+        if (!b || b.disabled) {
+          return;
+        }
         if (b.dataset.skill) {
           this.context.element('skill-message').textContent = learnSkill(
             journey.profile,
             b.dataset.skill,
             this.context.seals(),
           );
-          this.context.quests.syncAchievements();
+          this.context.achievements.syncAchievements();
         } else if (b.dataset.skillToggle) {
           toggleSkill(journey.profile, b.dataset.skillToggle);
           this.context.element('skill-message').textContent =
@@ -274,49 +306,52 @@ export class InputController {
         }
         journey.dirty = true;
         this.context.menu.renderSkills();
-        this.context.menu.updateHUD();
+        this.context.hud.updateHUD();
       },
       { signal },
     );
     click('skill-reset', () => {
       const points = refundBranch(journey.profile, weaponFor(journey.profile).style);
-      if (!points) return;
+      if (!points) {
+        return;
+      }
       hero.activeSkill = null;
       hero.attackTime = -1;
       this.context.element('skill-message').textContent =
         `Возвращено ${points} искр. Купленные приёмы сохранены; повторная оплата не нужна.`;
       journey.dirty = true;
       this.context.menu.renderSkills();
-      this.context.menu.updateHUD();
+      this.context.hud.updateHUD();
     });
     click('achievement-prev', () => {
       ui.achievementPage = Math.max(0, ui.achievementPage - 1);
-      this.context.quests.renderAchievements();
+      this.context.achievements.renderAchievements();
     });
     click('achievement-next', () => {
       ui.achievementPage++;
-      this.context.quests.renderAchievements();
+      this.context.achievements.renderAchievements();
     });
     click('dialog-skip', () => {
-      ui.dialogTime = ui.dialogTarget.length / 78 + 1;
+      ui.dialogTime = ui.dialogTarget.length / GAME_CONFIG.dialogCharactersPerSecond + 1;
       this.context.element('dialog-text').textContent = ui.dialogTarget;
     });
     click('dialog-quest', () => this.context.quests.talkQuest());
     click('dialog-leave', () => this.context.village.leaveDialog());
     click('shop-close', () => {
       this.context.element('shop-overlay').hidden = true;
-      ui.state = 'dialog';
+      this.context.flow.transitionTo('dialog');
       this.context.element('dialog-overlay').hidden = false;
       this.context.village.say(
         'Снаряжение останется после смерти. Перед закрытием сохрани путешествие вручную.',
       );
     });
-    for (const tab of ['weapons', 'armors', 'upgrades', 'skins', 'supplies', 'growth'] as const)
+    for (const tab of ['weapons', 'armors', 'upgrades', 'skins', 'supplies', 'growth'] as const) {
       click(`tab-${tab}`, () => {
         ui.shopTab = tab;
         ui.shopPage = 0;
         this.context.economy.renderShop();
       });
+    }
     click('shop-prev', () => {
       ui.shopPage = Math.max(0, ui.shopPage - 1);
       this.context.economy.renderShop();
@@ -329,7 +364,9 @@ export class InputController {
       if (ui.briefingPage < BRIEFING_CARDS.length - 1) {
         ui.briefingPage++;
         this.context.tutorial.renderBriefing();
-      } else this.context.tutorial.startLessons();
+      } else {
+        this.context.tutorial.startLessons();
+      }
     });
     click('briefing-start', () => this.context.tutorial.startLessons());
     click('training-yes', () => this.context.story.newJourney(true));
@@ -340,11 +377,10 @@ export class InputController {
     click('quit-button', () => this.context.menu.confirmExit('title'));
     click('confirm-cancel', () => this.context.menu.cancelExit());
     click('confirm-save', () => {
-      const previous = ui.state;
-      ui.state = 'paused';
       this.context.saves.saveProgress();
-      ui.state = previous;
-      if (!journey.dirty) this.context.menu.commitExit();
+      if (!journey.dirty) {
+        this.context.menu.commitExit();
+      }
     });
     click('confirm-discard', () => this.context.menu.commitExit());
     window.addEventListener(
@@ -362,7 +398,9 @@ export class InputController {
       (e) => {
         const b =
           e.target instanceof Element ? e.target.closest<HTMLButtonElement>('[data-item]') : null;
-        if (!b?.dataset.item || b.disabled) return;
+        if (!b?.dataset.item || b.disabled) {
+          return;
+        }
         const before = stats(journey.profile);
         journey.dirty = true;
         this.context.element('shop-message').textContent = this.context.economy.buyItem(
@@ -370,7 +408,7 @@ export class InputController {
         );
         this.context.economy.applyEquipment(before);
         this.context.economy.renderShop();
-        this.context.menu.updateHUD();
+        this.context.hud.updateHUD();
       },
       { signal },
     );
@@ -390,5 +428,112 @@ export class InputController {
     hero.velocity = { x: 0, y: 0 };
     ui.mouseHeld = false;
     this.context.input.keyboard?.resetKeys();
+  }
+
+  updateGlobal(): boolean {
+    const { flow, ui } = this.context;
+    const pressed = (name: string) => Phaser.Input.Keyboard.JustDown(ui.keys[name]);
+    if (pressed('H')) {
+      this.context.menu.toggleGuide();
+    }
+    if (pressed('M')) {
+      this.context.map.toggleMap();
+    }
+    if (pressed('TAB')) {
+      this.context.menu.toggleMenu();
+      return true;
+    }
+    switch (flow.state) {
+      case 'travel':
+        if (pressed('ESC')) {
+          this.context.village.closeTravel();
+        }
+        return false;
+      case 'menu':
+        if (pressed('ESC')) {
+          this.context.menu.toggleMenu();
+        }
+        return false;
+      case 'map':
+        if (pressed('ESC')) {
+          this.context.map.toggleMap();
+        }
+        return false;
+      case 'dialog':
+        if (pressed('ESC')) {
+          this.context.village.leaveDialog();
+        }
+        return false;
+      case 'shop':
+        if (pressed('ESC')) {
+          this.context.element('shop-close').click();
+        }
+        return false;
+      case 'story':
+      case 'confirm':
+      case 'loot':
+      case 'intro':
+        return false;
+    }
+    if (pressed('ESC')) {
+      if (flow.state === 'paused') {
+        this.context.menu.togglePause();
+      } else {
+        this.context.menu.toggleMenu();
+      }
+      return true;
+    }
+    if (pressed('P')) {
+      this.context.menu.togglePause();
+    }
+    if (pressed('ENTER') && !flow.playing) {
+      this.context.menu.primaryAction();
+    }
+    return false;
+  }
+
+  updatePlaying(): void {
+    const { ui } = this.context;
+    const pressed = (name: string) => Phaser.Input.Keyboard.JustDown(ui.keys[name]);
+    if (ui.keys.J.isDown || ui.mouseHeld) {
+      this.context.combat.attack();
+    }
+    if (pressed('SPACE') || pressed('SHIFT')) {
+      this.context.player.dodge();
+    }
+    if (pressed('C')) {
+      this.context.combat.parry();
+    }
+    for (const [index, key] of SKILL_KEYS.entries()) {
+      if (pressed(key)) {
+        this.context.combat.useSkill(index + 1);
+      }
+    }
+    if (pressed('Q')) {
+      this.context.player.heal();
+    }
+    if (pressed('V')) {
+      this.context.player.heal(true);
+    }
+    if (pressed('R')) {
+      this.context.ultimate.useUltimate();
+    }
+    if (pressed('E')) {
+      this.context.village.interact();
+    }
+  }
+
+  private bindPointer(event: string, handler: (pointer: Phaser.Input.Pointer) => void): void {
+    const input = this.context.input;
+    input.on(event, handler);
+    this.disposers.push(() => input.off(event, handler));
+  }
+
+  destroy(): void {
+    this.context.ui.listeners?.abort();
+    for (const dispose of this.disposers) {
+      dispose();
+    }
+    this.disposers.length = 0;
   }
 }

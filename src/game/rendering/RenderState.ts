@@ -1,5 +1,6 @@
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 import { type Point } from '../world/Navigation';
+
 /** Ссылки на объекты Phaser, анимации и пулы графических эффектов. */
 export class RenderState {
   player!: Phaser.GameObjects.Image;
@@ -33,5 +34,7 @@ export class RenderState {
   trailAttack = -1;
   attackImages: Phaser.GameObjects.Image[] = [];
   attackImageCursor = 0;
-  liveParticles = 0;
+  resetScene(): void {
+    Object.assign(this, new RenderState());
+  }
 }

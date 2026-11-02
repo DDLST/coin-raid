@@ -1,15 +1,32 @@
-import { type Snapshot, parseSave } from './SaveSchema';
-import { PROFILE_KEY } from '../progression/PlayerProgression';
+import {
+  GAME_CONFIG,
+  LEGACY_KEYS,
+  LESSONS,
+  PROFILE_KEY,
+  REGIONS,
+  TUTORIAL_CONFIG,
+} from '../Constants';
 import { stats } from '../combat/CombatRules';
-import { REGIONS, villagePosition } from '../world/WorldConfig';
+import { type GameScene } from '../GameScene';
+import { trainingEnemyParameters } from '../story/TrainingEnemyRules';
 import { clampPoint } from '../world/Navigation';
-import { WAVE_FIRST } from '../enemies/EnemyConfig';
-import { LESSONS } from '../story/StoryContent';
-import type { GameScene } from '../GameScene';
+import { villagePosition } from '../world/WorldLayout';
+import { parseSave, type Snapshot } from './SaveSchema';
 
 /** Ручная запись, загрузка и отображение состояния сохранения. */
 export class SaveSystem {
   constructor(private readonly context: GameScene) {}
+  initialize(): void {
+    const { journey } = this.context;
+    try {
+      for (const key of LEGACY_KEYS) {
+        localStorage.removeItem(key);
+      }
+      journey.saved = parseSave(localStorage.getItem(PROFILE_KEY));
+    } catch {
+      journey.storageAvailable = false;
+    }
+  }
   refreshSaveUI(): void {
     const { journey } = this.context;
     this.context.element<HTMLButtonElement>('load-button').disabled = !journey.saved;
@@ -89,8 +106,15 @@ export class SaveSystem {
     };
   }
   saveProgress(): void {
-    const { journey, ui } = this.context;
-    if (ui.state !== 'menu' && ui.state !== 'paused' && ui.state !== 'won') return;
+    const { journey } = this.context;
+    if (
+      this.context.flow.state !== 'menu' &&
+      this.context.flow.state !== 'paused' &&
+      this.context.flow.state !== 'won' &&
+      this.context.flow.state !== 'confirm'
+    ) {
+      return;
+    }
     try {
       const raw = JSON.stringify(this.snapshot());
       localStorage.setItem(PROFILE_KEY, raw);
@@ -123,7 +147,7 @@ export class SaveSystem {
       return;
     }
     this.context.audio.unlock();
-    this.context.world.clearActors();
+    this.context.session.reset();
     journey.saved = saved;
     journey.profile = saved.profile;
     journey.progress = saved.progress;
@@ -146,7 +170,9 @@ export class SaveSystem {
       (worldState.area === 'village' ||
         (worldState.area === 'interior' && !this.context.tutorial.trainingArea()) ||
         journey.progress[saved.region].coins >=
-          (worldState.area === 'tutorial' ? 3 : REGIONS[saved.region].awaken));
+          (worldState.area === 'tutorial'
+            ? TUTORIAL_CONFIG.weaponCoins
+            : REGIONS[saved.region].awaken));
     journey.profile.blade = hero.armed;
     hero.ultimate = saved.ultimate;
     journey.elapsed = saved.elapsed;
@@ -155,7 +181,9 @@ export class SaveSystem {
     journey.deaths = saved.deaths;
     journey.campVisits = new Set(saved.villages);
     this.context.scenery.ensureVillageArt(worldState.villageIndex);
-    if (worldState.area === 'biome') this.context.scenery.ensureRegionArt(worldState.regionIndex);
+    if (worldState.area === 'biome') {
+      this.context.scenery.ensureRegionArt(worldState.regionIndex);
+    }
     if (worldState.area === 'interior') {
       const h = worldState.houses.find(
         (h) => h.village === worldState.villageIndex && h.role === saved.interiorRole,
@@ -163,10 +191,12 @@ export class SaveSystem {
       if (h) {
         this.context.village.enterHouse(h, true);
         worldState.interiorReturn = saved.interiorReturn;
-      } else worldState.area = 'village';
+      } else {
+        worldState.area = 'village';
+      }
     }
-    const bounds = this.context.world.playerBounds(),
-      at = clampPoint(saved.player, bounds);
+    const bounds = this.context.world.playerBounds();
+    const at = clampPoint(saved.player, bounds);
     journey.checkpoint = {
       x: villagePosition(worldState.lastVillage).x + 15,
       y: 645,
@@ -183,71 +213,46 @@ export class SaveSystem {
         x: e.x,
         y: e.y,
       });
-      enemy.hp = Math.min(enemy.maxHP, e.hp);
       enemy.phase2 = e.phase2;
       enemy.training = e.training;
-      if (e.training && journey.lessonIndex < 10 && journey.lessonIndex !== 3) {
-        enemy.stun = 999;
-        enemy.speed = 0;
-      } else if (e.training) {
-        enemy.damage = 5;
-        enemy.speed = 65;
-        enemy.clock = 0.8;
+      if (e.training) {
+        Object.assign(enemy, trainingEnemyParameters(journey.lessonIndex, true));
       }
+      enemy.hp = Math.min(enemy.maxHP, e.hp);
     }
-    for (const c of saved.coins) this.context.economy.spawnCoin(c.region, false, c);
-    for (const c of saved.chests) this.context.quests.spawnChest(c);
+    for (const c of saved.coins) {
+      this.context.economy.spawnCoin(c.region, false, c);
+    }
+    for (const c of saved.chests) {
+      this.context.loot.spawnChest(c);
+    }
     const p = journey.progress[worldState.regionIndex];
     if (
       p.spawned &&
       !p.bossDead &&
       !worldState.enemies.some((e) => e.region === worldState.regionIndex && e.kind === 'boss')
-    )
+    ) {
       p.spawned = false;
-    hero.attackTime = -1;
-    hero.counterLeft = 0;
-    hero.counterTarget = -1;
-    hero.counterStrike = false;
-    hero.activeSkill = null;
-    hero.skillCooldowns = {};
-    hero.shieldLeft = 0;
-    journey.waveClock = WAVE_FIRST;
-    hero.dodgeLeft = 0;
-    hero.dodgeWait = 0;
-    hero.hurtLeft = 1.2;
-    hero.hurtFlash = 0;
-    hero.healWait = 0;
-    hero.regenDelay = 0;
-    hero.ultimateLeft = 0;
-    ui.mouse = null;
-    this.context.controls.resetInput();
-    this.context.weather.resetWeather();
+    }
+    hero.hurtLeft = GAME_CONFIG.loadProtection;
     this.context.audio.setSettings(saved.audio);
     this.context.audio.setRegion(worldState.regionIndex);
-    for (const id of [
-      'menu-overlay',
-      'map-overlay',
-      'shop-overlay',
-      'dialog-overlay',
-      'loot-overlay',
-      'intro-overlay',
-    ])
-      this.context.element(id).hidden = true;
-    this.context.menu.hideModal();
-    ui.state = 'playing';
+    this.context.flow.transitionTo('playing');
     this.context.world.configureCamera();
     this.context.element('training-panel').hidden = !this.context.tutorial.trainingArea();
-    if (this.context.tutorial.trainingArea()) this.context.tutorial.renderLesson();
+    if (this.context.tutorial.trainingArea()) {
+      this.context.tutorial.renderLesson();
+    }
     this.context.quests.makeQuestProps(saved.wisp);
     ui.guideWanted = true;
     this.context.menu.syncGuide();
     journey.dirty = false;
     this.context.actors.drawGates();
     this.context.actors.drawActors();
-    this.context.menu.updateHUD();
+    this.context.hud.updateHUD();
     this.refreshSaveUI();
     if (journey.progress.every((v) => v.cleared)) {
-      ui.state = 'won';
+      this.context.flow.transitionTo('won');
       this.context.menu.showModal(
         'СЕМЬЯ СПАСЕНА',
         'Дом снова ждёт тебя.',
@@ -260,7 +265,7 @@ export class SaveSystem {
     }
     journey.tutorialFinished = journey.lessonIndex >= LESSONS.length;
     this.context.tutorial.updateTeachingUI();
-    this.context.quests.syncAchievements(false);
+    this.context.achievements.syncAchievements(false);
     this.context.menu.toast(
       saved.migrated
         ? 'Сохранение v6 перенесено в расширенный мир. Для записи обновления нажми «Сохранить прогресс».'

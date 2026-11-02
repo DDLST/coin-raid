@@ -1,21 +1,19 @@
-import { weaponFor, WEAPONS, ARMORS, SKINS, armorFor } from '../progression/PlayerProgression';
 import {
+  ARMORS,
+  GAME_CONFIG,
   REGIONS,
-  type EnemyAttack,
-  VILLAGE_NAMES,
-  villagePosition,
-  regionStart,
-} from '../world/WorldConfig';
-import { SKILL_TREE } from '../progression/Skills';
-import { stats, ULTIMATE_MAX } from '../combat/CombatRules';
-import { houseName } from '../village/Residents';
-import { LESSONS } from '../story/StoryContent';
-import { BOSS_NAMES } from '../enemies/BossPatterns';
-import { WEATHER_NAMES } from '../world/WeatherSystem';
-import { type Point } from '../world/Navigation';
-import type { GameScene } from '../GameScene';
+  SESSION_OVERLAYS,
+  SKILL_TREE,
+  SKINS,
+  ULTIMATE_MAX,
+  WEAPONS,
+} from '../Constants';
+import { stats } from '../combat/CombatRules';
+import { type GameScene } from '../GameScene';
+import { armorFor, weaponFor } from '../progression/PlayerProgression';
+import { pageCount } from './Pagination';
 
-/** Меню, HUD, пауза, справка, начальный экран и подтверждение выхода. */
+/** Меню, пауза, справка, начальный экран и подтверждение выхода. */
 export class MenuController {
   constructor(private readonly context: GameScene) {}
 
@@ -25,22 +23,29 @@ export class MenuController {
     t.textContent = text;
     t.classList.add('visible');
     window.clearTimeout(ui.toastTimeout);
-    ui.toastTimeout = window.setTimeout(() => t.classList.remove('visible'), 3200);
+    ui.toastTimeout = window.setTimeout(
+      () => t.classList.remove('visible'),
+      GAME_CONFIG.toastDurationMs,
+    );
   }
 
   toggleMenu(): void {
     const { ui } = this.context;
-    if (ui.state === 'menu') {
-      ui.state = ui.menuReturn;
+    if (this.context.flow.state === 'menu') {
+      this.context.flow.transitionTo(ui.menuReturn);
       this.context.element('menu-overlay').hidden = true;
       this.context.controls.resetInput();
-      if (ui.state === 'paused') this.showPauseModal();
+      if (ui.menuReturn === 'paused') {
+        this.showPauseModal();
+      }
       this.syncGuide();
       return;
     }
-    if (ui.state !== 'playing' && ui.state !== 'paused') return;
-    ui.menuReturn = ui.state;
-    ui.state = 'menu';
+    if (this.context.flow.state !== 'playing' && this.context.flow.state !== 'paused') {
+      return;
+    }
+    ui.menuReturn = this.context.flow.state;
+    this.context.flow.transitionTo('menu');
     this.context.controls.resetInput();
     this.hideModal();
     this.syncGuide();
@@ -51,7 +56,7 @@ export class MenuController {
 
   renderMenu(): void {
     const { worldState, journey, ui } = this.context;
-    this.updateHUD();
+    this.context.hud.updateHUD();
     this.context.map.drawMaps();
     this.context.saves.refreshSaveUI();
     this.context.element<HTMLButtonElement>('travel-open').disabled =
@@ -64,21 +69,33 @@ export class MenuController {
       'quests',
       'achievements',
       'settings',
-    ] as const)
+    ] as const) {
       this.context.element(`menu-${tab}`).hidden = tab !== ui.menuTab;
-    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-menu-tab]'))
+    }
+    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-menu-tab]')) {
       b.classList.toggle('selected', b.dataset.menuTab === ui.menuTab);
-    if (ui.menuTab === 'equipment') this.renderEquipment();
-    if (ui.menuTab === 'skills') this.renderSkills();
-    if (ui.menuTab === 'quests') this.context.quests.renderQuests();
-    if (ui.menuTab === 'achievements') this.context.quests.renderAchievements();
-    if (ui.menuTab === 'settings') this.renderAudio();
+    }
+    if (ui.menuTab === 'equipment') {
+      this.renderEquipment();
+    }
+    if (ui.menuTab === 'skills') {
+      this.renderSkills();
+    }
+    if (ui.menuTab === 'quests') {
+      this.context.quests.renderQuests();
+    }
+    if (ui.menuTab === 'achievements') {
+      this.context.achievements.renderAchievements();
+    }
+    if (ui.menuTab === 'settings') {
+      this.renderAudio();
+    }
   }
 
   renderSkills(): void {
     const { journey } = this.context;
-    const style = weaponFor(journey.profile).style,
-      seals = this.context.seals();
+    const style = weaponFor(journey.profile).style;
+    const seals = this.context.seals();
     this.context.element('skill-points').textContent =
       `Искры: ${journey.profile.skillPoints} · печати ${seals}/${REGIONS.length}`;
     this.context.element<HTMLButtonElement>('skill-reset').disabled = !SKILL_TREE.some(
@@ -88,13 +105,14 @@ export class MenuController {
       `Ветка: ${weaponFor(journey.profile).name}. Верни искры, чтобы сменить сборку; другая ветка выбирается во «Вещах».`;
     this.context.element('skill-items').innerHTML = SKILL_TREE.filter((s) => s.style === style)
       .map((s) => {
-        const known = journey.profile.skills.includes(s.id),
-          purchased = journey.profile.unlockedSkills.includes(s.id),
-          disabled = journey.profile.disabledSkills.includes(s.id),
-          price = purchased ? 0 : s.price,
-          previous = SKILL_TREE.find((p) => p.style === style && p.tier === s.tier - 1),
-          locked = seals < s.seals || (!!previous && !journey.profile.skills.includes(previous.id)),
-          afford = journey.profile.coins >= price && journey.profile.skillPoints >= s.points;
+        const known = journey.profile.skills.includes(s.id);
+        const purchased = journey.profile.unlockedSkills.includes(s.id);
+        const disabled = journey.profile.disabledSkills.includes(s.id);
+        const price = purchased ? 0 : s.price;
+        const previous = SKILL_TREE.find((p) => p.style === style && p.tier === s.tier - 1);
+        const locked =
+          seals < s.seals || (!!previous && !journey.profile.skills.includes(previous.id));
+        const afford = journey.profile.coins >= price && journey.profile.skillPoints >= s.points;
         return `<article class="skill-card ${known ? 'complete' : ''}"><div><b>${s.key}</b><strong>${s.name}</strong></div><p>${s.description}</p><small>${known ? `${s.points} искр вложено · ${disabled ? 'снят с панели' : 'клавиша ' + s.key}` : `${s.seals} печатей · ${s.points} искр · ${price} ◈`}</small><button ${known ? 'data-skill-toggle' : 'data-skill'}="${s.id}" ${!known && (locked || !afford) ? 'disabled' : ''}>${known ? (disabled ? 'Вставить в панель' : 'Убрать из панели') : locked ? 'Ветка пока закрыта' : purchased ? 'Вложить искры' : 'Изучить'}</button></article>`;
       })
       .join('');
@@ -103,8 +121,8 @@ export class MenuController {
   renderEquipment(): void {
     const { hero, journey, ui } = this.context;
     const items =
-        ui.equipmentTab === 'weapons' ? WEAPONS : ui.equipmentTab === 'armors' ? ARMORS : SKINS,
-      pages = Math.ceil(items.length / 4);
+      ui.equipmentTab === 'weapons' ? WEAPONS : ui.equipmentTab === 'armors' ? ARMORS : SKINS;
+    const pages = pageCount(items.length);
     ui.equipmentPage = Math.max(0, Math.min(pages - 1, ui.equipmentPage));
     this.context.element('equipment-items').innerHTML = this.context.economy.itemCards(
       ui.equipmentTab,
@@ -115,20 +133,22 @@ export class MenuController {
     this.context.element<HTMLButtonElement>('equipment-prev').disabled = ui.equipmentPage === 0;
     this.context.element<HTMLButtonElement>('equipment-next').disabled =
       ui.equipmentPage === pages - 1;
-    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-equipment]'))
+    for (const b of document.querySelectorAll<HTMLButtonElement>('[data-equipment]')) {
       b.classList.toggle('selected', b.dataset.equipment === ui.equipmentTab);
+    }
     const w = weaponFor(journey.profile);
     this.context.element('equipment-detail').textContent =
       `${journey.profile.relics.includes('emberseal') ? 'Пепельная печать: -18% магии. ' : ''}${w.name}: урон ${Math.round(stats(journey.profile).damage)}, дальность ${w.reach}, расход ${w.cost}. ${armorFor(journey.profile).name}. ПКМ: ${w.description.split('ПКМ: ')[1] ?? w.description}`;
     this.context.element('ultimate-info').textContent =
-      `R · ${w.ultimate}: ${w.ultimateHint}. Заряд ${Math.floor(hero.ultimate)} / 100.`;
+      `R · ${w.ultimate}: ${w.ultimateHint}. Заряд ${Math.floor(hero.ultimate)} / ${ULTIMATE_MAX}.`;
   }
 
   renderAudio(): void {
-    for (const key of ['master', 'music', 'effects'] as const)
+    for (const key of ['master', 'music', 'effects'] as const) {
       this.context.element<HTMLInputElement>(`volume-${key}`).value = String(
         Math.round(this.context.audio.settings[key] * 100),
       );
+    }
     this.context.element('audio-track').textContent = this.context.audio.trackTitle;
     this.context.element('mute-button').textContent = this.context.audio.settings.muted
       ? 'Включить звук'
@@ -137,20 +157,23 @@ export class MenuController {
 
   setGuideText(): void {
     const hint = this.context.element('overlay').querySelector('.control-hint');
-    if (hint)
+    if (hint) {
       hint.textContent =
         'WASD - идти · мышь - прицел · ЛКМ / ПКМ - приёмы · C - парирование · Tab - меню';
+    }
     const grid = this.context.element('guide').querySelector('.guide-grid');
-    if (grid)
+    if (grid) {
       grid.innerHTML =
         '<span><b>WASD / стрелки</b> движение</span><span><b>Мышь + ЛКМ</b> удар по прицелу</span><span><b>ПКМ</b> второй приём оружия</span><span><b>C</b> парирование · затем ЛКМ</span><span><b>Space / Shift</b> уклонение</span><span><b>1 / 2 / 3 · R</b> навыки · абсолютное умение</span><span><b>Q / V</b> фляга / зелье</span><span><b>E · M</b> действие · карта</span><span><b>Tab / Esc · H · P</b> меню · справка · пауза</span>';
+    }
   }
 
   syncGuide(): void {
     const { ui } = this.context;
-    this.context.element('guide').hidden = !ui.guideWanted || ui.state !== 'playing';
-    if (ui.state !== 'playing' && ui.state !== 'won')
+    this.context.element('guide').hidden = !ui.guideWanted || this.context.flow.state !== 'playing';
+    if (this.context.flow.state !== 'playing' && this.context.flow.state !== 'won') {
       this.context.element('achievement-banner').hidden = true;
+    }
   }
 
   toggleGuide(show?: boolean): void {
@@ -160,14 +183,13 @@ export class MenuController {
   }
 
   togglePause(): void {
-    const { ui } = this.context;
-    if (ui.state === 'playing') {
-      ui.state = 'paused';
+    if (this.context.flow.state === 'playing') {
+      this.context.flow.transitionTo('paused');
       this.context.controls.resetInput();
       this.syncGuide();
       this.showPauseModal();
-    } else if (ui.state === 'paused') {
-      ui.state = 'playing';
+    } else if (this.context.flow.state === 'paused') {
+      this.context.flow.transitionTo('playing');
       this.hideModal();
       this.context.controls.resetInput();
       this.syncGuide();
@@ -187,19 +209,19 @@ export class MenuController {
   }
 
   primaryAction(): void {
-    const { ui } = this.context;
     this.context.audio.unlock();
-    if (ui.state === 'ready') {
+    if (this.context.flow.state === 'ready') {
       this.context.story.newJourney(
         this.context.element<HTMLInputElement>('start-training').checked,
       );
-    } else if (ui.state === 'paused') this.togglePause();
-    else if (ui.state === 'won') {
+    } else if (this.context.flow.state === 'paused') {
+      this.togglePause();
+    } else if (this.context.flow.state === 'won') {
       this.hideModal();
-      ui.state = 'playing';
+      this.context.flow.transitionTo('playing');
       this.syncGuide();
       this.context.actors.drawActors();
-      this.updateHUD();
+      this.context.hud.updateHUD();
     }
   }
 
@@ -233,208 +255,8 @@ export class MenuController {
     s.innerHTML = `<span><b>${journey.score}</b> очков</span><span><b>${journey.kills}</b> врагов</span><span><b>${journey.deaths}</b> смертей</span><span><b>${Math.floor(journey.elapsed)} с</b> в пути</span><span><b>${journey.profile.coins} ◈</b> осколков</span>`;
   }
 
-  updateHUD(): void {
-    const { hero, worldState, journey, ui, visuals } = this.context;
-    if (!journey.progress.length) return;
-    const s = stats(journey.profile),
-      r = REGIONS[worldState.regionIndex],
-      p = journey.progress[worldState.regionIndex],
-      w = weaponFor(journey.profile);
-
-    this.context.element('hp-text').textContent = `${Math.ceil(hero.hp)} / ${s.maxHP}`;
-    this.context.element('hp-fill').style.width = `${(Math.max(0, hero.hp) / s.maxHP) * 100}%`;
-    this.context.element('stamina-text').textContent = `${Math.floor(hero.stamina)}`;
-    this.context.element('stamina-fill').style.width = `${(hero.stamina / s.maxStamina) * 100}%`;
-    this.context.element('flask-count').textContent =
-      `Q: ${hero.flasks} · V: ${journey.profile.potions}`;
-    this.context.element('weapon-label').textContent = hero.armed
-      ? w.name
-      : `Оружие: сила ${Math.min(p.coins, r.awaken)}/${r.awaken}`;
-    this.context.element('region-number').textContent =
-      `БИОМ ${worldState.regionIndex + 1} / ${REGIONS.length}`;
-    this.context.element('region-name').textContent = r.name;
-    this.context.element('coin-goal').textContent =
-      `Сила биома: ${Math.min(p.coins, r.coins)} / ${r.coins}`;
-    this.context.element('region-lore').textContent = r.lore;
-    this.context.element('compact-souls').textContent = !hero.armed
-      ? `◈ ${Math.min(p.coins, r.awaken)} / ${r.awaken} · оружие`
-      : `◈ ${Math.min(p.coins, r.coins)} / ${r.coins}`;
-
-    const coinsLeft = Math.max(0, r.coins - p.coins);
-
-    this.context
-      .element('boss-timer')
-      .classList.toggle(
-        'timer-urgent',
-        worldState.area === 'biome' && !p.spawned && !p.bossDead && coinsLeft <= 3,
-      );
-
-    this.context
-      .element('boss-timer')
-      .classList.toggle('timer-safe', worldState.area !== 'biome' || p.bossDead);
-
-    this.context.element('boss-timer').textContent = p.bossDead
-      ? 'Хозяин повержен'
-      : p.spawned
-        ? 'ФАЗА 2 · БОСС'
-        : `Фаза 2: ${Math.min(p.coins, r.coins)}/${r.coins} ◈`;
-
-    const objective =
-      worldState.area === 'interior'
-        ? `Внутри: ${houseName(worldState.villageIndex, worldState.interiorRole ?? 'smith')}. E у жителя - разговор, E у двери - выйти.`
-        : worldState.area === 'village'
-          ? 'Деревня безопасна. Войди в дверь дома на E. Tab - вещи, навыки, дорога и сохранение. Выход в следующий биом справа.'
-          : worldState.area === 'tutorial'
-            ? LESSONS[Math.min(journey.lessonIndex, LESSONS.length - 1)].hint
-            : p.cleared
-              ? 'Туман рассеялся. Восточная стоянка открыта.'
-              : !hero.armed
-                ? `Верни ${r.awaken} осколков силы, чтобы восстановить ${w.name.toLowerCase()}. Фаза 2 начнётся после сбора ${r.coins} монет.`
-                : p.bossDead
-                  ? `Собери силу биома: ${p.coins} / ${r.coins}.`
-                  : p.spawned
-                    ? 'ФАЗА 2: победи хозяина биома.'
-                    : `Фаза 2 начнётся после сбора ${r.coins} монет. Собрано: ${Math.min(p.coins, r.coins)}/${r.coins}.`;
-
-    this.context.element('quest-text').textContent = objective;
-    const tracked =
-      journey.profile.trackedQuest &&
-      this.context.quests
-        .journalEntries()
-        .find((q) => q.id === journey.profile.trackedQuest && !q.done);
-
-    this.context.element('guide-objective').textContent = tracked
-      ? `${objective} Поручение: ${tracked.next}`
-      : objective;
-
-    this.context.element('guide-objective').hidden = this.context.tutorial.trainingArea();
-
-    const boss = worldState.enemies.find(
-      (e) => e.kind === 'boss' && e.region === worldState.regionIndex && !e.dead,
-    );
-
-    this.context.element('boss-hud').hidden = !boss || worldState.area !== 'biome';
-
-    if (boss) {
-      const names: Record<EnemyAttack, string> = {
-        ...BOSS_NAMES,
-        slash: 'удар',
-        charge: 'рывок',
-        slam: 'волна',
-        poison: 'яд',
-        summon: 'призыв',
-        fan: 'чары',
-        blink: 'прыжок',
-        meteor: 'печати',
-        breath: 'дыхание',
-        combo: 'серия',
-        nova: 'кольцо чар',
-        snipe: 'прицельный выстрел',
-        quake: 'волны земли',
-        curse: 'проклятие',
-      };
-
-      this.context.element('boss-name').textContent =
-        `${r.bossName}${boss.phase2 ? ' · II' : ''}${boss.mode === 'windup' ? ` · ${names[boss.move]}` : ''}`;
-      this.context.element('boss-hp-text').textContent = `${Math.ceil(boss.hp)} / ${boss.maxHP}`;
-      this.context.element('boss-hp-fill').style.width =
-        `${(Math.max(0, boss.hp) / boss.maxHP) * 100}%`;
-    }
-
-    if (worldState.area !== 'biome') {
-      this.context.element('boss-hud').hidden = true;
-      this.context.element('boss-timer').textContent =
-        worldState.area === 'tutorial' ? 'Обучение · без таймера' : 'Безопасная деревня';
-      this.context.element('compact-souls').textContent =
-        worldState.area === 'tutorial'
-          ? `Урок ${journey.lessonIndex + 1}/${LESSONS.length}`
-          : 'Подготовка к пути';
-      this.context.element('region-number').textContent =
-        worldState.area === 'tutorial' ? 'ПРЕДБИОМ' : 'ПОСЕЛЕНИЕ';
-      this.context.element('region-name').textContent = VILLAGE_NAMES[worldState.villageIndex + 1];
-      this.context.element('quest-text').textContent =
-        worldState.area === 'tutorial'
-          ? (LESSONS[journey.lessonIndex]?.hint ?? 'Обучение завершено')
-          : 'Поговори с жителями, купи снаряжение и иди на восток. Семью держат за восемью печатями.';
-      this.context.element('region-lore').textContent =
-        'Кузнец · бронница · лекарь · странник. Смерть вернёт тебя к последней посещённой деревне.';
-      this.context.element('coin-goal').textContent = 'Цель: спасти семью';
-      this.context.element('weapon-label').textContent = weaponFor(journey.profile).name;
-    }
-
-    this.context.element('weather-label').textContent =
-      hero.slowed > 0
-        ? 'Молния · замедление'
-        : worldState.weather === 'clear'
-          ? 'Ясно'
-          : `${WEATHER_NAMES[worldState.weather]} · ${Math.ceil(worldState.weatherLeft)} с`;
-
-    this.syncGuide();
-    this.context.element('counter-ready').hidden = hero.counterLeft <= 0 || ui.state !== 'playing';
-    this.context.element('guide-skills').textContent =
-      SKILL_TREE.filter(
-        (s) =>
-          s.style === w.style &&
-          journey.profile.skills.includes(s.id) &&
-          !journey.profile.disabledSkills.includes(s.id),
-      )
-        .map(
-          (s) =>
-            `${s.key} · ${s.name}${(hero.skillCooldowns[s.id] ?? 0) > 0 ? ' (' + Math.ceil(hero.skillCooldowns[s.id] ?? 0) + ' с)' : ''}`,
-        )
-        .join(' · ') || 'Приёмы изучаются в Tab → Навыки после побед над боссами.';
-    this.context.element('ultimate-ready').hidden = !hero.armed || hero.ultimate < ULTIMATE_MAX;
-
-    let target: Point | null = null,
-      label = '';
-
-    if (p.cleared && worldState.regionIndex < REGIONS.length - 1) {
-      const m = villagePosition(worldState.regionIndex);
-      target =
-        visuals.player.x < m.x + 60
-          ? villagePosition(worldState.regionIndex)
-          : {
-              x: regionStart(worldState.regionIndex + 1) + 70,
-              y: 550,
-            };
-      label = visuals.player.x < m.x + 60 ? 'Костёр и деревня' : 'Следующий биом';
-    } else if (p.coins < r.coins) {
-      const c = worldState.coins
-        .filter((c) => c.region === worldState.regionIndex)
-        .sort(
-          (a, b) =>
-            Math.hypot(a.sprite.x - visuals.player.x, a.sprite.y - visuals.player.y) -
-            Math.hypot(b.sprite.x - visuals.player.x, b.sprite.y - visuals.player.y),
-        )[0];
-
-      if (c) target = c.sprite;
-      label = 'Ближайший осколок души';
-    } else if (boss) {
-      target = boss.sprite;
-      label = 'Победи хозяина биома';
-    } else label = p.bossDead ? 'Биом очищается' : 'ФАЗА 2 · хозяин пробуждается';
-
-    if (worldState.area !== 'biome') {
-      target = {
-        x: regionStart(worldState.villageIndex + 1) + 80,
-        y: 550,
-      };
-      label =
-        worldState.area === 'tutorial'
-          ? (LESSONS[journey.lessonIndex]?.title ?? 'В биом')
-          : 'Восток · следующий биом';
-    }
-
-    this.context.element('navigation-text').textContent = label;
-    this.context.element('direction-arrow').hidden = !target;
-
-    if (target)
-      this.context.element('direction-arrow').style.transform =
-        `rotate(${(Math.atan2(target.y - visuals.player.y, target.x - visuals.player.x) * 180) / Math.PI}deg)`;
-  }
-
   showTitle(): void {
-    const { journey, ui } = this.context;
+    const { journey } = this.context;
     for (const id of [
       'briefing-overlay',
       'dialog-overlay',
@@ -446,18 +268,19 @@ export class MenuController {
       'training-overlay',
       'confirm-overlay',
       'travel-overlay',
-    ])
+    ]) {
       this.context.element(id).hidden = true;
+    }
 
     this.context.controls.resetInput();
-    ui.state = 'ready';
+    this.context.flow.transitionTo('ready');
     journey.dirty = false;
     this.context.bosses.resetBossCountdown();
     this.context.element('guide').hidden = true;
     this.context.element('training-panel').hidden = true;
 
     this.showModal(
-      'ОСКОЛКИ ДУШИ · v10.0',
+      'ОСКОЛКИ ДУШИ · v10.1',
       'RAID COIN',
       'Восемь печатей. Одна клятва. Верни силу и спаси семью.',
       'Новая игра',
@@ -478,15 +301,18 @@ export class MenuController {
 
   requestNew(): void {
     const { journey } = this.context;
-    if (journey.dirty) this.confirmExit('new');
-    else this.askTraining();
+    if (journey.dirty) {
+      this.confirmExit('new');
+    } else {
+      this.askTraining();
+    }
   }
 
   confirmExit(target: 'title' | 'new'): void {
     const { ui } = this.context;
-    ui.confirmReturn = ui.state;
+    ui.confirmReturn = this.context.flow.state;
     ui.confirmTarget = target;
-    ui.state = 'confirm';
+    this.context.flow.transitionTo('confirm');
     this.context.controls.resetInput();
     this.context.element('confirm-overlay').hidden = false;
     this.context.element('confirm-title').textContent =
@@ -496,7 +322,7 @@ export class MenuController {
   cancelExit(): void {
     const { ui } = this.context;
     this.context.element('confirm-overlay').hidden = true;
-    ui.state = ui.confirmReturn;
+    this.context.flow.transitionTo(ui.confirmReturn);
   }
 
   commitExit(): void {
@@ -508,11 +334,35 @@ export class MenuController {
       'dialog-overlay',
       'map-overlay',
       'loot-overlay',
-    ])
+    ]) {
       this.context.element(id).hidden = true;
+    }
     journey.dirty = false;
     this.hideModal();
-    if (ui.confirmTarget === 'new') this.askTraining();
-    else this.showTitle();
+    if (ui.confirmTarget === 'new') {
+      this.askTraining();
+    } else {
+      this.showTitle();
+    }
+  }
+
+  resetSession(): void {
+    window.clearTimeout(this.context.ui.toastTimeout);
+    for (const id of SESSION_OVERLAYS) {
+      this.context.element(id).hidden = true;
+    }
+    this.context.element('guide').hidden = true;
+    this.context.element('toast').classList.remove('visible');
+    this.hideModal();
+  }
+  updateNotices(dt: number): void {
+    const { ui } = this.context;
+    if (this.context.flow.playing && ui.checkpointBannerLeft > 0) {
+      ui.checkpointBannerLeft = Math.max(0, ui.checkpointBannerLeft - dt);
+      if (ui.checkpointBannerLeft === 0) {
+        this.context.element('checkpoint-banner').hidden = true;
+      }
+    }
+    this.context.achievements.updateAchievementNotice(dt);
   }
 }

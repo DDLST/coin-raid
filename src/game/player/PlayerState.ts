@@ -1,11 +1,13 @@
+import { GAME_CONFIG, PLAYER_CONFIG } from '../Constants';
 import { type SkillId } from '../progression/Skills';
 import { type Point } from '../world/Navigation';
+
 /** Текущее состояние героя. Максимумы вычисляются в CombatRules.stats. */
 export class PlayerState {
   // Ресурсы героя. Формулы максимумов и лечения задаются в CombatRules.
-  hp = 100;
-  stamina = 100;
-  flasks = 2;
+  hp: number = PLAYER_CONFIG.baseHP;
+  stamina: number = PLAYER_CONFIG.baseStamina;
+  flasks: number = GAME_CONFIG.initialFlasks;
   armed = false;
   ultimate = 0;
   ultimateLeft = 0;
@@ -42,4 +44,8 @@ export class PlayerState {
   deathLeft = 0;
   slowed = 0;
   strideDistance = 0;
+
+  reset(): void {
+    Object.assign(this, new PlayerState());
+  }
 }

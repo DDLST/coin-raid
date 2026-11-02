@@ -1,14 +1,7 @@
-import {
-  LINES,
-  DELIVERIES,
-  lineReady,
-  type LineId,
-  type QuestLine,
-  type Delivery,
-} from '../story/StoryContent';
-import { REGIONS, VILLAGE_NAMES } from '../world/WorldConfig';
+import { DELIVERIES, LINES, REGIONS, VILLAGE_NAMES } from '../Constants';
+import { type Delivery, lineReady, type QuestLine } from '../story/StoryProgress';
 import { resident } from '../village/Residents';
-import type { Point } from '../world/Navigation';
+import { type Point } from '../world/Navigation';
 
 export type JournalEntry = {
   id: string;
@@ -24,36 +17,14 @@ export type JournalEntry = {
   region: number;
   village: number | null;
 };
-export const QUEST_NOTES: Record<LineId, { why: string; offer: string; thanks: string }> = {
-  bell: {
-    why: 'Колокол возвращал людям имена. Некроманты заглушили его, и Брун хочет вернуть память погибших стражей.',
-    offer:
-      'Я помню имена тех, кто охранял эту дорогу. Некроманты украли голос нашего колокола. Разбей двух заклинателей и забери его язык у лунного алтаря. Когда падёт Госпожа тумана, колокол снова зазвучит. Я выкую тебе клинок, который лечит раны светом памяти.',
-    thanks:
-      'Слышишь? Колокол снова зовёт стражей по именам. Теперь их память защищает тебя. Клинок Рассвета возвращает 2 HP при попадании. Спасибо, что не прошёл мимо нашей беды.',
-  },
-  runes: {
-    why: 'Хранитель оставил письма дочери в трёх печатях. Лисандр ищет их, чтобы история семьи не исчезла в огне.',
-    offer:
-      'Караванщик спрятал письма своей дочери в трёх печатях Пепельного святилища. Читай их в порядке Луна, Искра, Корень: память, надежда, дом. Архонт не даст вынести письмо, пока жив. Верни его после победы - и я отдам посох хранителя, а не продам последнюю память о нём.',
-    thanks:
-      'В письме всего три слова: «Я вернусь домой». Для тебя они тоже важны. Посох трёх печатей выпускает три сгустка за один удар. Пусть эта чужая надежда поможет вернуть твою семью.',
-  },
-  wisp: {
-    why: 'Огонёк хранит голос пропавшего ученика Ивы. Его нужно вывести из пепла к восточному огню.',
-    offer:
-      'Мой ученик ушёл искать пленников и не вернулся. В святилище остался его огонёк. Найди его на западной тропе и держись рядом до восточного костра. Он пугается боли и замирает, если тебя ранят. Победи Архонта, чтобы огонь не погас. Я сохраню его голос в защитной печати для тебя.',
-    thanks:
-      'Он добрался до огня. Теперь я знаю, что его память не досталась дракону. Пепельная печать ослабляет магию на 18% и действует сразу. Ты вернул мне надежду - пусть она бережёт тебя.',
-  },
-};
+
 export function lineJournal(
   q: QuestLine,
   bossDead: boolean,
 ): Omit<JournalEntry, 'point' | 'region' | 'village' | 'available'> {
-  const d = LINES.find((d) => d.id === q.id)!,
-    person = resident(d.offered, d.giver),
-    ready = lineReady(q, bossDead);
+  const d = LINES.find((d) => d.id === q.id)!;
+  const person = resident(d.offered, d.giver);
+  const ready = lineReady(q, bossDead);
   const steps =
     q.id === 'bell'
       ? [
@@ -108,9 +79,9 @@ export function lineJournal(
 export function deliveryJournal(
   q: Delivery,
 ): Omit<JournalEntry, 'point' | 'region' | 'village' | 'available'> {
-  const d = DELIVERIES.find((d) => d.id === q.id)!,
-    giver = resident(d.from, d.giver),
-    receiver = resident(d.to, d.receiver);
+  const d = DELIVERIES.find((d) => d.id === q.id)!;
+  const giver = resident(d.from, d.giver);
+  const receiver = resident(d.to, d.receiver);
   return {
     id: `delivery:${q.id}`,
     title: d.name,

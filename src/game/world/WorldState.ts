@@ -1,12 +1,15 @@
-import type Phaser from 'phaser';
-import { type SavedChest } from '../persistence/SaveSchema';
-import { type Terrain, type NavGrid, type Point } from './Navigation';
+import Phaser from 'phaser';
+import { GAME_CONFIG } from '../Constants';
+import { type Hazard } from '../combat/HazardSystem';
+import { type Projectile } from '../combat/ProjectileSystem';
 import { type Enemy } from '../enemies/EnemyTypes';
-import { type Projectile, type Hazard } from '../combat/CombatEffects';
-import { type Area, type Role, type LineId } from '../story/StoryContent';
-import { type House } from '../village/VillageLayout';
-import { type WeatherKind, type Strike } from './WeatherSystem';
+import { type SavedChest } from '../persistence/SaveSchema';
 import { type BiomeMood } from '../rendering/Atmosphere';
+import { type Area, type LineId, type Role } from '../story/StoryProgress';
+import { type House } from '../village/VillageLayout';
+import { type NavGrid, type Point, type Terrain } from './Navigation';
+import { type Strike, type WeatherKind } from './WeatherSystem';
+
 /** Объекты мира, геометрия, текущая область и состояние погоды. */
 export type Coin = {
   region: number;
@@ -59,12 +62,12 @@ export class WorldState {
   wispPathLeft = 0;
   weather: WeatherKind = 'clear';
   weatherLeft = 0;
-  weatherNext = 13;
+  weatherNext: number = GAME_CONFIG.firstWeatherDelay;
   wetZones: (Point & {
     radius: number;
   })[] = [];
   strike: Strike | null = null;
-  strikeNext = 2;
+  strikeNext: number = GAME_CONFIG.firstStrikeDelay;
   biomeMoods: BiomeMood[] = [];
   hurricane:
     | (Point & {
@@ -74,4 +77,21 @@ export class WorldState {
   windSoundLeft = 0;
   drawnRegions = new Set<number>();
   drawnVillages = new Set<number>();
+
+  resetJourney(): void {
+    this.regionIndex = 0;
+    this.villageIndex = -1;
+    this.lastVillage = -1;
+    this.area = 'village';
+    this.wispFear = 0;
+    this.wispPath = [];
+    this.wispPathLeft = 0;
+    for (const villager of this.villagers) {
+      villager.near = false;
+      villager.greetUntil = 0;
+    }
+  }
+  resetScene(): void {
+    Object.assign(this, new WorldState());
+  }
 }

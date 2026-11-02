@@ -1,22 +1,20 @@
+import Phaser from 'phaser';
 import {
-  REGIONS,
-  regionStart,
-  REGION_WIDTH,
-  WORLD_HEIGHT,
-  villagePosition,
-  regionEnd,
+  PEOPLE,
   PROLOGUE_WIDTH,
+  REGION_WIDTH,
+  REGIONS,
   ROAD_WIDTH,
   VILLAGE_NAMES,
-} from './WorldConfig';
-import { regionTerrain, makeGrid } from './Navigation';
-import { PEOPLE } from '../story/StoryContent';
-import { housePoint } from '../village/VillageLayout';
-import Phaser from 'phaser';
-import { background, mergeScenery, biomeGround } from '../rendering/TextureFactory';
+  WORLD_HEIGHT,
+} from '../Constants';
+import { type GameScene } from '../GameScene';
 import { createBiomeMood } from '../rendering/Atmosphere';
+import { background, biomeGround, mergeScenery } from '../rendering/textures/SceneryTextures';
 import { houseName, resident } from '../village/Residents';
-import type { GameScene } from '../GameScene';
+import { housePoint } from '../village/VillageLayout';
+import { makeGrid, regionTerrain } from './Navigation';
+import { regionEnd, regionStart, villagePosition } from './WorldLayout';
 
 /** Создание декораций биомов и деревень с ленивой загрузкой. */
 export class WorldRenderer {
@@ -31,12 +29,13 @@ export class WorldRenderer {
       worldState.bossNav[i] = makeGrid(terrain, this.context.world.regionBounds(i), 1, 35);
     }
     for (let i = -1; i < REGIONS.length - 1; i++) {
-      for (const person of PEOPLE)
+      for (const person of PEOPLE) {
         worldState.terrain.push({
           kind: 'ruin',
           ...housePoint(i, person.role),
           radius: 94,
         });
+      }
       const center = villagePosition(i);
       worldState.terrain.push(
         { kind: 'ruin', x: center.x - 85, y: 458, radius: 28 },
@@ -53,15 +52,17 @@ export class WorldRenderer {
   }
   ensureRegionArt(i: number): void {
     const { worldState } = this.context;
-    if (worldState.drawnRegions.has(i)) return;
+    if (worldState.drawnRegions.has(i)) {
+      return;
+    }
     worldState.drawnRegions.add(i);
-    const before = new Set(this.context.children.list),
-      road = this.context.add.graphics().setDepth(1);
-    const start = regionStart(i),
-      region = REGIONS[i],
-      floorKey = background(this.context, REGION_WIDTH, WORLD_HEIGHT, i + 1, region.palette),
-      floor = this.context.add.image(start, 0, floorKey).setOrigin(0).setDepth(0),
-      terrainImages: Phaser.GameObjects.Image[] = [];
+    const before = new Set(this.context.children.list);
+    const road = this.context.add.graphics().setDepth(1);
+    const start = regionStart(i);
+    const region = REGIONS[i];
+    const floorKey = background(this.context, REGION_WIDTH, WORLD_HEIGHT, i + 1, region.palette);
+    const floor = this.context.add.image(start, 0, floorKey).setOrigin(0).setDepth(0);
+    const terrainImages: Phaser.GameObjects.Image[] = [];
     road.lineStyle(86, 0xcbb991, 0.19);
     road.beginPath();
     road.moveTo(start, 550);
@@ -77,8 +78,9 @@ export class WorldRenderer {
       if (
         Math.abs(t.x - (start + REGION_WIDTH * 0.65)) < 1 &&
         Math.abs(t.y - WORLD_HEIGHT * 0.25) < 1
-      )
+      ) {
         continue;
+      }
       terrainImages.push(
         this.context.add
           .image(t.x, t.y, t.kind)
@@ -112,14 +114,16 @@ export class WorldRenderer {
   }
   ensureVillageArt(i: number): void {
     const { worldState } = this.context;
-    if (i < -1 || i >= REGIONS.length - 1 || worldState.drawnVillages.has(i)) return;
+    if (i < -1 || i >= REGIONS.length - 1 || worldState.drawnVillages.has(i)) {
+      return;
+    }
     worldState.drawnVillages.add(i);
-    const before = new Set(this.context.children.list),
-      road = this.context.add.graphics().setDepth(1);
-    const center = villagePosition(i),
-      left = i < 0 ? 0 : regionEnd(i),
-      width = i < 0 ? PROLOGUE_WIDTH : ROAD_WIDTH,
-      palette = REGIONS[Math.max(0, i)].palette;
+    const before = new Set(this.context.children.list);
+    const road = this.context.add.graphics().setDepth(1);
+    const center = villagePosition(i);
+    const left = i < 0 ? 0 : regionEnd(i);
+    const width = i < 0 ? PROLOGUE_WIDTH : ROAD_WIDTH;
+    const palette = REGIONS[Math.max(0, i)].palette;
     const floorKey = background(this.context, width, WORLD_HEIGHT, 31 + i, palette);
     this.context.add.image(left, 0, floorKey).setOrigin(0).setDepth(0);
     road.lineStyle(100, 0xd3bf86, 0.24);
@@ -138,8 +142,8 @@ export class WorldRenderer {
       .setOrigin(0.5)
       .setDepth(10);
     for (const [n, person] of PEOPLE.entries()) {
-      const at = housePoint(i, person.role),
-        door = { x: at.x, y: at.y + 130 };
+      const at = housePoint(i, person.role);
+      const door = { x: at.x, y: at.y + 130 };
       const roof = this.context.add
         .image(at.x, at.y, `building-${n}`)
         .setDisplaySize(240, 303)
@@ -176,7 +180,9 @@ export class WorldRenderer {
         near: false,
         greetUntil: 0,
       });
-      if (i >= 0 && person.role === 'smith') worldState.merchants[i] = sprite;
+      if (i >= 0 && person.role === 'smith') {
+        worldState.merchants[i] = sprite;
+      }
       if (person.role === 'smith') {
         const ember = this.context.add
           .image(at.x - 56, at.y + 40, 'fire')
@@ -205,9 +211,9 @@ export class WorldRenderer {
     }
     const garden = this.context.add.graphics().setDepth(4);
     for (let n = 0; n < 80; n++) {
-      const side = n % 2 ? 1 : -1,
-        x = center.x + side * (280 + ((n * 47) % 75)),
-        y = 190 + ((n * 59) % 720);
+      const side = n % 2 ? 1 : -1;
+      const x = center.x + side * (280 + ((n * 47) % 75));
+      const y = 190 + ((n * 59) % 720);
       garden.lineStyle(1, 0x426c43, 0.8);
       garden.lineBetween(x, y, x - 2, y - 7);
       garden.fillStyle(n % 3 ? 0xd9c18d : 0xb48ab0, 0.85);

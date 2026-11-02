@@ -1,10 +1,19 @@
-import { type Point, clampPoint, type Terrain, type Bounds, moveCircle } from './Navigation';
-import { PLAYER_RADIUS } from '../combat/CombatRules';
-import type { GameScene } from '../GameScene';
+import {
+  HURRICANE_PULL,
+  HURRICANE_RADIUS,
+  LIGHTNING_RADIUS,
+  LIGHTNING_WARNING,
+  METEOR_RADIUS,
+  METEOR_WARNING,
+  PLAYER_RADIUS,
+  WEATHER_DURATION,
+  WEATHER_HINTS,
+} from '../Constants';
+import { type GameScene } from '../GameScene';
+import { type Bounds, clampPoint, moveCircle, type Point, type Terrain } from './Navigation';
 
 /** Дождь, гроза, метеоры, ураган и замедление от поверхности. */
-export const LIGHTNING_WARNING = 1.2;
-export const LIGHTNING_RADIUS = 48;
+
 export type Strike = Point & {
   left: number;
   phase: 'warning' | 'impact';
@@ -15,7 +24,9 @@ export class WeatherSystem {
     const { worldState, visuals } = this.context;
     const g = visuals.weatherInk;
     g.clear();
-    if (worldState.weather === 'clear') return;
+    if (worldState.weather === 'clear') {
+      return;
+    }
     for (const z of worldState.wetZones) {
       g.fillStyle(0x71b5be, 0.12);
       g.fillCircle(z.x, z.y, z.radius);
@@ -26,15 +37,15 @@ export class WeatherSystem {
     if (worldState.weather === 'rain' || worldState.weather === 'storm') {
       g.lineStyle(1, 0xa9b8c8, 0.42);
       for (let i = 0; i < 75; i++) {
-        const x = v.x + ((i * 83 + visuals.animationTime * 110) % v.width),
-          y = v.y + ((i * 151 + visuals.animationTime * 410) % v.height);
+        const x = v.x + ((i * 83 + visuals.animationTime * 110) % v.width);
+        const y = v.y + ((i * 151 + visuals.animationTime * 410) % v.height);
         g.lineBetween(x, y, x - 7, y + 17);
       }
     }
     if (worldState.weather === 'meteors') {
       for (let n = 0; n < 14; n++) {
-        const x = v.x + ((n * 157 + visuals.animationTime * 67) % v.width),
-          y = v.y + ((n * 109 + visuals.animationTime * 45) % v.height);
+        const x = v.x + ((n * 157 + visuals.animationTime * 67) % v.width);
+        const y = v.y + ((n * 109 + visuals.animationTime * 45) % v.height);
         g.fillStyle(0xc77451, 0.4);
         g.fillCircle(x, y, 1.7);
       }
@@ -54,8 +65,8 @@ export class WeatherSystem {
         0.8,
       );
       for (let n = 0; n < 16; n++) {
-        const a = visuals.animationTime * 3 + n * 0.8,
-          r = 25 + n * 5;
+        const a = visuals.animationTime * 3 + n * 0.8;
+        const r = 25 + n * 5;
         g.fillStyle(n % 2 ? 0x9a9c85 : 0x66606f, 0.6);
         g.fillEllipse(z.x + Math.cos(a) * r, z.y + Math.sin(a) * r * 0.65, 5, 2);
       }
@@ -85,15 +96,18 @@ export class WeatherSystem {
   }
   groundSpeed(at: Point, player: boolean): number {
     const { hero, worldState, journey } = this.context;
-    if (player && hero.slowed > 0) return 0.3;
+    if (player && hero.slowed > 0) {
+      return 0.3;
+    }
     if (
       player &&
       worldState.hazards.some(
         (h) =>
           h.kind === 'curse' && h.warning <= 0 && Math.hypot(at.x - h.x, at.y - h.y) < h.radius,
       )
-    )
+    ) {
       return 0.78;
+    }
     const wet =
       worldState.terrain.some(
         (t) => t.kind === 'puddle' && Math.hypot(at.x - t.x, at.y - t.y) < t.radius,
@@ -116,7 +130,9 @@ export class WeatherSystem {
   updateWeather(dt: number): void {
     const { hero, worldState, journey, visuals } = this.context;
     if (journey.progress[worldState.regionIndex].cleared) {
-      if (worldState.weather !== 'clear') this.resetWeather();
+      if (worldState.weather !== 'clear') {
+        this.resetWeather();
+      }
       return;
     }
     worldState.weatherNext -= dt;
@@ -131,14 +147,17 @@ export class WeatherSystem {
               radius: 90 + Math.random() * 40,
             }))
           : [];
-      if (worldState.weather === 'hurricane')
+      if (worldState.weather === 'hurricane') {
         worldState.hurricane = {
           ...this.context.world.freePosition(worldState.regionIndex, 30, 220),
           phase: 0,
         };
+      }
       this.context.menu.toast(WEATHER_HINTS[worldState.weather]);
     }
-    if (worldState.weather === 'clear') return;
+    if (worldState.weather === 'clear') {
+      return;
+    }
     worldState.weatherLeft -= dt;
     if (worldState.weather === 'storm') {
       worldState.strikeNext -= dt;
@@ -178,7 +197,7 @@ export class WeatherSystem {
                 true,
               );
             }
-            this.context.effects.weatherHitEnemies(worldState.strike, LIGHTNING_RADIUS, 10);
+            this.context.hazards.damageEnemiesInArea(worldState.strike, LIGHTNING_RADIUS, 10);
             this.context.effects.particles(worldState.strike.x, worldState.strike.y, 14, 0xc4d8eb);
           } else {
             worldState.strike = null;
@@ -190,13 +209,13 @@ export class WeatherSystem {
       worldState.strikeNext -= dt;
       if (worldState.strikeNext <= 0) {
         const target =
-            Math.random() < 0.55
-              ? {
-                  x: visuals.player.x + hero.velocity.x * 0.4,
-                  y: visuals.player.y + hero.velocity.y * 0.4,
-                }
-              : this.context.world.freePosition(worldState.regionIndex, 30, 0),
-          at = clampPoint(target, this.context.world.regionBounds(worldState.regionIndex));
+          Math.random() < 0.55
+            ? {
+                x: visuals.player.x + hero.velocity.x * 0.4,
+                y: visuals.player.y + hero.velocity.y * 0.4,
+              }
+            : this.context.world.freePosition(worldState.regionIndex, 30, 0);
+        const at = clampPoint(target, this.context.world.regionBounds(worldState.regionIndex));
         worldState.hazards.push({
           ...at,
           region: worldState.regionIndex,
@@ -223,9 +242,9 @@ export class WeatherSystem {
       z.x = at.x;
       z.y = at.y;
       const pull = (point: Point, radius: number, terrain: Terrain[], bounds: Bounds) => {
-        const dx = z.x - point.x,
-          dy = z.y - point.y,
-          d = Math.hypot(dx, dy);
+        const dx = z.x - point.x;
+        const dy = z.y - point.y;
+        const d = Math.hypot(dx, dy);
         return d < HURRICANE_RADIUS && d > 8
           ? moveCircle(
               point,
@@ -245,10 +264,11 @@ export class WeatherSystem {
           this.context.world.playerBounds(),
         );
         visuals.player.setPosition(moved.x, moved.y);
-        if (Math.hypot(z.x - visuals.player.x, z.y - visuals.player.y) < 37)
+        if (Math.hypot(z.x - visuals.player.x, z.y - visuals.player.y) < 37) {
           this.context.player.damagePlayer(6 + worldState.regionIndex, z, true);
+        }
       }
-      for (const e of worldState.enemies)
+      for (const e of worldState.enemies) {
         if (!e.dead && e.region === worldState.regionIndex) {
           const moved = pull(
             e.sprite,
@@ -257,10 +277,14 @@ export class WeatherSystem {
             this.context.enemies.enemyBounds(e),
           );
           e.sprite.setPosition(moved.x, moved.y);
-          if (Math.hypot(z.x - e.sprite.x, z.y - e.sprite.y) < 37)
+          if (Math.hypot(z.x - e.sprite.x, z.y - e.sprite.y) < 37) {
             e.hp = Math.max(0, e.hp - 7 * dt);
-          if (e.hp === 0) this.context.combat.killEnemy(e);
+          }
+          if (e.hp === 0) {
+            this.context.defeats.killEnemy(e);
+          }
         }
+      }
       worldState.windSoundLeft -= dt;
       if (worldState.windSoundLeft <= 0) {
         this.context.audio.play('wind');
@@ -277,26 +301,7 @@ export class WeatherSystem {
   }
 }
 export type WeatherKind = 'clear' | 'rain' | 'storm' | 'meteors' | 'hurricane';
-export const WEATHER_DURATION = 15;
-export const METEOR_WARNING = 1.65,
-  METEOR_RADIUS = 65;
-export const HURRICANE_RADIUS = 125,
-  HURRICANE_PULL = 72;
-export const WEATHER_NAMES: Record<WeatherKind, string> = {
-  clear: 'Ясно',
-  rain: 'Дождь',
-  storm: 'Гроза',
-  meteors: 'Метеорный дождь',
-  hurricane: 'Ураган',
-};
-export const WEATHER_HINTS: Record<WeatherKind, string> = {
-  clear: '',
-  rain: 'Дождь: мокрые участки замедляют лиса и противников.',
-  storm: 'Гроза: выйди из красного круга до удара молнии.',
-  meteors: 'Метеоры: огненный круг отмечает место падения. Камни поражают и врагов.',
-  hurricane:
-    'Ураган: обходи движущуюся воронку. Она тянет и лиса, и врагов; Пробел помогает вырваться.',
-};
+
 export function randomWeather(
   region: number,
   value = Math.random(),

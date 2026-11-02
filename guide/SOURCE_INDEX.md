@@ -2,108 +2,300 @@
 
 Индекс создан из текущего кода командой `npm run docs:map`. В браузерной [карте проекта](index.html) можно искать механику, выбирать файл и читать код с номерами строк.
 
-База изменений: `3186059b6c07881b5bbe3b2f6017dd327aea5bcf`.
+База изменений: `7673a0b5975ff52c63072068e04ba4f08f49761a`.
 
 ## Запуск и состояние
 
-### [src/game/core/JourneyState.ts](../src/game/core/JourneyState.ts)
+### [src/game/Constants.ts](../src/game/Constants.ts)
 
-Профиль, прогресс областей, задания и время текущего путешествия.
+Общие константы, баланс, каталоги, тексты, пути ресурсов и таблицы кадров.
+
+Строк: 2504.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `GAME_TRANSITIONS` | [36](../src/game/Constants.ts#L36) | Параметры, таблица данных или функция, объявленная константой. |
+| `DODGE_TIME` | [67](../src/game/Constants.ts#L67) | Параметры, таблица данных или функция, объявленная константой. |
+| `DODGE_COST` | [69](../src/game/Constants.ts#L69) | Параметры, таблица данных или функция, объявленная константой. |
+| `HURT_PROTECTION` | [71](../src/game/Constants.ts#L71) | Параметры, таблица данных или функция, объявленная константой. |
+| `FLASK_HEAL` | [73](../src/game/Constants.ts#L73) | Параметры, таблица данных или функция, объявленная константой. |
+| `POTION_HEAL` | [75](../src/game/Constants.ts#L75) | Параметры, таблица данных или функция, объявленная константой. |
+| `ULTIMATE_MAX` | [77](../src/game/Constants.ts#L77) | Параметры, таблица данных или функция, объявленная константой. |
+| `PLAYER_DAMAGE_SCALE` | [79](../src/game/Constants.ts#L79) | Параметры, таблица данных или функция, объявленная константой. |
+| `PLAYER_RADIUS` | [81](../src/game/Constants.ts#L81) | Параметры, таблица данных или функция, объявленная константой. |
+| `STAMINA_DELAY` | [83](../src/game/Constants.ts#L83) | Параметры, таблица данных или функция, объявленная константой. |
+| `PARRY_DURATION` | [85](../src/game/Constants.ts#L85) | Параметры, таблица данных или функция, объявленная константой. |
+| `PERFECT_PARRY` | [87](../src/game/Constants.ts#L87) | Параметры, таблица данных или функция, объявленная константой. |
+| `COUNTER_WINDOW` | [89](../src/game/Constants.ts#L89) | Параметры, таблица данных или функция, объявленная константой. |
+| `PLAYER_CONFIG` | [92](../src/game/Constants.ts#L92) | Параметры, таблица данных или функция, объявленная константой. |
+| `TUTORIAL_CONFIG` | [128](../src/game/Constants.ts#L128) | Параметры, таблица данных или функция, объявленная константой. |
+| `ULTIMATE_CONFIG` | [155](../src/game/Constants.ts#L155) | Параметры, таблица данных или функция, объявленная константой. |
+| `COMBAT_CONFIG` | [179](../src/game/Constants.ts#L179) | Параметры, таблица данных или функция, объявленная константой. |
+| `UI_CONFIG` | [202](../src/game/Constants.ts#L202) | Параметры, таблица данных или функция, объявленная константой. |
+| `GAME_CONFIG` | [216](../src/game/Constants.ts#L216) | Параметры, таблица данных или функция, объявленная константой. |
+| `SKILL_KEYS` | [245](../src/game/Constants.ts#L245) | Параметры, таблица данных или функция, объявленная константой. |
+| `SESSION_OVERLAYS` | [246](../src/game/Constants.ts#L246) | Параметры, таблица данных или функция, объявленная константой. |
+| `BOSS_MOVES` | [265](../src/game/Constants.ts#L265) | Параметры, таблица данных или функция, объявленная константой. |
+| `BOSS_NAMES` | [276](../src/game/Constants.ts#L276) | Параметры, таблица данных или функция, объявленная константой. |
+| `BOSS_ATTACK_IDS` | [303](../src/game/Constants.ts#L303) | Параметры, таблица данных или функция, объявленная константой. |
+| `REGION_WIDTH` | [306](../src/game/Constants.ts#L306) | Параметры, таблица данных или функция, объявленная константой. |
+| `ROAD_WIDTH` | [308](../src/game/Constants.ts#L308) | Параметры, таблица данных или функция, объявленная константой. |
+| `PROLOGUE_WIDTH` | [310](../src/game/Constants.ts#L310) | Параметры, таблица данных или функция, объявленная константой. |
+| `REGION_STEP` | [312](../src/game/Constants.ts#L312) | Параметры, таблица данных или функция, объявленная константой. |
+| `WORLD_HEIGHT` | [314](../src/game/Constants.ts#L314) | Параметры, таблица данных или функция, объявленная константой. |
+| `ENEMY_KINDS` | [316](../src/game/Constants.ts#L316) | Параметры, таблица данных или функция, объявленная константой. |
+| `REGIONS` | [331](../src/game/Constants.ts#L331) | Параметры, таблица данных или функция, объявленная константой. |
+| `WORLD_WIDTH` | [546](../src/game/Constants.ts#L546) | Параметры, таблица данных или функция, объявленная константой. |
+| `VILLAGE_NAMES` | [548](../src/game/Constants.ts#L548) | Параметры, таблица данных или функция, объявленная константой. |
+| `REGION_INCOME` | [559](../src/game/Constants.ts#L559) | Параметры, таблица данных или функция, объявленная константой. |
+| `REGION_THEMES` | [561](../src/game/Constants.ts#L561) | Параметры, таблица данных или функция, объявленная константой. |
+| `PICKUP_RADIUS` | [572](../src/game/Constants.ts#L572) | Параметры, таблица данных или функция, объявленная константой. |
+| `INTERACT_DISTANCE` | [574](../src/game/Constants.ts#L574) | Параметры, таблица данных или функция, объявленная константой. |
+| `PATH_INTERVAL` | [577](../src/game/Constants.ts#L577) | Параметры, таблица данных или функция, объявленная константой. |
+| `MAX_MINIONS` | [579](../src/game/Constants.ts#L579) | Параметры, таблица данных или функция, объявленная константой. |
+| `WAVE_FIRST` | [581](../src/game/Constants.ts#L581) | Параметры, таблица данных или функция, объявленная константой. |
+| `WAVE_SIZE` | [583](../src/game/Constants.ts#L583) | Параметры, таблица данных или функция, объявленная константой. |
+| `BOSS_REWARD` | [585](../src/game/Constants.ts#L585) | Параметры, таблица данных или функция, объявленная константой. |
+| `THIRD_BIOME_DAMAGE` | [587](../src/game/Constants.ts#L587) | Параметры, таблица данных или функция, объявленная константой. |
+| `THIRD_BIOME_WINDUP` | [589](../src/game/Constants.ts#L589) | Параметры, таблица данных или функция, объявленная константой. |
+| `ENEMY_BASE_HP` | [591](../src/game/Constants.ts#L591) | Параметры, таблица данных или функция, объявленная константой. |
+| `PROFILE_KEY` | [606](../src/game/Constants.ts#L606) | Параметры, таблица данных или функция, объявленная константой. |
+| `LEGACY_KEYS` | [608](../src/game/Constants.ts#L608) | Параметры, таблица данных или функция, объявленная константой. |
+| `SKINS` | [618](../src/game/Constants.ts#L618) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEAPONS` | [664](../src/game/Constants.ts#L664) | Параметры, таблица данных или функция, объявленная константой. |
+| `ARMORS` | [787](../src/game/Constants.ts#L787) | Параметры, таблица данных или функция, объявленная константой. |
+| `ATTRIBUTE_GAIN` | [842](../src/game/Constants.ts#L842) | Параметры, таблица данных или функция, объявленная константой. |
+| `ATTRIBUTE_FIRST_PRICE` | [843](../src/game/Constants.ts#L843) | Параметры, таблица данных или функция, объявленная константой. |
+| `ATTRIBUTE_PRICE_STEP` | [844](../src/game/Constants.ts#L844) | Параметры, таблица данных или функция, объявленная константой. |
+| `ATTRIBUTE_SHOP_HINT` | [846](../src/game/Constants.ts#L846) | Параметры, таблица данных или функция, объявленная константой. |
+| `UPGRADES` | [848](../src/game/Constants.ts#L848) | Параметры, таблица данных или функция, объявленная константой. |
+| `SKILL_TREE` | [936](../src/game/Constants.ts#L936) | Параметры, таблица данных или функция, объявленная константой. |
+| `ACHIEVEMENTS` | [1085](../src/game/Constants.ts#L1085) | Параметры, таблица данных или функция, объявленная константой. |
+| `POTION_PRICE` | [1196](../src/game/Constants.ts#L1196) | Параметры, таблица данных или функция, объявленная константой. |
+| `SUPPLY_CONFIG` | [1198](../src/game/Constants.ts#L1198) | Параметры, таблица данных или функция, объявленная константой. |
+| `SUPPLIES` | [1200](../src/game/Constants.ts#L1200) | Параметры, таблица данных или функция, объявленная константой. |
+| `PEOPLE` | [1232](../src/game/Constants.ts#L1232) | Параметры, таблица данных или функция, объявленная константой. |
+| `OPENING` | [1267](../src/game/Constants.ts#L1267) | Параметры, таблица данных или функция, объявленная константой. |
+| `ENDING` | [1290](../src/game/Constants.ts#L1290) | Параметры, таблица данных или функция, объявленная константой. |
+| `LESSONS` | [1303](../src/game/Constants.ts#L1303) | Параметры, таблица данных или функция, объявленная константой. |
+| `LINES` | [1372](../src/game/Constants.ts#L1372) | Параметры, таблица данных или функция, объявленная константой. |
+| `DELIVERIES` | [1408](../src/game/Constants.ts#L1408) | Параметры, таблица данных или функция, объявленная константой. |
+| `INTRO_DURATION` | [1439](../src/game/Constants.ts#L1439) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEAPON_STEAL_AT` | [1441](../src/game/Constants.ts#L1441) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEAPON_BREAK_AT` | [1443](../src/game/Constants.ts#L1443) | Параметры, таблица данных или функция, объявленная константой. |
+| `BRIEFING_CARDS` | [1446](../src/game/Constants.ts#L1446) | Параметры, таблица данных или функция, объявленная константой. |
+| `LESSON_CUES` | [1479](../src/game/Constants.ts#L1479) | Параметры, таблица данных или функция, объявленная константой. |
+| `LOOT_CONFIG` | [1538](../src/game/Constants.ts#L1538) | Параметры, таблица данных или функция, объявленная константой. |
+| `LOOT_ODDS` | [1545](../src/game/Constants.ts#L1545) | Параметры, таблица данных или функция, объявленная константой. |
+| `TRIAL_CONFIG` | [1558](../src/game/Constants.ts#L1558) | Параметры, таблица данных или функция, объявленная константой. |
+| `QUEST_NOTES` | [1569](../src/game/Constants.ts#L1569) | Параметры, таблица данных или функция, объявленная константой. |
+| `SPECIES` | [1594](../src/game/Constants.ts#L1594) | Параметры, таблица данных или функция, объявленная константой. |
+| `RESIDENT_NAMES` | [1605](../src/game/Constants.ts#L1605) | Параметры, таблица данных или функция, объявленная константой. |
+| `VILLAGE_TRADITIONS` | [1616](../src/game/Constants.ts#L1616) | Параметры, таблица данных или функция, объявленная константой. |
+| `VILLAGE_STOCK` | [1627](../src/game/Constants.ts#L1627) | Параметры, таблица данных или функция, объявленная константой. |
+| `HOUSE_NAMES` | [1639](../src/game/Constants.ts#L1639) | Параметры, таблица данных или функция, объявленная константой. |
+| `GRID_CELL` | [1647](../src/game/Constants.ts#L1647) | Параметры, таблица данных или функция, объявленная константой. |
+| `TERRAIN_LAYOUTS` | [1649](../src/game/Constants.ts#L1649) | Параметры, таблица данных или функция, объявленная константой. |
+| `LIGHTNING_WARNING` | [1691](../src/game/Constants.ts#L1691) | Параметры, таблица данных или функция, объявленная константой. |
+| `LIGHTNING_RADIUS` | [1693](../src/game/Constants.ts#L1693) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEATHER_DURATION` | [1695](../src/game/Constants.ts#L1695) | Параметры, таблица данных или функция, объявленная константой. |
+| `METEOR_WARNING` | [1697](../src/game/Constants.ts#L1697) | Параметры, таблица данных или функция, объявленная константой. |
+| `METEOR_RADIUS` | [1698](../src/game/Constants.ts#L1698) | Параметры, таблица данных или функция, объявленная константой. |
+| `HURRICANE_RADIUS` | [1700](../src/game/Constants.ts#L1700) | Параметры, таблица данных или функция, объявленная константой. |
+| `HURRICANE_PULL` | [1701](../src/game/Constants.ts#L1701) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEATHER_NAMES` | [1703](../src/game/Constants.ts#L1703) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEATHER_HINTS` | [1711](../src/game/Constants.ts#L1711) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEAPON_ART` | [1721](../src/game/Constants.ts#L1721) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEAPON_SIZE` | [1733](../src/game/Constants.ts#L1733) | Параметры, таблица данных или функция, объявленная константой. |
+| `ROLL_GRIPS` | [1737](../src/game/Constants.ts#L1737) | Параметры, таблица данных или функция, объявленная константой. |
+| `UPPER_ARM_LENGTH` | [1764](../src/game/Constants.ts#L1764) | Параметры, таблица данных или функция, объявленная константой. |
+| `FOREARM_LENGTH` | [1765](../src/game/Constants.ts#L1765) | Параметры, таблица данных или функция, объявленная константой. |
+| `TRACKS` | [1768](../src/game/Constants.ts#L1768) | Параметры, таблица данных или функция, объявленная константой. |
+| `THEMES` | [1831](../src/game/Constants.ts#L1831) | Параметры, таблица данных или функция, объявленная константой. |
+| `DEFAULT_AUDIO` | [1883](../src/game/Constants.ts#L1883) | Параметры, таблица данных или функция, объявленная константой. |
+| `AUDIO_MELODIES` | [1890](../src/game/Constants.ts#L1890) | Параметры, таблица данных или функция, объявленная константой. |
+| `ATLAS_ASSETS` | [1899](../src/game/Constants.ts#L1899) | Параметры, таблица данных или функция, объявленная константой. |
+| `HEAVY_ATTACKS` | [1916](../src/game/Constants.ts#L1916) | Параметры, таблица данных или функция, объявленная константой. |
+| `SKILL_ATTACK_BASE` | [1959](../src/game/Constants.ts#L1959) | Параметры, таблица данных или функция, объявленная константой. |
+| `SKILL_ATTACKS` | [1970](../src/game/Constants.ts#L1970) | Параметры, таблица данных или функция, объявленная константой. |
+| `COMBO_DAMAGE_MULTIPLIERS` | [2087](../src/game/Constants.ts#L2087) | Параметры, таблица данных или функция, объявленная константой. |
+| `SPAWN_CONFIG` | [2090](../src/game/Constants.ts#L2090) | Параметры, таблица данных или функция, объявленная константой. |
+| `BOSS_CONFIG` | [2108](../src/game/Constants.ts#L2108) | Параметры, таблица данных или функция, объявленная константой. |
+| `AUDIO_ROOT_NOTES` | [2123](../src/game/Constants.ts#L2123) | Параметры, таблица данных или функция, объявленная константой. |
+| `AUDIO_RIFFS` | [2125](../src/game/Constants.ts#L2125) | Параметры, таблица данных или функция, объявленная константой. |
+| `WEAPON_SOUND_PARAMETERS` | [2133](../src/game/Constants.ts#L2133) | Параметры, таблица данных или функция, объявленная константой. |
+| `ENEMY_ATTACK_MOVES` | [2142](../src/game/Constants.ts#L2142) | Параметры, таблица данных или функция, объявленная константой. |
+| `RESIDENT_FUR_COLORS` | [2156](../src/game/Constants.ts#L2156) | Параметры, таблица данных или функция, объявленная константой. |
+| `WOLF_TEXTURE_COLORS` | [2160](../src/game/Constants.ts#L2160) | Параметры, таблица данных или функция, объявленная константой. |
+| `VILLAGER_TEXTURE_KEYS` | [2166](../src/game/Constants.ts#L2166) | Параметры, таблица данных или функция, объявленная константой. |
+| `ENEMY_TEXTURE_KEYS` | [2168](../src/game/Constants.ts#L2168) | Параметры, таблица данных или функция, объявленная константой. |
+| `HERO_DIRECTIONS` | [2179](../src/game/Constants.ts#L2179) | Параметры, таблица данных или функция, объявленная константой. |
+| `COMBAT_TEXTURE_KEYS` | [2181](../src/game/Constants.ts#L2181) | Параметры, таблица данных или функция, объявленная константой. |
+| `EQUIPMENT_ATLAS_FRAMES` | [2200](../src/game/Constants.ts#L2200) | Параметры, таблица данных или функция, объявленная константой. |
+| `ARMED_MOTION_FRAMES` | [2215](../src/game/Constants.ts#L2215) | Параметры, таблица данных или функция, объявленная константой. |
+| `RESIDENT_ROLES` | [2246](../src/game/Constants.ts#L2246) | Параметры, таблица данных или функция, объявленная константой. |
+| `RESIDENT_CLOTH_COLORS` | [2248](../src/game/Constants.ts#L2248) | Параметры, таблица данных или функция, объявленная константой. |
+| `TUTORIAL_KEY_NAMES` | [2250](../src/game/Constants.ts#L2250) | Параметры, таблица данных или функция, объявленная константой. |
+| `ENEMY_PARAMETERS` | [2257](../src/game/Constants.ts#L2257) | Параметры, таблица данных или функция, объявленная константой. |
+| `COUNTER_ATTACK` | [2394](../src/game/Constants.ts#L2394) | Параметры, таблица данных или функция, объявленная константой. |
+| `ARTWORK_READY_KEY` | [2406](../src/game/Constants.ts#L2406) | Параметры, таблица данных или функция, объявленная константой. |
+| `ENEMY_ATTACK_CONFIG` | [2409](../src/game/Constants.ts#L2409) | Параметры, таблица данных или функция, объявленная константой. |
+| `PROJECTILE_CONFIG` | [2483](../src/game/Constants.ts#L2483) | Параметры, таблица данных или функция, объявленная константой. |
+| `HAZARD_CONFIG` | [2495](../src/game/Constants.ts#L2495) | Параметры, таблица данных или функция, объявленная константой. |
+
+### [src/game/core/BossAwakeningSystem.ts](../src/game/core/BossAwakeningSystem.ts)
+
+Условие пробуждения босса по осколкам и однократный переход к его появлению.
 
 Строк: 39.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `JourneyState` | [9](../src/game/core/JourneyState.ts#L9) | Объявление в этом модуле. |
-| `progress` | [10](../src/game/core/JourneyState.ts#L10) | Прогресс по биомам: сила, время, босс, очищение, доход и однократная награда. |
-| `quests` | [11](../src/game/core/JourneyState.ts#L11) | Три испытания для каждого биома. |
-| `campVisits` | [12](../src/game/core/JourneyState.ts#L12) | Индексы посещённых деревень, доступных для быстрого перехода. |
-| `deliveries` | [13](../src/game/core/JourneyState.ts#L13) | Состояния доставок: принято, передано и награда получена. |
-| `lines` | [14](../src/game/core/JourneyState.ts#L14) | Состояния сюжетных поручений: принятие, предметы и награды. |
-| `lessonIndex` | [15](../src/game/core/JourneyState.ts#L15) | Номер текущего практического урока, начиная с нуля. |
-| `lessonProgress` | [16](../src/game/core/JourneyState.ts#L16) | Количество зачтённых действий текущего урока. |
-| `tutorialFinished` | [17](../src/game/core/JourneyState.ts#L17) | Завершены ли практические уроки. |
-| `wantsTraining` | [18](../src/game/core/JourneyState.ts#L18) | Выбрано ли обучение при начале новой игры. |
-| `storyClosing` | [19](../src/game/core/JourneyState.ts#L19) | Показывается финальная история, а не вступление. |
-| `storyIndex` | [20](../src/game/core/JourneyState.ts#L20) | Номер текущего сюжетного кадра. |
-| `storyTime` | [21](../src/game/core/JourneyState.ts#L21) | Сколько секунд показывается текущий кадр. |
-| `dirty` | [22](../src/game/core/JourneyState.ts#L22) | Есть изменения, о которых нужно предупредить перед выходом без ручного сохранения. |
-| `combatMusicLeft` | [23](../src/game/core/JourneyState.ts#L23) | Оставшееся время режима боевой музыки после исчезновения близкой угрозы. |
-| `waveClock` | [24](../src/game/core/JourneyState.ts#L24) | Время до следующей волны обычных противников. |
-| `waveNumber` | [25](../src/game/core/JourneyState.ts#L25) | Номер волны для выбора состава врагов. |
-| `pruneLeft` | [26](../src/game/core/JourneyState.ts#L26) | Таймер периодического удаления завершённых объектов врагов. |
-| `profile` | [27](../src/game/core/JourneyState.ts#L27) | Покупки, кошелёк, улучшения, экипировка, навыки и достижения текущего путешествия. |
-| `saved` | [28](../src/game/core/JourneyState.ts#L28) | Последнее прочитанное и проверенное ручное сохранение. |
-| `storageAvailable` | [29](../src/game/core/JourneyState.ts#L29) | Разрешил ли браузер работу с localStorage. |
-| `score` | [30](../src/game/core/JourneyState.ts#L30) | Набранные очки; отдельный показатель, не кошелёк. |
-| `kills` | [31](../src/game/core/JourneyState.ts#L31) | Число побеждённых противников текущего путешествия. |
-| `deaths` | [32](../src/game/core/JourneyState.ts#L32) | Число смертей героя в текущем путешествии. |
-| `elapsed` | [33](../src/game/core/JourneyState.ts#L33) | Игровое время путешествия, секунды. |
-| `nextId` | [34](../src/game/core/JourneyState.ts#L34) | Следующий уникальный ID противника. |
-| `checkpoint` | [35](../src/game/core/JourneyState.ts#L35) | Координаты последнего контрольного костра. |
-| `introLeft` | [36](../src/game/core/JourneyState.ts#L36) | Время до завершения сцены похищения оружия. |
-| `introBroken` | [37](../src/game/core/JourneyState.ts#L37) | Оружие уже разрушено в текущей сцене призрака. |
-| `introResume` | [38](../src/game/core/JourneyState.ts#L38) | Вариант вступительной сцены при переходе к следующему биому. |
+| `BossAwakeningSystem` | [5](../src/game/core/BossAwakeningSystem.ts#L5) | Объявление в этом модуле. |
+| `shouldAwakenBoss` | [8](../src/game/core/BossAwakeningSystem.ts#L8) | Проверяет квоту осколков и состояние активного биома. |
+| `update` | [21](../src/game/core/BossAwakeningSystem.ts#L21) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `enterBossPhase` | [27](../src/game/core/BossAwakeningSystem.ts#L27) | Один раз отмечает появление и поручает генератору создать босса. |
+
+### [src/game/core/GameSession.ts](../src/game/core/GameSession.ts)
+
+Полный сброс, обновление времени и диспетчер отдельных режимов сессии.
+
+Строк: 68.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `GameSession` | [6](../src/game/core/GameSession.ts#L6) | Объявление в этом модуле. |
+| `reset` | [9](../src/game/core/GameSession.ts#L9) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
+| `advance` | [24](../src/game/core/GameSession.ts#L24) | Объявление в этом модуле. |
+| `updateMode` | [39](../src/game/core/GameSession.ts#L39) | Объявление в этом модуле. |
+| `updateHUD` | [59](../src/game/core/GameSession.ts#L59) | Обновляет HP, выносливость, силу, таймеры, босса и стрелку направления. |
+
+### [src/game/core/GameStateSystem.ts](../src/game/core/GameStateSystem.ts)
+
+Единственный владелец режима и проверка допустимых переходов.
+
+Строк: 52.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `GameState` | [3](../src/game/core/GameStateSystem.ts#L3) | Форма данных для проверки TypeScript. |
+| `GameStateSystem` | [20](../src/game/core/GameStateSystem.ts#L20) | Объявление в этом модуле. |
+| `current` | [21](../src/game/core/GameStateSystem.ts#L21) | Поле состояния или ссылка на систему. |
+| `state` | [25](../src/game/core/GameStateSystem.ts#L25) | Режим игры: playing, menu, paused, dialog, shop, map и другие состояния. |
+| `playing` | [29](../src/game/core/GameStateSystem.ts#L29) | Объявление в этом модуле. |
+| `cinematic` | [33](../src/game/core/GameStateSystem.ts#L33) | Объявление в этом модуле. |
+| `transitionTo` | [37](../src/game/core/GameStateSystem.ts#L37) | Проверяет и выполняет переход режима. |
+| `reset` | [48](../src/game/core/GameStateSystem.ts#L48) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
+
+### [src/game/core/JourneyState.ts](../src/game/core/JourneyState.ts)
+
+Профиль, прогресс областей, задания и время текущего путешествия.
+
+Строк: 53.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `JourneyState` | [10](../src/game/core/JourneyState.ts#L10) | Объявление в этом модуле. |
+| `progress` | [11](../src/game/core/JourneyState.ts#L11) | Прогресс по биомам: сила, время, босс, очищение, доход и однократная награда. |
+| `quests` | [12](../src/game/core/JourneyState.ts#L12) | Три испытания для каждого биома. |
+| `campVisits` | [13](../src/game/core/JourneyState.ts#L13) | Индексы посещённых деревень, доступных для быстрого перехода. |
+| `deliveries` | [14](../src/game/core/JourneyState.ts#L14) | Состояния доставок: принято, передано и награда получена. |
+| `lines` | [15](../src/game/core/JourneyState.ts#L15) | Состояния сюжетных поручений: принятие, предметы и награды. |
+| `lessonIndex` | [16](../src/game/core/JourneyState.ts#L16) | Номер текущего практического урока, начиная с нуля. |
+| `lessonProgress` | [17](../src/game/core/JourneyState.ts#L17) | Количество зачтённых действий текущего урока. |
+| `tutorialFinished` | [18](../src/game/core/JourneyState.ts#L18) | Завершены ли практические уроки. |
+| `wantsTraining` | [19](../src/game/core/JourneyState.ts#L19) | Выбрано ли обучение при начале новой игры. |
+| `storyClosing` | [20](../src/game/core/JourneyState.ts#L20) | Показывается финальная история, а не вступление. |
+| `storyIndex` | [21](../src/game/core/JourneyState.ts#L21) | Номер текущего сюжетного кадра. |
+| `storyTime` | [22](../src/game/core/JourneyState.ts#L22) | Сколько секунд показывается текущий кадр. |
+| `dirty` | [23](../src/game/core/JourneyState.ts#L23) | Есть изменения, о которых нужно предупредить перед выходом без ручного сохранения. |
+| `profile` | [24](../src/game/core/JourneyState.ts#L24) | Покупки, кошелёк, улучшения, экипировка, навыки и достижения текущего путешествия. |
+| `saved` | [25](../src/game/core/JourneyState.ts#L25) | Последнее прочитанное и проверенное ручное сохранение. |
+| `storageAvailable` | [26](../src/game/core/JourneyState.ts#L26) | Разрешил ли браузер работу с localStorage. |
+| `score` | [27](../src/game/core/JourneyState.ts#L27) | Набранные очки; отдельный показатель, не кошелёк. |
+| `kills` | [28](../src/game/core/JourneyState.ts#L28) | Число побеждённых противников текущего путешествия. |
+| `deaths` | [29](../src/game/core/JourneyState.ts#L29) | Число смертей героя в текущем путешествии. |
+| `elapsed` | [30](../src/game/core/JourneyState.ts#L30) | Игровое время путешествия, секунды. |
+| `nextId` | [31](../src/game/core/JourneyState.ts#L31) | Следующий уникальный ID противника. |
+| `checkpoint` | [32](../src/game/core/JourneyState.ts#L32) | Координаты последнего контрольного костра. |
+| `introLeft` | [33](../src/game/core/JourneyState.ts#L33) | Время до завершения сцены похищения оружия. |
+| `introBroken` | [34](../src/game/core/JourneyState.ts#L34) | Оружие уже разрушено в текущей сцене призрака. |
+| `introResume` | [35](../src/game/core/JourneyState.ts#L35) | Вариант вступительной сцены при переходе к следующему биому. |
+| `reset` | [37](../src/game/core/JourneyState.ts#L37) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
 
 ### [src/game/createGame.ts](../src/game/createGame.ts)
 
 Настраивает движок, масштабирование холста, частоту кадров и начальную сцену.
 
-Строк: 21.
+Строк: 22.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `createGame` | [4](../src/game/createGame.ts#L4) | Создаёт Phaser.Game с настройками проекта. |
+| `createGame` | [5](../src/game/createGame.ts#L5) | Создаёт Phaser.Game с настройками проекта. |
 
 ### [src/game/GameScene.ts](../src/game/GameScene.ts)
 
 Создаёт сцену Phaser, загружает атласы, связывает системы и вызывает их в игровом цикле.
 
-Строк: 397.
+Строк: 188.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `GameScene` | [64](../src/game/GameScene.ts#L64) | Объявление в этом модуле. |
-| `hero` | [65](../src/game/GameScene.ts#L65) | Группа PlayerState: текущие ресурсы и боевые окна героя. |
-| `worldState` | [66](../src/game/GameScene.ts#L66) | Группа WorldState: объекты, геометрия, область и погода. |
-| `journey` | [67](../src/game/GameScene.ts#L67) | Группа JourneyState: профиль и прогресс путешествия. |
-| `ui` | [68](../src/game/GameScene.ts#L68) | Группа InterfaceState: окна, режим, ввод и уведомления. |
-| `visuals` | [69](../src/game/GameScene.ts#L69) | Группа RenderState: спрайты и визуальные эффекты. |
-| `player` | [70](../src/game/GameScene.ts#L70) | Контроллер движения, здоровья и лечения героя. Спрайт расположен в visuals.player. |
-| `combat` | [71](../src/game/GameScene.ts#L71) | Атаки героя, парирование, урон врагам и награды за победу. |
-| `effects` | [72](../src/game/GameScene.ts#L72) | Снаряды, опасные зоны, боевые эффекты и сообщения над персонажами. |
-| `enemies` | [73](../src/game/GameScene.ts#L73) | Создание противников, волны, поиск пути и обычные вражеские атаки. |
-| `bosses` | [74](../src/game/GameScene.ts#L74) | Предупреждения появления и выполнение уникальных приёмов боссов. |
-| `world` | [75](../src/game/GameScene.ts#L75) | Границы, переходы между областями, камера, контрольные точки и возрождение. |
-| `scenery` | [76](../src/game/GameScene.ts#L76) | Создание декораций биомов и деревень с ленивой загрузкой. |
-| `village` | [77](../src/game/GameScene.ts#L77) | Дома, собеседники, взаимодействия, доставки и быстрое путешествие. |
-| `economy` | [78](../src/game/GameScene.ts#L78) | Сбор осколков, кошелёк, ассортимент, покупки и экипировка. |
-| `quests` | [79](../src/game/GameScene.ts#L79) | Испытания, сундуки, сюжетные поручения, журнал и достижения. |
-| `menu` | [80](../src/game/GameScene.ts#L80) | Меню, HUD, пауза, справка, начальный экран и подтверждение выхода. |
-| `map` | [81](../src/game/GameScene.ts#L81) | Локальная карта, карта мира и выбор области. |
-| `controls` | [82](../src/game/GameScene.ts#L82) | Привязка DOM-кнопок, клавиатуры и мыши, сброс ввода и полноэкранный режим. |
-| `saves` | [83](../src/game/GameScene.ts#L83) | Ручная запись, загрузка и отображение состояния сохранения. |
-| `story` | [84](../src/game/GameScene.ts#L84) | Новое путешествие, сюжетные сцены и похищение оружия. |
-| `tutorial` | [85](../src/game/GameScene.ts#L85) | Вводные карточки, практические уроки и подсказки обучения. |
-| `actors` | [86](../src/game/GameScene.ts#L86) | Позы, руки, оружие, враги, жители и отрисовка границ биома. |
-| `weather` | [87](../src/game/GameScene.ts#L87) | Дождь, гроза, метеоры, ураган и замедление от поверхности. |
-| `audio` | [88](../src/game/GameScene.ts#L88) | Управление звуковыми эффектами, музыкой и громкостью. |
-| `preload` | [92](../src/game/GameScene.ts#L92) | Загрузка атласов и сообщения о ходе загрузки. |
-| `create` | [113](../src/game/GameScene.ts#L113) | Создание объектов сцены, подключение управления и запуск путешествия. |
-| `element` | [191](../src/game/GameScene.ts#L191) | Получение обязательного DOM-элемента по id с проверкой его наличия. |
-| `seals` | [196](../src/game/GameScene.ts#L196) | Число уже побеждённых боссов. |
-| `update` | [199](../src/game/GameScene.ts#L199) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `GameScene` | [43](../src/game/GameScene.ts#L43) | Объявление в этом модуле. |
+| `session` | [44](../src/game/GameScene.ts#L44) | Сброс и время путешествия. |
+| `music` | [45](../src/game/GameScene.ts#L45) | Выбор музыкального режима. |
+| `bossAwakening` | [46](../src/game/GameScene.ts#L46) | Условие и переход к бою с боссом. |
+| `enemySpawner` | [47](../src/game/GameScene.ts#L47) | Волны и часы появления. |
+| `flow` | [48](../src/game/GameScene.ts#L48) | Единственный владелец режима игры. |
+| `hero` | [49](../src/game/GameScene.ts#L49) | Группа PlayerState: текущие ресурсы и боевые окна героя. |
+| `worldState` | [50](../src/game/GameScene.ts#L50) | Группа WorldState: объекты, геометрия, область и погода. |
+| `journey` | [51](../src/game/GameScene.ts#L51) | Группа JourneyState: профиль и прогресс путешествия. |
+| `ui` | [52](../src/game/GameScene.ts#L52) | Группа InterfaceState: окна, ввод, вкладки и уведомления. |
+| `visuals` | [53](../src/game/GameScene.ts#L53) | Группа RenderState: спрайты и визуальные эффекты. |
+| `player` | [54](../src/game/GameScene.ts#L54) | Контроллер движения, здоровья и лечения героя. Спрайт расположен в visuals.player. |
+| `ultimate` | [55](../src/game/GameScene.ts#L55) | Абсолютное умение героя. |
+| `defeats` | [56](../src/game/GameScene.ts#L56) | Награды и завершение боя. |
+| `enemyAttacks` | [57](../src/game/GameScene.ts#L57) | Обычные приёмы врагов. |
+| `hud` | [58](../src/game/GameScene.ts#L58) | Показатели героя и текущая цель. |
+| `combat` | [59](../src/game/GameScene.ts#L59) | Обычные атаки героя, комбо, навыки, парирование и попадания. |
+| `projectiles` | [60](../src/game/GameScene.ts#L60) | Владелец движения и столкновений снарядов. |
+| `hazards` | [61](../src/game/GameScene.ts#L61) | Владелец времени и попаданий опасных зон. |
+| `effects` | [62](../src/game/GameScene.ts#L62) | Временные визуальные эффекты, частицы и всплывающий текст. |
+| `enemies` | [63](../src/game/GameScene.ts#L63) | Создание, движение, поиск пути и обновление состояния врагов. |
+| `bosses` | [64](../src/game/GameScene.ts#L64) | Предупреждения появления и выполнение уникальных приёмов боссов. |
+| `world` | [65](../src/game/GameScene.ts#L65) | Границы, переходы между областями, камера, контрольные точки и возрождение. |
+| `scenery` | [66](../src/game/GameScene.ts#L66) | Создание декораций биомов и деревень с ленивой загрузкой. |
+| `village` | [67](../src/game/GameScene.ts#L67) | Дома, собеседники, взаимодействия, доставки и быстрое путешествие. |
+| `economy` | [68](../src/game/GameScene.ts#L68) | Сбор осколков, кошелёк, ассортимент, покупки и экипировка. |
+| `achievements` | [69](../src/game/GameScene.ts#L69) | Достижения и очередь уведомлений. |
+| `loot` | [70](../src/game/GameScene.ts#L70) | Сундуки и начисление награды. |
+| `quests` | [71](../src/game/GameScene.ts#L71) | Испытания, сундуки, сюжетные поручения, журнал и достижения. |
+| `menu` | [72](../src/game/GameScene.ts#L72) | Меню, пауза, справка, начальный экран и подтверждение выхода. |
+| `map` | [73](../src/game/GameScene.ts#L73) | Локальная карта, карта мира и выбор области. |
+| `controls` | [74](../src/game/GameScene.ts#L74) | Привязка DOM-кнопок, клавиатуры и мыши, сброс ввода и полноэкранный режим. |
+| `saves` | [75](../src/game/GameScene.ts#L75) | Ручная запись, загрузка и отображение состояния сохранения. |
+| `story` | [76](../src/game/GameScene.ts#L76) | Новое путешествие, сюжетные сцены и похищение оружия. |
+| `tutorial` | [77](../src/game/GameScene.ts#L77) | Вводные карточки, практические уроки и подсказки обучения. |
+| `actors` | [78](../src/game/GameScene.ts#L78) | Позы, руки, оружие, враги, жители и отрисовка границ биома. |
+| `weather` | [79](../src/game/GameScene.ts#L79) | Дождь, гроза, метеоры, ураган и замедление от поверхности. |
+| `audio` | [80](../src/game/GameScene.ts#L80) | Управление звуковыми эффектами, музыкой и громкостью. |
+| `preload` | [85](../src/game/GameScene.ts#L85) | Загрузка атласов и сообщения о ходе загрузки. |
+| `create` | [88](../src/game/GameScene.ts#L88) | Создание объектов сцены, подключение управления и запуск путешествия. |
+| `element` | [121](../src/game/GameScene.ts#L121) | Получение обязательного DOM-элемента по id с проверкой его наличия. |
+| `seals` | [128](../src/game/GameScene.ts#L128) | Число уже побеждённых боссов. |
+| `update` | [132](../src/game/GameScene.ts#L132) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `syncWorldClock` | [181](../src/game/GameScene.ts#L181) | Объявление в этом модуле. |
 
 ### [src/main.ts](../src/main.ts)
 
 Запускает игру по кнопке начального экрана и обрабатывает выход.
 
-Строк: 20.
+Строк: 24.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `started` | [9](../src/main.ts#L9) | Поле состояния или ссылка на систему. |
-| `requestAnimationFrame` | [13](../src/main.ts#L13) | Объявление в этом модуле. |
+| `started` | [11](../src/main.ts#L11) | Поле состояния или ссылка на систему. |
+| `requestAnimationFrame` | [15](../src/main.ts#L15) | Объявление в этом модуле. |
 
 ## Герой
 
@@ -111,153 +303,162 @@
 
 Движение, здоровье, лечение и уклонение героя.
 
-Строк: 212.
+Строк: 301.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `PlayerController` | [21](../src/game/player/PlayerController.ts#L21) | Объявление в этом модуле. |
-| `updateAim` | [23](../src/game/player/PlayerController.ts#L23) | Направляет героя на мышь, когда атака и перекат не блокируют поворот. |
-| `movePlayer` | [32](../src/game/player/PlayerController.ts#L32) | Нормализует WASD, применяет скорость, замедления и столкновения. |
-| `dodge` | [97](../src/game/player/PlayerController.ts#L97) | Списывает выносливость и запускает перекат с окном защиты. |
-| `heal` | [117](../src/game/player/PlayerController.ts#L117) | Восстанавливает HP флягой Q или зельем V; проверяет запас и перезарядку. |
-| `damagePlayer` | [143](../src/game/player/PlayerController.ts#L143) | Проверяет защиту, направление парирования и броню; снимает HP и запускает смерть. |
+| `PlayerController` | [24](../src/game/player/PlayerController.ts#L24) | Объявление в этом модуле. |
+| `updateAim` | [26](../src/game/player/PlayerController.ts#L26) | Направляет героя на мышь, когда атака и перекат не блокируют поворот. |
+| `movePlayer` | [38](../src/game/player/PlayerController.ts#L38) | Нормализует WASD, применяет скорость, замедления и столкновения. |
+| `dodge` | [117](../src/game/player/PlayerController.ts#L117) | Списывает выносливость и запускает перекат с окном защиты. |
+| `heal` | [141](../src/game/player/PlayerController.ts#L141) | Восстанавливает HP флягой Q или зельем V; проверяет запас и перезарядку. |
+| `damagePlayer` | [181](../src/game/player/PlayerController.ts#L181) | Проверяет защиту, направление парирования и броню; снимает HP и запускает смерть. |
+| `updateTimers` | [264](../src/game/player/PlayerController.ts#L264) | Обновляет временные окна владельца во время активной игры. |
+| `updateDeath` | [275](../src/game/player/PlayerController.ts#L275) | Объявление в этом модуле. |
+| `regenerateStamina` | [293](../src/game/player/PlayerController.ts#L293) | Объявление в этом модуле. |
 
 ### [src/game/player/PlayerState.ts](../src/game/player/PlayerState.ts)
 
 Текущее состояние героя. Максимумы вычисляются в CombatRules.stats.
 
-Строк: 45.
+Строк: 51.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `PlayerState` | [4](../src/game/player/PlayerState.ts#L4) | Объявление в этом модуле. |
-| `hp` | [6](../src/game/player/PlayerState.ts#L6) | Текущее здоровье. Для героя максимум задаёт CombatRules.stats().maxHP. |
-| `stamina` | [7](../src/game/player/PlayerState.ts#L7) | Текущая выносливость; расходуется атаками, навыками и перекатом. |
-| `flasks` | [8](../src/game/player/PlayerState.ts#L8) | Оставшиеся заряды лечебной фляги Q. |
-| `armed` | [9](../src/game/player/PlayerState.ts#L9) | Может ли герой использовать духовное оружие в текущей области. |
-| `ultimate` | [10](../src/game/player/PlayerState.ts#L10) | Накопленный заряд абсолютного умения, от 0 до 100. |
-| `ultimateLeft` | [11](../src/game/player/PlayerState.ts#L11) | Оставшееся время выполняемого абсолютного умения, секунды. |
-| `ultimatePulse` | [12](../src/game/player/PlayerState.ts#L12) | Сколько импульсов абсолютной атаки уже выполнено. |
-| `ultimateAngle` | [13](../src/game/player/PlayerState.ts#L13) | Зафиксированное направление абсолютной атаки, радианы. |
-| `guardLeft` | [16](../src/game/player/PlayerState.ts#L16) | Оставшееся окно парирования, секунды. |
-| `heavyAttack` | [17](../src/game/player/PlayerState.ts#L17) | Признак тяжёлого ПКМ-приёма текущей атаки. |
-| `counterTarget` | [18](../src/game/player/PlayerState.ts#L18) | ID врага для контрудара после точного парирования; -1 означает отсутствие цели. |
-| `counterLeft` | [19](../src/game/player/PlayerState.ts#L19) | Оставшееся время, за которое можно выполнить контрудар. |
-| `counterStrike` | [20](../src/game/player/PlayerState.ts#L20) | Текущий удар является контрударом. |
-| `strikeTarget` | [21](../src/game/player/PlayerState.ts#L21) | ID цели, зафиксированной при начале контрудара. |
-| `activeSkill` | [22](../src/game/player/PlayerState.ts#L22) | ID текущего активного приёма или null для обычной атаки. |
-| `attackPulse` | [23](../src/game/player/PlayerState.ts#L23) | Индекс уже обработанного импульса многоударного навыка. |
-| `skillCooldowns` | [24](../src/game/player/PlayerState.ts#L24) | Оставшиеся перезарядки изученных приёмов по их ID. |
-| `shieldLeft` | [25](../src/game/player/PlayerState.ts#L25) | Время действия защитного эффекта навыка. |
-| `face` | [26](../src/game/player/PlayerState.ts#L26) | Направление взгляда и прицеливания героя, радианы. |
-| `velocity` | [27](../src/game/player/PlayerState.ts#L27) | Фактическая скорость героя после столкновений; используется для прогноза врагов. |
-| `movement` | [28](../src/game/player/PlayerState.ts#L28) | Нормализованное последнее направление перемещения. |
-| `attackTime` | [29](../src/game/player/PlayerState.ts#L29) | Время от начала удара; -1 означает отсутствие атаки. |
-| `attackAngle` | [30](../src/game/player/PlayerState.ts#L30) | Зафиксированное направление текущего удара. |
-| `attackFired` | [31](../src/game/player/PlayerState.ts#L31) | Для текущего удара уже создан снаряд или одноразовый эффект. |
-| `attackHits` | [32](../src/game/player/PlayerState.ts#L32) | ID врагов, уже задетых текущим ударом; защищает от повторного урона. |
-| `combo` | [33](../src/game/player/PlayerState.ts#L33) | Индекс удара в трёхчастном комбо: 0, 1 или 2. |
-| `lastAttack` | [34](../src/game/player/PlayerState.ts#L34) | Время начала прошлого удара для продолжения комбо. |
-| `dodgeLeft` | [35](../src/game/player/PlayerState.ts#L35) | Оставшееся время активного переката. |
-| `dodgeWait` | [36](../src/game/player/PlayerState.ts#L36) | Время до возможности следующего переката. |
-| `dodgeVector` | [37](../src/game/player/PlayerState.ts#L37) | Зафиксированное направление активного переката. |
-| `hurtLeft` | [38](../src/game/player/PlayerState.ts#L38) | Оставшееся время защиты от повторного получения урона. |
-| `hurtFlash` | [39](../src/game/player/PlayerState.ts#L39) | Время визуальной вспышки после получения урона. |
-| `regenDelay` | [40](../src/game/player/PlayerState.ts#L40) | Задержка перед восстановлением выносливости. |
-| `healWait` | [41](../src/game/player/PlayerState.ts#L41) | Оставшаяся перезарядка лечения. |
-| `deathLeft` | [42](../src/game/player/PlayerState.ts#L42) | Время до окончания анимации смерти и возрождения. |
-| `slowed` | [43](../src/game/player/PlayerState.ts#L43) | Время принудительного замедления героя. |
-| `strideDistance` | [44](../src/game/player/PlayerState.ts#L44) | Пройденное расстояние для фазы беговой анимации. |
+| `PlayerState` | [6](../src/game/player/PlayerState.ts#L6) | Объявление в этом модуле. |
+| `hp` | [8](../src/game/player/PlayerState.ts#L8) | Текущее здоровье. Для героя максимум задаёт CombatRules.stats().maxHP. |
+| `stamina` | [9](../src/game/player/PlayerState.ts#L9) | Текущая выносливость; расходуется атаками, навыками и перекатом. |
+| `flasks` | [10](../src/game/player/PlayerState.ts#L10) | Оставшиеся заряды лечебной фляги Q. |
+| `armed` | [11](../src/game/player/PlayerState.ts#L11) | Может ли герой использовать духовное оружие в текущей области. |
+| `ultimate` | [12](../src/game/player/PlayerState.ts#L12) | Накопленный заряд абсолютного умения, от 0 до 100. |
+| `ultimateLeft` | [13](../src/game/player/PlayerState.ts#L13) | Оставшееся время выполняемого абсолютного умения, секунды. |
+| `ultimatePulse` | [14](../src/game/player/PlayerState.ts#L14) | Сколько импульсов абсолютной атаки уже выполнено. |
+| `ultimateAngle` | [15](../src/game/player/PlayerState.ts#L15) | Зафиксированное направление абсолютной атаки, радианы. |
+| `guardLeft` | [18](../src/game/player/PlayerState.ts#L18) | Оставшееся окно парирования, секунды. |
+| `heavyAttack` | [19](../src/game/player/PlayerState.ts#L19) | Признак тяжёлого ПКМ-приёма текущей атаки. |
+| `counterTarget` | [20](../src/game/player/PlayerState.ts#L20) | ID врага для контрудара после точного парирования; -1 означает отсутствие цели. |
+| `counterLeft` | [21](../src/game/player/PlayerState.ts#L21) | Оставшееся время, за которое можно выполнить контрудар. |
+| `counterStrike` | [22](../src/game/player/PlayerState.ts#L22) | Текущий удар является контрударом. |
+| `strikeTarget` | [23](../src/game/player/PlayerState.ts#L23) | ID цели, зафиксированной при начале контрудара. |
+| `activeSkill` | [24](../src/game/player/PlayerState.ts#L24) | ID текущего активного приёма или null для обычной атаки. |
+| `attackPulse` | [25](../src/game/player/PlayerState.ts#L25) | Индекс уже обработанного импульса многоударного навыка. |
+| `skillCooldowns` | [26](../src/game/player/PlayerState.ts#L26) | Оставшиеся перезарядки изученных приёмов по их ID. |
+| `shieldLeft` | [27](../src/game/player/PlayerState.ts#L27) | Время действия защитного эффекта навыка. |
+| `face` | [28](../src/game/player/PlayerState.ts#L28) | Направление взгляда и прицеливания героя, радианы. |
+| `velocity` | [29](../src/game/player/PlayerState.ts#L29) | Фактическая скорость героя после столкновений; используется для прогноза врагов. |
+| `movement` | [30](../src/game/player/PlayerState.ts#L30) | Нормализованное последнее направление перемещения. |
+| `attackTime` | [31](../src/game/player/PlayerState.ts#L31) | Время от начала удара; -1 означает отсутствие атаки. |
+| `attackAngle` | [32](../src/game/player/PlayerState.ts#L32) | Зафиксированное направление текущего удара. |
+| `attackFired` | [33](../src/game/player/PlayerState.ts#L33) | Для текущего удара уже создан снаряд или одноразовый эффект. |
+| `attackHits` | [34](../src/game/player/PlayerState.ts#L34) | ID врагов, уже задетых текущим ударом; защищает от повторного урона. |
+| `combo` | [35](../src/game/player/PlayerState.ts#L35) | Индекс удара в трёхчастном комбо: 0, 1 или 2. |
+| `lastAttack` | [36](../src/game/player/PlayerState.ts#L36) | Время начала прошлого удара для продолжения комбо. |
+| `dodgeLeft` | [37](../src/game/player/PlayerState.ts#L37) | Оставшееся время активного переката. |
+| `dodgeWait` | [38](../src/game/player/PlayerState.ts#L38) | Время до возможности следующего переката. |
+| `dodgeVector` | [39](../src/game/player/PlayerState.ts#L39) | Зафиксированное направление активного переката. |
+| `hurtLeft` | [40](../src/game/player/PlayerState.ts#L40) | Оставшееся время защиты от повторного получения урона. |
+| `hurtFlash` | [41](../src/game/player/PlayerState.ts#L41) | Время визуальной вспышки после получения урона. |
+| `regenDelay` | [42](../src/game/player/PlayerState.ts#L42) | Задержка перед восстановлением выносливости. |
+| `healWait` | [43](../src/game/player/PlayerState.ts#L43) | Оставшаяся перезарядка лечения. |
+| `deathLeft` | [44](../src/game/player/PlayerState.ts#L44) | Время до окончания анимации смерти и возрождения. |
+| `slowed` | [45](../src/game/player/PlayerState.ts#L45) | Время принудительного замедления героя. |
+| `strideDistance` | [46](../src/game/player/PlayerState.ts#L46) | Пройденное расстояние для фазы беговой анимации. |
+| `reset` | [48](../src/game/player/PlayerState.ts#L48) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
 
 ## Бой
-
-### [src/game/combat/CombatEffects.ts](../src/game/combat/CombatEffects.ts)
-
-Снаряды, опасные зоны, боевые эффекты и сообщения над персонажами.
-
-Строк: 340.
-
-| Символ | Строка | Назначение |
-| --- | --- | --- |
-| `Projectile` | [11](../src/game/combat/CombatEffects.ts#L11) | Форма данных для проверки TypeScript. |
-| `vx` | [12](../src/game/combat/CombatEffects.ts#L12) | Поле состояния или ссылка на систему. |
-| `vy` | [13](../src/game/combat/CombatEffects.ts#L13) | Поле состояния или ссылка на систему. |
-| `life` | [14](../src/game/combat/CombatEffects.ts#L14) | Поле состояния или ссылка на систему. |
-| `damage` | [15](../src/game/combat/CombatEffects.ts#L15) | Поле состояния или ссылка на систему. |
-| `region` | [16](../src/game/combat/CombatEffects.ts#L16) | Поле состояния или ссылка на систему. |
-| `friendly` | [17](../src/game/combat/CombatEffects.ts#L17) | Поле состояния или ссылка на систему. |
-| `color` | [18](../src/game/combat/CombatEffects.ts#L18) | Поле состояния или ссылка на систему. |
-| `radius` | [19](../src/game/combat/CombatEffects.ts#L19) | Поле состояния или ссылка на систему. |
-| `blast` | [20](../src/game/combat/CombatEffects.ts#L20) | Поле состояния или ссылка на систему. |
-| `visual` | [21](../src/game/combat/CombatEffects.ts#L21) | Поле состояния или ссылка на систему. |
-| `hits` | [22](../src/game/combat/CombatEffects.ts#L22) | Поле состояния или ссылка на систему. |
-| `Hazard` | [24](../src/game/combat/CombatEffects.ts#L24) | Форма данных для проверки TypeScript. |
-| `region` | [25](../src/game/combat/CombatEffects.ts#L25) | Поле состояния или ссылка на систему. |
-| `radius` | [26](../src/game/combat/CombatEffects.ts#L26) | Поле состояния или ссылка на систему. |
-| `warning` | [27](../src/game/combat/CombatEffects.ts#L27) | Поле состояния или ссылка на систему. |
-| `left` | [28](../src/game/combat/CombatEffects.ts#L28) | Поле состояния или ссылка на систему. |
-| `damage` | [29](../src/game/combat/CombatEffects.ts#L29) | Поле состояния или ссылка на систему. |
-| `kind` | [30](../src/game/combat/CombatEffects.ts#L30) | Поле состояния или ссылка на систему. |
-| `fired` | [31](../src/game/combat/CombatEffects.ts#L31) | Поле состояния или ссылка на систему. |
-| `environment` | [32](../src/game/combat/CombatEffects.ts#L32) | Поле состояния или ссылка на систему. |
-| `bossStrike` | [33](../src/game/combat/CombatEffects.ts#L33) | Поле состояния или ссылка на систему. |
-| `ownerId` | [34](../src/game/combat/CombatEffects.ts#L34) | Поле состояния или ссылка на систему. |
-| `CombatEffects` | [36](../src/game/combat/CombatEffects.ts#L36) | Объявление в этом модуле. |
-| `particles` | [38](../src/game/combat/CombatEffects.ts#L38) | Создаёт ограниченное число частиц с удалением после анимации. |
-| `popup` | [60](../src/game/combat/CombatEffects.ts#L60) | Показывает урон или награду над персонажем. |
-| `enemyProjectile` | [80](../src/game/combat/CombatEffects.ts#L80) | Выбирает вид снаряда по врагу и типу атаки. |
-| `drawCombatImage` | [96](../src/game/combat/CombatEffects.ts#L96) | Переиспользует спрайты боевых эффектов из пула. |
-| `weatherHitEnemies` | [113](../src/game/combat/CombatEffects.ts#L113) | Наносит урон противникам от погодного события. |
-| `shoot` | [127](../src/game/combat/CombatEffects.ts#L127) | Создаёт летящий снаряд с направлением и параметрами урона. |
-| `updateProjectiles` | [155](../src/game/combat/CombatEffects.ts#L155) | Двигает снаряды, проверяет стены и попадания, удаляет завершённые. |
-| `updateHazards` | [214](../src/game/combat/CombatEffects.ts#L214) | Отсчитывает предупреждения опасных зон и применяет урон по их геометрии. |
-| `cone` | [294](../src/game/combat/CombatEffects.ts#L294) | Рисует сектор предупреждения атаки. |
-| `addEffect` | [321](../src/game/combat/CombatEffects.ts#L321) | Добавляет короткую дугу, кольцо или след выпада. |
 
 ### [src/game/combat/CombatRules.ts](../src/game/combat/CombatRules.ts)
 
 Формулы максимального HP, выносливости, урона и защиты; фазы атак, лечение и стоимость действий.
 
-Строк: 243.
+Строк: 90.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `DODGE_TIME` | [9](../src/game/combat/CombatRules.ts#L9) | Параметры, таблица данных или функция, объявленная константой. |
-| `DODGE_COST` | [10](../src/game/combat/CombatRules.ts#L10) | Параметры, таблица данных или функция, объявленная константой. |
-| `HURT_PROTECTION` | [11](../src/game/combat/CombatRules.ts#L11) | Параметры, таблица данных или функция, объявленная константой. |
-| `FLASK_HEAL` | [12](../src/game/combat/CombatRules.ts#L12) | Параметры, таблица данных или функция, объявленная константой. |
-| `POTION_HEAL` | [13](../src/game/combat/CombatRules.ts#L13) | Параметры, таблица данных или функция, объявленная константой. |
-| `ULTIMATE_MAX` | [14](../src/game/combat/CombatRules.ts#L14) | Параметры, таблица данных или функция, объявленная константой. |
-| `PLAYER_DAMAGE_SCALE` | [16](../src/game/combat/CombatRules.ts#L16) | Параметры, таблица данных или функция, объявленная константой. |
-| `stats` | [17](../src/game/combat/CombatRules.ts#L17) | Вычисляет максимум ресурсов, скорость, урон, броню, защиту от магии и восстановление. |
-| `slashConnects` | [36](../src/game/combat/CombatRules.ts#L36) | Проверяет расстояние и угол попадания сектором. |
-| `attackSpec` | [50](../src/game/combat/CombatRules.ts#L50) | Параметры обычной атаки, комбо и тяжёлого ПКМ-приёма. |
-| `skillAttack` | [108](../src/game/combat/CombatRules.ts#L108) | Параметры активных атак навыков. |
-| `PLAYER_RADIUS` | [239](../src/game/combat/CombatRules.ts#L239) | Параметры, таблица данных или функция, объявленная константой. |
-| `STAMINA_DELAY` | [240](../src/game/combat/CombatRules.ts#L240) | Параметры, таблица данных или функция, объявленная константой. |
-| `PARRY_DURATION` | [241](../src/game/combat/CombatRules.ts#L241) | Параметры, таблица данных или функция, объявленная константой. |
-| `PERFECT_PARRY` | [242](../src/game/combat/CombatRules.ts#L242) | Параметры, таблица данных или функция, объявленная константой. |
-| `COUNTER_WINDOW` | [243](../src/game/combat/CombatRules.ts#L243) | Параметры, таблица данных или функция, объявленная константой. |
+| `stats` | [16](../src/game/combat/CombatRules.ts#L16) | Вычисляет максимум ресурсов, скорость, урон, броню, защиту от магии и восстановление. |
+| `slashConnects` | [56](../src/game/combat/CombatRules.ts#L56) | Проверяет расстояние и угол попадания сектором. |
+| `attackSpec` | [70](../src/game/combat/CombatRules.ts#L70) | Параметры обычной атаки, комбо и тяжёлого ПКМ-приёма. |
+| `skillAttack` | [88](../src/game/combat/CombatRules.ts#L88) | Параметры активных атак навыков. |
 
 ### [src/game/combat/CombatSystem.ts](../src/game/combat/CombatSystem.ts)
 
-Атаки героя, парирование, урон врагам и награды за победу.
+Обычные атаки героя, комбо, навыки, парирование и попадания.
 
-Строк: 578.
+Строк: 492.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
 | `CombatSystem` | [20](../src/game/combat/CombatSystem.ts#L20) | Объявление в этом модуле. |
 | `currentAttackSpec` | [22](../src/game/combat/CombatSystem.ts#L22) | Выбирает параметры обычного удара, контрудара или активного навыка. |
-| `attack` | [50](../src/game/combat/CombatSystem.ts#L50) | Начинает обычный удар или контрудар; выбирает комбо и списывает выносливость. |
-| `parry` | [120](../src/game/combat/CombatSystem.ts#L120) | Открывает короткое окно парирования. |
-| `useSkill` | [139](../src/game/combat/CombatSystem.ts#L139) | Проверяет навык, клавишу, ресурс и перезарядку; начинает приём. |
-| `resolveAttack` | [179](../src/game/combat/CombatSystem.ts#L179) | В активной фазе проверяет цели и препятствия; исключает повторное попадание одним ударом. |
-| `hitEnemy` | [357](../src/game/combat/CombatSystem.ts#L357) | Применяет вражеский щит, снимает HP, даёт отбрасывание и вызывает смерть врага. |
-| `killEnemy` | [408](../src/game/combat/CombatSystem.ts#L408) | Отмечает смерть один раз, выдаёт награду и обрабатывает разрыв печати босса. |
-| `useUltimate` | [476](../src/game/combat/CombatSystem.ts#L476) | Расходует полную шкалу абсолютного умения. |
-| `updateUltimate` | [512](../src/game/combat/CombatSystem.ts#L512) | Выполняет импульсы абсолютной атаки во времени. |
-| `secondaryAttack` | [547](../src/game/combat/CombatSystem.ts#L547) | Выбирает ПКМ-приём текущего типа оружия. |
+| `attack` | [44](../src/game/combat/CombatSystem.ts#L44) | Начинает обычный удар или контрудар; выбирает комбо и списывает выносливость. |
+| `parry` | [127](../src/game/combat/CombatSystem.ts#L127) | Открывает короткое окно парирования. |
+| `useSkill` | [147](../src/game/combat/CombatSystem.ts#L147) | Проверяет навык, клавишу, ресурс и перезарядку; начинает приём. |
+| `resolveAttack` | [188](../src/game/combat/CombatSystem.ts#L188) | В активной фазе проверяет цели и препятствия; исключает повторное попадание одним ударом. |
+| `hitEnemy` | [379](../src/game/combat/CombatSystem.ts#L379) | Применяет вражеский щит, снимает HP, даёт отбрасывание и вызывает смерть врага. |
+| `secondaryAttack` | [436](../src/game/combat/CombatSystem.ts#L436) | Выбирает ПКМ-приём текущего типа оружия. |
+| `updateTimers` | [471](../src/game/combat/CombatSystem.ts#L471) | Обновляет временные окна владельца во время активной игры. |
+
+### [src/game/combat/HazardSystem.ts](../src/game/combat/HazardSystem.ts)
+
+Предупреждения, время жизни и попадания опасных зон.
+
+Строк: 164.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `Hazard` | [7](../src/game/combat/HazardSystem.ts#L7) | Форма данных для проверки TypeScript. |
+| `region` | [8](../src/game/combat/HazardSystem.ts#L8) | Поле состояния или ссылка на систему. |
+| `radius` | [9](../src/game/combat/HazardSystem.ts#L9) | Поле состояния или ссылка на систему. |
+| `warning` | [10](../src/game/combat/HazardSystem.ts#L10) | Поле состояния или ссылка на систему. |
+| `left` | [11](../src/game/combat/HazardSystem.ts#L11) | Поле состояния или ссылка на систему. |
+| `damage` | [12](../src/game/combat/HazardSystem.ts#L12) | Поле состояния или ссылка на систему. |
+| `kind` | [13](../src/game/combat/HazardSystem.ts#L13) | Поле состояния или ссылка на систему. |
+| `fired` | [14](../src/game/combat/HazardSystem.ts#L14) | Поле состояния или ссылка на систему. |
+| `environment` | [15](../src/game/combat/HazardSystem.ts#L15) | Поле состояния или ссылка на систему. |
+| `bossStrike` | [16](../src/game/combat/HazardSystem.ts#L16) | Поле состояния или ссылка на систему. |
+| `ownerId` | [17](../src/game/combat/HazardSystem.ts#L17) | Поле состояния или ссылка на систему. |
+| `HazardSystem` | [21](../src/game/combat/HazardSystem.ts#L21) | Объявление в этом модуле. |
+| `damageEnemiesInArea` | [24](../src/game/combat/HazardSystem.ts#L24) | Объявление в этом модуле. |
+| `update` | [45](../src/game/combat/HazardSystem.ts#L45) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `reset` | [161](../src/game/combat/HazardSystem.ts#L161) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
+
+### [src/game/combat/ProjectileSystem.ts](../src/game/combat/ProjectileSystem.ts)
+
+Создание, движение, столкновения и удаление снарядов.
+
+Строк: 144.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `Projectile` | [6](../src/game/combat/ProjectileSystem.ts#L6) | Форма данных для проверки TypeScript. |
+| `vx` | [7](../src/game/combat/ProjectileSystem.ts#L7) | Поле состояния или ссылка на систему. |
+| `vy` | [8](../src/game/combat/ProjectileSystem.ts#L8) | Поле состояния или ссылка на систему. |
+| `life` | [9](../src/game/combat/ProjectileSystem.ts#L9) | Поле состояния или ссылка на систему. |
+| `damage` | [10](../src/game/combat/ProjectileSystem.ts#L10) | Поле состояния или ссылка на систему. |
+| `region` | [11](../src/game/combat/ProjectileSystem.ts#L11) | Поле состояния или ссылка на систему. |
+| `friendly` | [12](../src/game/combat/ProjectileSystem.ts#L12) | Поле состояния или ссылка на систему. |
+| `color` | [13](../src/game/combat/ProjectileSystem.ts#L13) | Поле состояния или ссылка на систему. |
+| `radius` | [14](../src/game/combat/ProjectileSystem.ts#L14) | Поле состояния или ссылка на систему. |
+| `blast` | [15](../src/game/combat/ProjectileSystem.ts#L15) | Поле состояния или ссылка на систему. |
+| `visual` | [16](../src/game/combat/ProjectileSystem.ts#L16) | Поле состояния или ссылка на систему. |
+| `hits` | [17](../src/game/combat/ProjectileSystem.ts#L17) | Поле состояния или ссылка на систему. |
+| `ProjectileSystem` | [21](../src/game/combat/ProjectileSystem.ts#L21) | Объявление в этом модуле. |
+| `enemyProjectileTexture` | [24](../src/game/combat/ProjectileSystem.ts#L24) | Объявление в этом модуле. |
+| `shoot` | [41](../src/game/combat/ProjectileSystem.ts#L41) | Создаёт летящий снаряд с направлением и параметрами урона. |
+| `update` | [70](../src/game/combat/ProjectileSystem.ts#L70) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `reset` | [141](../src/game/combat/ProjectileSystem.ts#L141) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
+
+### [src/game/combat/UltimateSystem.ts](../src/game/combat/UltimateSystem.ts)
+
+Запуск, импульсы и завершение абсолютной атаки.
+
+Строк: 119.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `UltimateSystem` | [8](../src/game/combat/UltimateSystem.ts#L8) | Объявление в этом модуле. |
+| `useUltimate` | [11](../src/game/combat/UltimateSystem.ts#L11) | Расходует полную шкалу абсолютного умения. |
+| `updateUltimate` | [62](../src/game/combat/UltimateSystem.ts#L62) | Выполняет импульсы абсолютной атаки во времени. |
 
 ## Враги и боссы
 
@@ -265,82 +466,119 @@
 
 24 уникальных приёма восьми боссов и единая геометрия предупреждения и попадания.
 
-Строк: 362.
+Строк: 366.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `BOSS_MOVES` | [4](../src/game/enemies/BossPatterns.ts#L4) | Параметры, таблица данных или функция, объявленная константой. |
-| `BossAttack` | [14](../src/game/enemies/BossPatterns.ts#L14) | Форма данных для проверки TypeScript. |
-| `BOSS_NAMES` | [15](../src/game/enemies/BossPatterns.ts#L15) | Параметры, таблица данных или функция, объявленная константой. |
-| `isBossAttack` | [42](../src/game/enemies/BossPatterns.ts#L42) | Параметры, таблица данных или функция, объявленная константой. |
-| `BossStrike` | [43](../src/game/enemies/BossPatterns.ts#L43) | Форма данных для проверки TypeScript. |
-| `shape` | [44](../src/game/enemies/BossPatterns.ts#L44) | Поле состояния или ссылка на систему. |
-| `radius` | [45](../src/game/enemies/BossPatterns.ts#L45) | Поле состояния или ссылка на систему. |
-| `inner` | [46](../src/game/enemies/BossPatterns.ts#L46) | Поле состояния или ссылка на систему. |
-| `angle` | [47](../src/game/enemies/BossPatterns.ts#L47) | Поле состояния или ссылка на систему. |
-| `length` | [48](../src/game/enemies/BossPatterns.ts#L48) | Поле состояния или ссылка на систему. |
-| `width` | [49](../src/game/enemies/BossPatterns.ts#L49) | Поле состояния или ссылка на систему. |
-| `delay` | [50](../src/game/enemies/BossPatterns.ts#L50) | Поле состояния или ссылка на систему. |
-| `visual` | [51](../src/game/enemies/BossPatterns.ts#L51) | Поле состояния или ссылка на систему. |
-| `physical` | [52](../src/game/enemies/BossPatterns.ts#L52) | Поле состояния или ссылка на систему. |
-| `scale` | [53](../src/game/enemies/BossPatterns.ts#L53) | Поле состояния или ссылка на систему. |
-| `bossPattern` | [57](../src/game/enemies/BossPatterns.ts#L57) | План отдельных опасных зон выбранного приёма босса. |
-| `rage` | [61](../src/game/enemies/BossPatterns.ts#L61) | Поле состояния или ссылка на систему. |
-| `bossStrikeHits` | [346](../src/game/enemies/BossPatterns.ts#L346) | Проверка попадания линией, кольцом или круговой меткой. |
+| `BossAttack` | [6](../src/game/enemies/BossPatterns.ts#L6) | Форма данных для проверки TypeScript. |
+| `isBossAttack` | [8](../src/game/enemies/BossPatterns.ts#L8) | Параметры, таблица данных или функция, объявленная константой. |
+| `BossStrike` | [9](../src/game/enemies/BossPatterns.ts#L9) | Форма данных для проверки TypeScript. |
+| `shape` | [10](../src/game/enemies/BossPatterns.ts#L10) | Поле состояния или ссылка на систему. |
+| `radius` | [11](../src/game/enemies/BossPatterns.ts#L11) | Поле состояния или ссылка на систему. |
+| `inner` | [12](../src/game/enemies/BossPatterns.ts#L12) | Поле состояния или ссылка на систему. |
+| `angle` | [13](../src/game/enemies/BossPatterns.ts#L13) | Поле состояния или ссылка на систему. |
+| `length` | [14](../src/game/enemies/BossPatterns.ts#L14) | Поле состояния или ссылка на систему. |
+| `width` | [15](../src/game/enemies/BossPatterns.ts#L15) | Поле состояния или ссылка на систему. |
+| `delay` | [16](../src/game/enemies/BossPatterns.ts#L16) | Поле состояния или ссылка на систему. |
+| `visual` | [17](../src/game/enemies/BossPatterns.ts#L17) | Поле состояния или ссылка на систему. |
+| `physical` | [18](../src/game/enemies/BossPatterns.ts#L18) | Поле состояния или ссылка на систему. |
+| `scale` | [19](../src/game/enemies/BossPatterns.ts#L19) | Поле состояния или ссылка на систему. |
+| `bossPattern` | [23](../src/game/enemies/BossPatterns.ts#L23) | План отдельных опасных зон выбранного приёма босса. |
+| `rage` | [27](../src/game/enemies/BossPatterns.ts#L27) | Поле состояния или ссылка на систему. |
+| `bossStrikeHits` | [350](../src/game/enemies/BossPatterns.ts#L350) | Проверка попадания линией, кольцом или круговой меткой. |
 
 ### [src/game/enemies/BossSystem.ts](../src/game/enemies/BossSystem.ts)
 
 Предупреждения появления и выполнение уникальных приёмов боссов.
 
-Строк: 173.
+Строк: 195.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
 | `BossSystem` | [8](../src/game/enemies/BossSystem.ts#L8) | Объявление в этом модуле. |
 | `resetBossCountdown` | [10](../src/game/enemies/BossSystem.ts#L10) | Скрывает цифры обратного отсчёта. |
 | `updateBossCountdown` | [16](../src/game/enemies/BossSystem.ts#L16) | Показывает последние десять секунд до появления босса. |
-| `startBossAttack` | [49](../src/game/enemies/BossSystem.ts#L49) | Фиксирует цель и план уникального приёма босса. |
-| `executeBossAttack` | [62](../src/game/enemies/BossSystem.ts#L62) | Создаёт опасные зоны по зафиксированному плану. |
-| `drawBossStrike` | [87](../src/game/enemies/BossSystem.ts#L87) | Рисует ту же геометрию, которая используется для попадания. |
+| `startBossAttack` | [52](../src/game/enemies/BossSystem.ts#L52) | Фиксирует цель и план уникального приёма босса. |
+| `executeBossAttack` | [65](../src/game/enemies/BossSystem.ts#L65) | Создаёт опасные зоны по зафиксированному плану. |
+| `drawBossStrike` | [93](../src/game/enemies/BossSystem.ts#L93) | Рисует ту же геометрию, которая используется для попадания. |
+| `updatePhase` | [179](../src/game/enemies/BossSystem.ts#L179) | Объявление в этом модуле. |
 
-### [src/game/enemies/EnemyConfig.ts](../src/game/enemies/EnemyConfig.ts)
+### [src/game/enemies/EnemyAttackGeometry.ts](../src/game/enemies/EnemyAttackGeometry.ts)
 
-Базовое HP обычных врагов, рост характеристик по биомам, награда, скорость и лимит волн.
+Общая геометрия обычных ударов и предупреждений.
 
-Строк: 78.
+Строк: 30.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `PATH_INTERVAL` | [4](../src/game/enemies/EnemyConfig.ts#L4) | Параметры, таблица данных или функция, объявленная константой. |
-| `MAX_MINIONS` | [5](../src/game/enemies/EnemyConfig.ts#L5) | Параметры, таблица данных или функция, объявленная константой. |
-| `WAVE_FIRST` | [6](../src/game/enemies/EnemyConfig.ts#L6) | Параметры, таблица данных или функция, объявленная константой. |
-| `WAVE_SIZE` | [7](../src/game/enemies/EnemyConfig.ts#L7) | Параметры, таблица данных или функция, объявленная константой. |
-| `BOSS_REWARD` | [8](../src/game/enemies/EnemyConfig.ts#L8) | Параметры, таблица данных или функция, объявленная константой. |
-| `THIRD_BIOME_DAMAGE` | [9](../src/game/enemies/EnemyConfig.ts#L9) | Параметры, таблица данных или функция, объявленная константой. |
-| `THIRD_BIOME_WINDUP` | [10](../src/game/enemies/EnemyConfig.ts#L10) | Параметры, таблица данных или функция, объявленная константой. |
-| `ENEMY_BASE_HP` | [12](../src/game/enemies/EnemyConfig.ts#L12) | Параметры, таблица данных или функция, объявленная константой. |
-| `enemyStats` | [27](../src/game/enemies/EnemyConfig.ts#L27) | Численные HP, урон, награда, скорость, размер и радиус врага. |
+| `enemyMeleeReach` | [4](../src/game/enemies/EnemyAttackGeometry.ts#L4) | Объявление в этом модуле. |
+| `enemyAreaRadius` | [12](../src/game/enemies/EnemyAttackGeometry.ts#L12) | Объявление в этом модуле. |
+
+### [src/game/enemies/EnemyAttackSystem.ts](../src/game/enemies/EnemyAttackSystem.ts)
+
+Выбор и выполнение обычных вражеских приёмов.
+
+Строк: 386.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `EnemyAttackSystem` | [18](../src/game/enemies/EnemyAttackSystem.ts#L18) | Объявление в этом модуле. |
+| `startEnemyAttack` | [21](../src/game/enemies/EnemyAttackSystem.ts#L21) | Выбирает обычный вражеский приём и начинает замах. |
+| `recoverEnemy` | [77](../src/game/enemies/EnemyAttackSystem.ts#L77) | Переводит врага в восстановление после атаки. |
+| `executeEnemyAttack` | [82](../src/game/enemies/EnemyAttackSystem.ts#L82) | Исполняет обычный приём: удар, выстрел, призыв, телепортацию и другие действия. |
+| `summonMinions` | [336](../src/game/enemies/EnemyAttackSystem.ts#L336) | Создаёт помощников врага с учётом ограничения числа существ. |
+
+### [src/game/enemies/EnemyDefeatSystem.ts](../src/game/enemies/EnemyDefeatSystem.ts)
+
+Однократная победа, награда и завершение боя с боссом.
+
+Строк: 93.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `EnemyDefeatSystem` | [7](../src/game/enemies/EnemyDefeatSystem.ts#L7) | Объявление в этом модуле. |
+| `killEnemy` | [10](../src/game/enemies/EnemyDefeatSystem.ts#L10) | Отмечает смерть один раз, выдаёт награду и обрабатывает разрыв печати босса. |
+
+### [src/game/enemies/EnemySpawnSystem.ts](../src/game/enemies/EnemySpawnSystem.ts)
+
+Волны, их часы, ограничения числа врагов и появление босса.
+
+Строк: 102.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `EnemySpawnSystem` | [6](../src/game/enemies/EnemySpawnSystem.ts#L6) | Объявление в этом модуле. |
+| `waveClock` | [7](../src/game/enemies/EnemySpawnSystem.ts#L7) | Время до следующей волны обычных противников. |
+| `waveNumber` | [8](../src/game/enemies/EnemySpawnSystem.ts#L8) | Номер волны для выбора состава врагов. |
+| `pruneLeft` | [9](../src/game/enemies/EnemySpawnSystem.ts#L9) | Таймер периодического удаления завершённых объектов врагов. |
+| `reset` | [13](../src/game/enemies/EnemySpawnSystem.ts#L13) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
+| `updateWaves` | [19](../src/game/enemies/EnemySpawnSystem.ts#L19) | Удаляет завершённые спрайты и создаёт новые волны в пределах лимита. |
+| `spawnBoss` | [81](../src/game/enemies/EnemySpawnSystem.ts#L81) | Создаёт босса и показывает начало боя; флаг перехода устанавливает PhaseSystem. |
+
+### [src/game/enemies/EnemyStats.ts](../src/game/enemies/EnemyStats.ts)
+
+Расчёт характеристик врага по общей таблице параметров.
+
+Строк: 18.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `enemyStats` | [5](../src/game/enemies/EnemyStats.ts#L5) | Численные HP, урон, награда, скорость, размер и радиус врага. |
 
 ### [src/game/enemies/EnemySystem.ts](../src/game/enemies/EnemySystem.ts)
 
-Создание противников, волны, поиск пути и обычные вражеские атаки.
+Создание, движение, поиск пути и обновление состояния врагов.
 
-Строк: 670.
+Строк: 331.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `EnemySystem` | [24](../src/game/enemies/EnemySystem.ts#L24) | Объявление в этом модуле. |
-| `predict` | [26](../src/game/enemies/EnemySystem.ts#L26) | Предсказывает положение героя с учётом его скорости. |
-| `walkEnemy` | [39](../src/game/enemies/EnemySystem.ts#L39) | Ведёт врага по прямой или маршруту A* и обходит препятствия. |
-| `spawnEnemy` | [76](../src/game/enemies/EnemySystem.ts#L76) | Создаёт спрайт и состояние врага по параметрам EnemyConfig. |
-| `updateWaves` | [134](../src/game/enemies/EnemySystem.ts#L134) | Удаляет завершённые спрайты и создаёт новые волны в пределах лимита. |
-| `spawnBoss` | [181](../src/game/enemies/EnemySystem.ts#L181) | Отмечает появление босса в прогрессе, создаёт его и включает бой. |
-| `startEnemyAttack` | [201](../src/game/enemies/EnemySystem.ts#L201) | Выбирает обычный вражеский приём и начинает замах. |
-| `updateEnemies` | [261](../src/game/enemies/EnemySystem.ts#L261) | Обновляет состояние врагов: преследование, замах, рывок, восстановление, эффекты и вторую фазу. |
-| `recoverEnemy` | [422](../src/game/enemies/EnemySystem.ts#L422) | Переводит врага в восстановление после атаки. |
-| `executeEnemyAttack` | [426](../src/game/enemies/EnemySystem.ts#L426) | Исполняет обычный приём: удар, выстрел, призыв, телепортацию и другие действия. |
-| `summonMinions` | [622](../src/game/enemies/EnemySystem.ts#L622) | Создаёт помощников врага с учётом ограничения числа существ. |
-| `enemyBounds` | [659](../src/game/enemies/EnemySystem.ts#L659) | Выбирает границы учебного двора или биома врага. |
+| `EnemySystem` | [25](../src/game/enemies/EnemySystem.ts#L25) | Объявление в этом модуле. |
+| `predict` | [27](../src/game/enemies/EnemySystem.ts#L27) | Предсказывает положение героя с учётом его скорости. |
+| `walkEnemy` | [40](../src/game/enemies/EnemySystem.ts#L40) | Ведёт врага по прямой или маршруту A* и обходит препятствия. |
+| `spawnEnemy` | [83](../src/game/enemies/EnemySystem.ts#L83) | Создаёт спрайт и состояние врага по EnemyStats. |
+| `updateEnemies` | [143](../src/game/enemies/EnemySystem.ts#L143) | Обновляет состояние врагов: преследование, замах, рывок, восстановление, эффекты и вторую фазу. |
+| `enemyBounds` | [320](../src/game/enemies/EnemySystem.ts#L320) | Выбирает границы учебного двора или биома врага. |
 
 ### [src/game/enemies/EnemyTypes.ts](../src/game/enemies/EnemyTypes.ts)
 
@@ -391,196 +629,175 @@
 
 Геометрия, столкновения кругов, видимость между точками и A* на сетке.
 
-Строк: 325.
+Строк: 322.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `Point` | [1](../src/game/world/Navigation.ts#L1) | Форма данных для проверки TypeScript. |
-| `Terrain` | [2](../src/game/world/Navigation.ts#L2) | Форма данных для проверки TypeScript. |
-| `kind` | [3](../src/game/world/Navigation.ts#L3) | Поле состояния или ссылка на систему. |
-| `radius` | [4](../src/game/world/Navigation.ts#L4) | Поле состояния или ссылка на систему. |
-| `Bounds` | [6](../src/game/world/Navigation.ts#L6) | Форма данных для проверки TypeScript. |
-| `width` | [7](../src/game/world/Navigation.ts#L7) | Поле состояния или ссылка на систему. |
-| `height` | [8](../src/game/world/Navigation.ts#L8) | Поле состояния или ссылка на систему. |
-| `margin` | [9](../src/game/world/Navigation.ts#L9) | Поле состояния или ссылка на систему. |
-| `top` | [10](../src/game/world/Navigation.ts#L10) | Поле состояния или ссылка на систему. |
-| `left` | [11](../src/game/world/Navigation.ts#L11) | Поле состояния или ссылка на систему. |
-| `NavGrid` | [13](../src/game/world/Navigation.ts#L13) | Форма данных для проверки TypeScript. |
-| `cell` | [14](../src/game/world/Navigation.ts#L14) | Поле состояния или ссылка на систему. |
-| `cols` | [15](../src/game/world/Navigation.ts#L15) | Поле состояния или ссылка на систему. |
-| `rows` | [16](../src/game/world/Navigation.ts#L16) | Поле состояния или ссылка на систему. |
-| `free` | [17](../src/game/world/Navigation.ts#L17) | Поле состояния или ссылка на систему. |
-| `bounds` | [18](../src/game/world/Navigation.ts#L18) | Поле состояния или ссылка на систему. |
-| `originX` | [19](../src/game/world/Navigation.ts#L19) | Поле состояния или ссылка на систему. |
-| `makeTerrain` | [65](../src/game/world/Navigation.ts#L65) | Объявление в этом модуле. |
-| `clampPoint` | [74](../src/game/world/Navigation.ts#L74) | Ограничивает координаты допустимыми границами. |
-| `freePoint` | [81](../src/game/world/Navigation.ts#L81) | Проверяет границы и свободное место вокруг точки. |
-| `moveCircle` | [95](../src/game/world/Navigation.ts#L95) | Двигает круг подшагами и выталкивает его из препятствий. |
-| `makeGrid` | [124](../src/game/world/Navigation.ts#L124) | Строит сетку проходимости и оставляет крупнейшую связанную область. |
-| `findPath` | [194](../src/game/world/Navigation.ts#L194) | Строит путь A* без срезания углов. |
-| `clearLine` | [253](../src/game/world/Navigation.ts#L253) | Проверяет свободный от препятствий отрезок. |
-| `regionTerrain` | [281](../src/game/world/Navigation.ts#L281) | Создаёт препятствия выбранного биома. |
-| `add` | [314](../src/game/world/Navigation.ts#L314) | Объявление в этом модуле. |
+| `Point` | [3](../src/game/world/Navigation.ts#L3) | Форма данных для проверки TypeScript. |
+| `Terrain` | [4](../src/game/world/Navigation.ts#L4) | Форма данных для проверки TypeScript. |
+| `kind` | [5](../src/game/world/Navigation.ts#L5) | Поле состояния или ссылка на систему. |
+| `radius` | [6](../src/game/world/Navigation.ts#L6) | Поле состояния или ссылка на систему. |
+| `Bounds` | [8](../src/game/world/Navigation.ts#L8) | Форма данных для проверки TypeScript. |
+| `width` | [9](../src/game/world/Navigation.ts#L9) | Поле состояния или ссылка на систему. |
+| `height` | [10](../src/game/world/Navigation.ts#L10) | Поле состояния или ссылка на систему. |
+| `margin` | [11](../src/game/world/Navigation.ts#L11) | Поле состояния или ссылка на систему. |
+| `top` | [12](../src/game/world/Navigation.ts#L12) | Поле состояния или ссылка на систему. |
+| `left` | [13](../src/game/world/Navigation.ts#L13) | Поле состояния или ссылка на систему. |
+| `NavGrid` | [15](../src/game/world/Navigation.ts#L15) | Форма данных для проверки TypeScript. |
+| `cell` | [16](../src/game/world/Navigation.ts#L16) | Поле состояния или ссылка на систему. |
+| `cols` | [17](../src/game/world/Navigation.ts#L17) | Поле состояния или ссылка на систему. |
+| `rows` | [18](../src/game/world/Navigation.ts#L18) | Поле состояния или ссылка на систему. |
+| `free` | [19](../src/game/world/Navigation.ts#L19) | Поле состояния или ссылка на систему. |
+| `bounds` | [20](../src/game/world/Navigation.ts#L20) | Поле состояния или ссылка на систему. |
+| `originX` | [21](../src/game/world/Navigation.ts#L21) | Поле состояния или ссылка на систему. |
+| `makeTerrain` | [26](../src/game/world/Navigation.ts#L26) | Объявление в этом модуле. |
+| `clampPoint` | [35](../src/game/world/Navigation.ts#L35) | Ограничивает координаты допустимыми границами. |
+| `freePoint` | [42](../src/game/world/Navigation.ts#L42) | Проверяет границы и свободное место вокруг точки. |
+| `moveCircle` | [57](../src/game/world/Navigation.ts#L57) | Двигает круг подшагами и выталкивает его из препятствий. |
+| `makeGrid` | [89](../src/game/world/Navigation.ts#L89) | Строит сетку проходимости и оставляет крупнейшую связанную область. |
+| `findPath` | [172](../src/game/world/Navigation.ts#L172) | Строит путь A* без срезания углов. |
+| `clearLine` | [244](../src/game/world/Navigation.ts#L244) | Проверяет свободный от препятствий отрезок. |
+| `regionTerrain` | [274](../src/game/world/Navigation.ts#L274) | Создаёт препятствия выбранного биома. |
+| `add` | [309](../src/game/world/Navigation.ts#L309) | Объявление в этом модуле. |
 
 ### [src/game/world/WeatherSystem.ts](../src/game/world/WeatherSystem.ts)
 
 Дождь, гроза, метеоры, ураган и замедление от поверхности.
 
-Строк: 311.
+Строк: 316.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `LIGHTNING_WARNING` | [6](../src/game/world/WeatherSystem.ts#L6) | Параметры, таблица данных или функция, объявленная константой. |
-| `LIGHTNING_RADIUS` | [7](../src/game/world/WeatherSystem.ts#L7) | Параметры, таблица данных или функция, объявленная константой. |
-| `Strike` | [8](../src/game/world/WeatherSystem.ts#L8) | Форма данных для проверки TypeScript. |
-| `left` | [9](../src/game/world/WeatherSystem.ts#L9) | Поле состояния или ссылка на систему. |
-| `phase` | [10](../src/game/world/WeatherSystem.ts#L10) | Поле состояния или ссылка на систему. |
-| `WeatherSystem` | [12](../src/game/world/WeatherSystem.ts#L12) | Объявление в этом модуле. |
-| `drawWeather` | [14](../src/game/world/WeatherSystem.ts#L14) | Рисует дождь, мокрые зоны, предупреждение молнии и ураган. |
-| `groundSpeed` | [86](../src/game/world/WeatherSystem.ts#L86) | Возвращает множитель скорости от воды, проклятия и замедления. |
-| `resetWeather` | [103](../src/game/world/WeatherSystem.ts#L103) | Убирает погодные зоны и сбрасывает таймеры. |
-| `updateWeather` | [116](../src/game/world/WeatherSystem.ts#L116) | Выбирает событие, двигает ураган и применяет удары молний и метеоров. |
-| `WeatherKind` | [279](../src/game/world/WeatherSystem.ts#L279) | Форма данных для проверки TypeScript. |
-| `WEATHER_DURATION` | [280](../src/game/world/WeatherSystem.ts#L280) | Параметры, таблица данных или функция, объявленная константой. |
-| `METEOR_WARNING` | [281](../src/game/world/WeatherSystem.ts#L281) | Параметры, таблица данных или функция, объявленная константой. |
-| `METEOR_RADIUS` | [282](../src/game/world/WeatherSystem.ts#L282) | Поле состояния или ссылка на систему. |
-| `HURRICANE_RADIUS` | [283](../src/game/world/WeatherSystem.ts#L283) | Параметры, таблица данных или функция, объявленная константой. |
-| `HURRICANE_PULL` | [284](../src/game/world/WeatherSystem.ts#L284) | Поле состояния или ссылка на систему. |
-| `WEATHER_NAMES` | [285](../src/game/world/WeatherSystem.ts#L285) | Параметры, таблица данных или функция, объявленная константой. |
-| `WEATHER_HINTS` | [292](../src/game/world/WeatherSystem.ts#L292) | Параметры, таблица данных или функция, объявленная константой. |
-| `randomWeather` | [300](../src/game/world/WeatherSystem.ts#L300) | Выбирает одно из четырёх погодных событий. |
-| `value` | [302](../src/game/world/WeatherSystem.ts#L302) | Поле состояния или ссылка на систему. |
+| `Strike` | [17](../src/game/world/WeatherSystem.ts#L17) | Форма данных для проверки TypeScript. |
+| `left` | [18](../src/game/world/WeatherSystem.ts#L18) | Поле состояния или ссылка на систему. |
+| `phase` | [19](../src/game/world/WeatherSystem.ts#L19) | Поле состояния или ссылка на систему. |
+| `WeatherSystem` | [21](../src/game/world/WeatherSystem.ts#L21) | Объявление в этом модуле. |
+| `drawWeather` | [23](../src/game/world/WeatherSystem.ts#L23) | Рисует дождь, мокрые зоны, предупреждение молнии и ураган. |
+| `groundSpeed` | [97](../src/game/world/WeatherSystem.ts#L97) | Возвращает множитель скорости от воды, проклятия и замедления. |
+| `resetWeather` | [117](../src/game/world/WeatherSystem.ts#L117) | Убирает погодные зоны и сбрасывает таймеры. |
+| `updateWeather` | [130](../src/game/world/WeatherSystem.ts#L130) | Выбирает событие, двигает ураган и применяет удары молний и метеоров. |
+| `WeatherKind` | [303](../src/game/world/WeatherSystem.ts#L303) | Форма данных для проверки TypeScript. |
+| `randomWeather` | [305](../src/game/world/WeatherSystem.ts#L305) | Выбирает одно из четырёх погодных событий. |
+| `value` | [307](../src/game/world/WeatherSystem.ts#L307) | Поле состояния или ссылка на систему. |
 
-### [src/game/world/WorldConfig.ts](../src/game/world/WorldConfig.ts)
+### [src/game/world/WorldLayout.ts](../src/game/world/WorldLayout.ts)
 
-Восемь биомов: цели, таймеры, HP боссов, состав врагов, размеры и положение деревень.
+Типы биомов и вычисление координат областей, деревень и контрольных точек.
 
-Строк: 315.
+Строк: 57.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `REGION_WIDTH` | [3](../src/game/world/WorldConfig.ts#L3) | Параметры, таблица данных или функция, объявленная константой. |
-| `ROAD_WIDTH` | [4](../src/game/world/WorldConfig.ts#L4) | Параметры, таблица данных или функция, объявленная константой. |
-| `PROLOGUE_WIDTH` | [5](../src/game/world/WorldConfig.ts#L5) | Параметры, таблица данных или функция, объявленная константой. |
-| `REGION_STEP` | [6](../src/game/world/WorldConfig.ts#L6) | Параметры, таблица данных или функция, объявленная константой. |
-| `WORLD_HEIGHT` | [7](../src/game/world/WorldConfig.ts#L7) | Параметры, таблица данных или функция, объявленная константой. |
-| `ENEMY_KINDS` | [8](../src/game/world/WorldConfig.ts#L8) | Параметры, таблица данных или функция, объявленная константой. |
-| `EnemyKind` | [22](../src/game/world/WorldConfig.ts#L22) | Форма данных для проверки TypeScript. |
-| `EnemyAttack` | [23](../src/game/world/WorldConfig.ts#L23) | Форма данных для проверки TypeScript. |
-| `Region` | [39](../src/game/world/WorldConfig.ts#L39) | Форма данных для проверки TypeScript. |
-| `name` | [40](../src/game/world/WorldConfig.ts#L40) | Поле состояния или ссылка на систему. |
-| `coins` | [41](../src/game/world/WorldConfig.ts#L41) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
-| `awaken` | [42](../src/game/world/WorldConfig.ts#L42) | Поле состояния или ссылка на систему. |
-| `bossTime` | [43](../src/game/world/WorldConfig.ts#L43) | Поле состояния или ссылка на систему. |
-| `roster` | [44](../src/game/world/WorldConfig.ts#L44) | Поле состояния или ссылка на систему. |
-| `speed` | [45](../src/game/world/WorldConfig.ts#L45) | Поле состояния или ссылка на систему. |
-| `bossName` | [46](../src/game/world/WorldConfig.ts#L46) | Поле состояния или ссылка на систему. |
-| `bossTexture` | [47](../src/game/world/WorldConfig.ts#L47) | Поле состояния или ссылка на систему. |
-| `bossHP` | [48](../src/game/world/WorldConfig.ts#L48) | Поле состояния или ссылка на систему. |
-| `bossMoves` | [49](../src/game/world/WorldConfig.ts#L49) | Поле состояния или ссылка на систему. |
-| `fog` | [50](../src/game/world/WorldConfig.ts#L50) | Поле состояния или ссылка на систему. |
-| `lore` | [51](../src/game/world/WorldConfig.ts#L51) | Поле состояния или ссылка на систему. |
-| `ground` | [52](../src/game/world/WorldConfig.ts#L52) | Поле состояния или ссылка на систему. |
-| `palette` | [53](../src/game/world/WorldConfig.ts#L53) | Поле состояния или ссылка на систему. |
-| `REGIONS` | [55](../src/game/world/WorldConfig.ts#L55) | Параметры, таблица данных или функция, объявленная константой. |
-| `WORLD_WIDTH` | [277](../src/game/world/WorldConfig.ts#L277) | Параметры, таблица данных или функция, объявленная константой. |
-| `regionStart` | [278](../src/game/world/WorldConfig.ts#L278) | Параметры, таблица данных или функция, объявленная константой. |
-| `regionEnd` | [279](../src/game/world/WorldConfig.ts#L279) | Параметры, таблица данных или функция, объявленная константой. |
-| `merchantPosition` | [280](../src/game/world/WorldConfig.ts#L280) | Параметры, таблица данных или функция, объявленная константой. |
-| `checkpointPosition` | [284](../src/game/world/WorldConfig.ts#L284) | Параметры, таблица данных или функция, объявленная константой. |
-| `villagePosition` | [289](../src/game/world/WorldConfig.ts#L289) | Параметры, таблица данных или функция, объявленная константой. |
-| `VILLAGE_NAMES` | [291](../src/game/world/WorldConfig.ts#L291) | Параметры, таблица данных или функция, объявленная константой. |
-| `REGION_INCOME` | [302](../src/game/world/WorldConfig.ts#L302) | Параметры, таблица данных или функция, объявленная константой. |
-| `REGION_THEMES` | [303](../src/game/world/WorldConfig.ts#L303) | Параметры, таблица данных или функция, объявленная константой. |
-| `PICKUP_RADIUS` | [314](../src/game/world/WorldConfig.ts#L314) | Параметры, таблица данных или функция, объявленная константой. |
-| `INTERACT_DISTANCE` | [315](../src/game/world/WorldConfig.ts#L315) | Параметры, таблица данных или функция, объявленная константой. |
+| `EnemyKind` | [12](../src/game/world/WorldLayout.ts#L12) | Форма данных для проверки TypeScript. |
+| `EnemyAttack` | [13](../src/game/world/WorldLayout.ts#L13) | Форма данных для проверки TypeScript. |
+| `Region` | [29](../src/game/world/WorldLayout.ts#L29) | Форма данных для проверки TypeScript. |
+| `name` | [30](../src/game/world/WorldLayout.ts#L30) | Поле состояния или ссылка на систему. |
+| `coins` | [31](../src/game/world/WorldLayout.ts#L31) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
+| `awaken` | [32](../src/game/world/WorldLayout.ts#L32) | Поле состояния или ссылка на систему. |
+| `roster` | [33](../src/game/world/WorldLayout.ts#L33) | Поле состояния или ссылка на систему. |
+| `speed` | [34](../src/game/world/WorldLayout.ts#L34) | Поле состояния или ссылка на систему. |
+| `bossName` | [35](../src/game/world/WorldLayout.ts#L35) | Поле состояния или ссылка на систему. |
+| `bossTexture` | [36](../src/game/world/WorldLayout.ts#L36) | Поле состояния или ссылка на систему. |
+| `bossHP` | [37](../src/game/world/WorldLayout.ts#L37) | Поле состояния или ссылка на систему. |
+| `bossMoves` | [38](../src/game/world/WorldLayout.ts#L38) | Поле состояния или ссылка на систему. |
+| `fog` | [39](../src/game/world/WorldLayout.ts#L39) | Поле состояния или ссылка на систему. |
+| `lore` | [40](../src/game/world/WorldLayout.ts#L40) | Поле состояния или ссылка на систему. |
+| `ground` | [41](../src/game/world/WorldLayout.ts#L41) | Поле состояния или ссылка на систему. |
+| `palette` | [42](../src/game/world/WorldLayout.ts#L42) | Поле состояния или ссылка на систему. |
+| `regionStart` | [45](../src/game/world/WorldLayout.ts#L45) | Параметры, таблица данных или функция, объявленная константой. |
+| `regionEnd` | [46](../src/game/world/WorldLayout.ts#L46) | Параметры, таблица данных или функция, объявленная константой. |
+| `merchantPosition` | [47](../src/game/world/WorldLayout.ts#L47) | Параметры, таблица данных или функция, объявленная константой. |
+| `checkpointPosition` | [51](../src/game/world/WorldLayout.ts#L51) | Параметры, таблица данных или функция, объявленная константой. |
+| `villagePosition` | [56](../src/game/world/WorldLayout.ts#L56) | Параметры, таблица данных или функция, объявленная константой. |
 
 ### [src/game/world/WorldRenderer.ts](../src/game/world/WorldRenderer.ts)
 
 Создание декораций биомов и деревень с ленивой загрузкой.
 
-Строк: 250.
+Строк: 256.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `WorldRenderer` | [22](../src/game/world/WorldRenderer.ts#L22) | Объявление в этом модуле. |
-| `drawWorld` | [24](../src/game/world/WorldRenderer.ts#L24) | Готовит геометрию всех биомов и начальные декорации. |
-| `rememberScenery` | [48](../src/game/world/WorldRenderer.ts#L48) | Запоминает созданные наружные объекты для скрытия в интерьере. |
-| `ensureRegionArt` | [54](../src/game/world/WorldRenderer.ts#L54) | Однократно создаёт графику посещённого биома. |
-| `ensureVillageArt` | [113](../src/game/world/WorldRenderer.ts#L113) | Однократно создаёт деревню, дома и жителей. |
+| `WorldRenderer` | [20](../src/game/world/WorldRenderer.ts#L20) | Объявление в этом модуле. |
+| `drawWorld` | [22](../src/game/world/WorldRenderer.ts#L22) | Готовит геометрию всех биомов и начальные декорации. |
+| `rememberScenery` | [47](../src/game/world/WorldRenderer.ts#L47) | Запоминает созданные наружные объекты для скрытия в интерьере. |
+| `ensureRegionArt` | [53](../src/game/world/WorldRenderer.ts#L53) | Однократно создаёт графику посещённого биома. |
+| `ensureVillageArt` | [115](../src/game/world/WorldRenderer.ts#L115) | Однократно создаёт деревню, дома и жителей. |
 
 ### [src/game/world/WorldState.ts](../src/game/world/WorldState.ts)
 
 Объекты мира, геометрия, текущая область и состояние погоды.
 
-Строк: 77.
+Строк: 97.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `Coin` | [11](../src/game/world/WorldState.ts#L11) | Форма данных для проверки TypeScript. |
-| `region` | [12](../src/game/world/WorldState.ts#L12) | Поле состояния или ссылка на систему. |
-| `sprite` | [13](../src/game/world/WorldState.ts#L13) | Поле состояния или ссылка на систему. |
-| `value` | [14](../src/game/world/WorldState.ts#L14) | Поле состояния или ссылка на систему. |
-| `phase` | [15](../src/game/world/WorldState.ts#L15) | Поле состояния или ссылка на систему. |
-| `Chest` | [17](../src/game/world/WorldState.ts#L17) | Форма данных для проверки TypeScript. |
-| `sprite` | [18](../src/game/world/WorldState.ts#L18) | Поле состояния или ссылка на систему. |
-| `WorldState` | [20](../src/game/world/WorldState.ts#L20) | Объявление в этом модуле. |
-| `terrain` | [21](../src/game/world/WorldState.ts#L21) | Общий список препятствий наружного мира. |
-| `terrainByRegion` | [22](../src/game/world/WorldState.ts#L22) | Препятствия, сгруппированные по биомам. |
-| `nav` | [23](../src/game/world/WorldState.ts#L23) | Сетки навигации обычных противников по биомам. |
-| `bossNav` | [24](../src/game/world/WorldState.ts#L24) | Сетки навигации под увеличенный радиус босса. |
-| `enemies` | [25](../src/game/world/WorldState.ts#L25) | Живые и завершающие анимацию смерти противники. |
-| `coins` | [26](../src/game/world/WorldState.ts#L26) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
-| `projectiles` | [27](../src/game/world/WorldState.ts#L27) | Активные летящие снаряды героя и врагов. |
-| `hazards` | [28](../src/game/world/WorldState.ts#L28) | Опасные зоны: предупреждения, время действия, урон и владелец. |
-| `chests` | [29](../src/game/world/WorldState.ts#L29) | Сундуки испытаний и их открытость. |
-| `merchants` | [30](../src/game/world/WorldState.ts#L30) | Ссылки на спрайты кузнецов деревень. |
-| `fires` | [31](../src/game/world/WorldState.ts#L31) | Спрайты костров. |
-| `regionIndex` | [32](../src/game/world/WorldState.ts#L32) | Индекс текущего биома; в деревне связан со следующим биомом. |
-| `area` | [33](../src/game/world/WorldState.ts#L33) | Тип области: village, biome, tutorial или interior. |
-| `villageIndex` | [34](../src/game/world/WorldState.ts#L34) | Индекс текущей деревни; начальная деревня имеет индекс -1. |
-| `lastVillage` | [35](../src/game/world/WorldState.ts#L35) | Индекс последнего посещённого костра для возвращения после смерти. |
-| `houses` | [44](../src/game/world/WorldState.ts#L44) | Дома с ролью владельца, дверью, крышей и подписью. |
-| `interiorRole` | [45](../src/game/world/WorldState.ts#L45) | Роль владельца открытого дома или null. |
-| `interiorReturn` | [46](../src/game/world/WorldState.ts#L46) | После выхода из интерьера вернуться в деревню или учебный двор. |
-| `interiorLayer` | [47](../src/game/world/WorldState.ts#L47) | Контейнер внутреннего оформления дома. |
-| `interiorShade` | [48](../src/game/world/WorldState.ts#L48) | Затемнение наружного мира при входе в дом. |
-| `outdoorArt` | [49](../src/game/world/WorldState.ts#L49) | Наружные объекты, которые скрываются на время интерьера. |
-| `wisp` | [56](../src/game/world/WorldState.ts#L56) | Спрайт сопровождаемого огонька или null. |
-| `wispFear` | [57](../src/game/world/WorldState.ts#L57) | Время, в течение которого огонёк боится и отступает. |
-| `wispPath` | [58](../src/game/world/WorldState.ts#L58) | Текущий путь огонька по свободным клеткам. |
-| `wispPathLeft` | [59](../src/game/world/WorldState.ts#L59) | Таймер до пересчёта пути огонька. |
-| `weather` | [60](../src/game/world/WorldState.ts#L60) | Текущее погодное событие или clear. |
-| `weatherLeft` | [61](../src/game/world/WorldState.ts#L61) | Оставшаяся длительность погодного события. |
-| `weatherNext` | [62](../src/game/world/WorldState.ts#L62) | Время до выбора следующей погоды. |
-| `strike` | [66](../src/game/world/WorldState.ts#L66) | Активное предупреждение или удар молнии. |
-| `strikeNext` | [67](../src/game/world/WorldState.ts#L67) | Время до следующего удара погодного события. |
-| `biomeMoods` | [68](../src/game/world/WorldState.ts#L68) | Графические слои затемнения, могил и цветов по биомам. |
-| `windSoundLeft` | [74](../src/game/world/WorldState.ts#L74) | Таймер звука урагана. |
-| `drawnRegions` | [75](../src/game/world/WorldState.ts#L75) | Биомы, для которых уже созданы декорации. |
-| `drawnVillages` | [76](../src/game/world/WorldState.ts#L76) | Деревни, для которых уже созданы дома и жители. |
+| `Coin` | [14](../src/game/world/WorldState.ts#L14) | Форма данных для проверки TypeScript. |
+| `region` | [15](../src/game/world/WorldState.ts#L15) | Поле состояния или ссылка на систему. |
+| `sprite` | [16](../src/game/world/WorldState.ts#L16) | Поле состояния или ссылка на систему. |
+| `value` | [17](../src/game/world/WorldState.ts#L17) | Поле состояния или ссылка на систему. |
+| `phase` | [18](../src/game/world/WorldState.ts#L18) | Поле состояния или ссылка на систему. |
+| `Chest` | [20](../src/game/world/WorldState.ts#L20) | Форма данных для проверки TypeScript. |
+| `sprite` | [21](../src/game/world/WorldState.ts#L21) | Поле состояния или ссылка на систему. |
+| `WorldState` | [23](../src/game/world/WorldState.ts#L23) | Объявление в этом модуле. |
+| `terrain` | [24](../src/game/world/WorldState.ts#L24) | Общий список препятствий наружного мира. |
+| `terrainByRegion` | [25](../src/game/world/WorldState.ts#L25) | Препятствия, сгруппированные по биомам. |
+| `nav` | [26](../src/game/world/WorldState.ts#L26) | Сетки навигации обычных противников по биомам. |
+| `bossNav` | [27](../src/game/world/WorldState.ts#L27) | Сетки навигации под увеличенный радиус босса. |
+| `enemies` | [28](../src/game/world/WorldState.ts#L28) | Живые и завершающие анимацию смерти противники. |
+| `coins` | [29](../src/game/world/WorldState.ts#L29) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
+| `projectiles` | [30](../src/game/world/WorldState.ts#L30) | Активные летящие снаряды героя и врагов. |
+| `hazards` | [31](../src/game/world/WorldState.ts#L31) | Опасные зоны: предупреждения, время действия, урон и владелец. |
+| `chests` | [32](../src/game/world/WorldState.ts#L32) | Сундуки испытаний и их открытость. |
+| `merchants` | [33](../src/game/world/WorldState.ts#L33) | Ссылки на спрайты кузнецов деревень. |
+| `fires` | [34](../src/game/world/WorldState.ts#L34) | Спрайты костров. |
+| `regionIndex` | [35](../src/game/world/WorldState.ts#L35) | Индекс текущего биома; в деревне связан со следующим биомом. |
+| `area` | [36](../src/game/world/WorldState.ts#L36) | Тип области: village, biome, tutorial или interior. |
+| `villageIndex` | [37](../src/game/world/WorldState.ts#L37) | Индекс текущей деревни; начальная деревня имеет индекс -1. |
+| `lastVillage` | [38](../src/game/world/WorldState.ts#L38) | Индекс последнего посещённого костра для возвращения после смерти. |
+| `houses` | [47](../src/game/world/WorldState.ts#L47) | Дома с ролью владельца, дверью, крышей и подписью. |
+| `interiorRole` | [48](../src/game/world/WorldState.ts#L48) | Роль владельца открытого дома или null. |
+| `interiorReturn` | [49](../src/game/world/WorldState.ts#L49) | После выхода из интерьера вернуться в деревню или учебный двор. |
+| `interiorLayer` | [50](../src/game/world/WorldState.ts#L50) | Контейнер внутреннего оформления дома. |
+| `interiorShade` | [51](../src/game/world/WorldState.ts#L51) | Затемнение наружного мира при входе в дом. |
+| `outdoorArt` | [52](../src/game/world/WorldState.ts#L52) | Наружные объекты, которые скрываются на время интерьера. |
+| `wisp` | [59](../src/game/world/WorldState.ts#L59) | Спрайт сопровождаемого огонька или null. |
+| `wispFear` | [60](../src/game/world/WorldState.ts#L60) | Время, в течение которого огонёк боится и отступает. |
+| `wispPath` | [61](../src/game/world/WorldState.ts#L61) | Текущий путь огонька по свободным клеткам. |
+| `wispPathLeft` | [62](../src/game/world/WorldState.ts#L62) | Таймер до пересчёта пути огонька. |
+| `weather` | [63](../src/game/world/WorldState.ts#L63) | Текущее погодное событие или clear. |
+| `weatherLeft` | [64](../src/game/world/WorldState.ts#L64) | Оставшаяся длительность погодного события. |
+| `weatherNext` | [65](../src/game/world/WorldState.ts#L65) | Время до выбора следующей погоды. |
+| `strike` | [69](../src/game/world/WorldState.ts#L69) | Активное предупреждение или удар молнии. |
+| `strikeNext` | [70](../src/game/world/WorldState.ts#L70) | Время до следующего удара погодного события. |
+| `biomeMoods` | [71](../src/game/world/WorldState.ts#L71) | Графические слои затемнения, могил и цветов по биомам. |
+| `windSoundLeft` | [77](../src/game/world/WorldState.ts#L77) | Таймер звука урагана. |
+| `drawnRegions` | [78](../src/game/world/WorldState.ts#L78) | Биомы, для которых уже созданы декорации. |
+| `drawnVillages` | [79](../src/game/world/WorldState.ts#L79) | Деревни, для которых уже созданы дома и жители. |
+| `resetJourney` | [81](../src/game/world/WorldState.ts#L81) | Сбрасывает профиль, прогресс, задания, статистику и мир текущей игры. |
+| `resetScene` | [94](../src/game/world/WorldState.ts#L94) | Объявление в этом модуле. |
 
 ### [src/game/world/WorldSystem.ts](../src/game/world/WorldSystem.ts)
 
 Границы, переходы между областями, камера, контрольные точки и возрождение.
 
-Строк: 385.
+Строк: 418.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `WorldSystem` | [21](../src/game/world/WorldSystem.ts#L21) | Объявление в этом модуле. |
-| `regionBounds` | [23](../src/game/world/WorldSystem.ts#L23) | Границы указанного биома. |
-| `playerBounds` | [32](../src/game/world/WorldSystem.ts#L32) | Допустимые границы героя с учётом печати, деревни и интерьера. |
+| `WorldSystem` | [19](../src/game/world/WorldSystem.ts#L19) | Объявление в этом модуле. |
+| `regionBounds` | [21](../src/game/world/WorldSystem.ts#L21) | Границы указанного биома. |
+| `playerBounds` | [30](../src/game/world/WorldSystem.ts#L30) | Допустимые границы героя с учётом печати, деревни и интерьера. |
 | `activeTerrain` | [69](../src/game/world/WorldSystem.ts#L69) | Выбирает препятствия улицы или комнаты. |
 | `configureCamera` | [75](../src/game/world/WorldSystem.ts#L75) | Масштабирует камеру, ведёт героя или центрирует комнату. |
-| `freePosition` | [94](../src/game/world/WorldSystem.ts#L94) | Находит свободную точку появления; при неудаче использует сетку навигации. |
-| `clearActors` | [116](../src/game/world/WorldSystem.ts#L116) | Удаляет динамические объекты и сбрасывает временные боевые состояния. |
-| `startRegion` | [148](../src/game/world/WorldSystem.ts#L148) | Подготавливает биом, врагов и силу, сбрасывает бой и при необходимости запускает сцену похищения. |
-| `reachCheckpoint` | [233](../src/game/world/WorldSystem.ts#L233) | Показывает имя достигнутого костра. |
-| `respawn` | [240](../src/game/world/WorldSystem.ts#L240) | Возвращает героя после смерти и обновляет испытания непройденного биома. |
-| `checkProgress` | [264](../src/game/world/WorldSystem.ts#L264) | Проверяет квоту силы и смерть босса, открывает путь и запускает переходы. |
-| `startVillage` | [308](../src/game/world/WorldSystem.ts#L308) | Активирует деревню, костёр, камеру и восстановление при возвращении. |
-| `freeNear` | [363](../src/game/world/WorldSystem.ts#L363) | Подбирает ближайшую свободную точку для сюжетного объекта. |
+| `freePosition` | [96](../src/game/world/WorldSystem.ts#L96) | Находит свободную точку появления; при неудаче использует сетку навигации. |
+| `clearActors` | [119](../src/game/world/WorldSystem.ts#L119) | Удаляет динамические объекты и сбрасывает временные боевые состояния. |
+| `startRegion` | [160](../src/game/world/WorldSystem.ts#L160) | Подготавливает биом, врагов и силу, сбрасывает бой и при необходимости запускает сцену похищения. |
+| `reachCheckpoint` | [255](../src/game/world/WorldSystem.ts#L255) | Показывает имя достигнутого костра. |
+| `respawn` | [262](../src/game/world/WorldSystem.ts#L262) | Возвращает героя после смерти и обновляет испытания непройденного биома. |
+| `checkProgress` | [288](../src/game/world/WorldSystem.ts#L288) | Проверяет квоту силы и смерть босса, открывает путь и запускает переходы. |
+| `startVillage` | [335](../src/game/world/WorldSystem.ts#L335) | Активирует деревню, костёр, камеру и восстановление при возвращении. |
+| `freeNear` | [392](../src/game/world/WorldSystem.ts#L392) | Подбирает ближайшую свободную точку для сюжетного объекта. |
 
 ## Деревни
 
@@ -588,59 +805,58 @@
 
 Имена и виды жителей, их реплики, названия домов и ассортимент оружия по деревням.
 
-Строк: 62.
+Строк: 23.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `SPECIES` | [4](../src/game/village/Residents.ts#L4) | Параметры, таблица данных или функция, объявленная константой. |
-| `villageStock` | [44](../src/game/village/Residents.ts#L44) | Параметры, таблица данных или функция, объявленная константой. |
-| `resident` | [46](../src/game/village/Residents.ts#L46) | Собирает имя, облик, профессию и реплику жителя. |
-| `houseName` | [59](../src/game/village/Residents.ts#L59) | Название дома с именем владельца. |
-| `villageTradition` | [61](../src/game/village/Residents.ts#L61) | Параметры, таблица данных или функция, объявленная константой. |
+| `villageStock` | [5](../src/game/village/Residents.ts#L5) | Параметры, таблица данных или функция, объявленная константой. |
+| `resident` | [7](../src/game/village/Residents.ts#L7) | Собирает имя, облик, профессию и реплику жителя. |
+| `houseName` | [20](../src/game/village/Residents.ts#L20) | Название дома с именем владельца. |
+| `villageTradition` | [22](../src/game/village/Residents.ts#L22) | Параметры, таблица данных или функция, объявленная константой. |
 
 ### [src/game/village/VillageLayout.ts](../src/game/village/VillageLayout.ts)
 
 Координаты домов, двери, границы интерьеров, препятствия и оформление помещений.
 
-Строк: 67.
+Строк: 64.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `House` | [6](../src/game/village/VillageLayout.ts#L6) | Форма данных для проверки TypeScript. |
-| `village` | [7](../src/game/village/VillageLayout.ts#L7) | Поле состояния или ссылка на систему. |
-| `role` | [8](../src/game/village/VillageLayout.ts#L8) | Поле состояния или ссылка на систему. |
-| `x` | [9](../src/game/village/VillageLayout.ts#L9) | Поле состояния или ссылка на систему. |
-| `y` | [10](../src/game/village/VillageLayout.ts#L10) | Поле состояния или ссылка на систему. |
-| `door` | [11](../src/game/village/VillageLayout.ts#L11) | Поле состояния или ссылка на систему. |
-| `roof` | [12](../src/game/village/VillageLayout.ts#L12) | Поле состояния или ссылка на систему. |
-| `label` | [13](../src/game/village/VillageLayout.ts#L13) | Поле состояния или ссылка на систему. |
-| `HOUSE_NAMES` | [15](../src/game/village/VillageLayout.ts#L15) | Параметры, таблица данных или функция, объявленная константой. |
-| `housePoint` | [21](../src/game/village/VillageLayout.ts#L21) | Координаты дома по деревне и роли жителя. |
-| `interiorBounds` | [26](../src/game/village/VillageLayout.ts#L26) | Границы перемещения в комнате. |
-| `interiorObstacles` | [35](../src/game/village/VillageLayout.ts#L35) | Непроходимые предметы комнаты. |
-| `interiorArt` | [41](../src/game/village/VillageLayout.ts#L41) | Рисует интерьер и его название. |
+| `House` | [8](../src/game/village/VillageLayout.ts#L8) | Форма данных для проверки TypeScript. |
+| `village` | [9](../src/game/village/VillageLayout.ts#L9) | Поле состояния или ссылка на систему. |
+| `role` | [10](../src/game/village/VillageLayout.ts#L10) | Поле состояния или ссылка на систему. |
+| `x` | [11](../src/game/village/VillageLayout.ts#L11) | Поле состояния или ссылка на систему. |
+| `y` | [12](../src/game/village/VillageLayout.ts#L12) | Поле состояния или ссылка на систему. |
+| `door` | [13](../src/game/village/VillageLayout.ts#L13) | Поле состояния или ссылка на систему. |
+| `roof` | [14](../src/game/village/VillageLayout.ts#L14) | Поле состояния или ссылка на систему. |
+| `label` | [15](../src/game/village/VillageLayout.ts#L15) | Поле состояния или ссылка на систему. |
+| `housePoint` | [18](../src/game/village/VillageLayout.ts#L18) | Координаты дома по деревне и роли жителя. |
+| `interiorBounds` | [23](../src/game/village/VillageLayout.ts#L23) | Границы перемещения в комнате. |
+| `interiorObstacles` | [32](../src/game/village/VillageLayout.ts#L32) | Непроходимые предметы комнаты. |
+| `interiorArt` | [38](../src/game/village/VillageLayout.ts#L38) | Рисует интерьер и его название. |
 
 ### [src/game/village/VillageSystem.ts](../src/game/village/VillageSystem.ts)
 
 Дома, собеседники, взаимодействия, доставки и быстрое путешествие.
 
-Строк: 315.
+Строк: 360.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `VillageSystem` | [9](../src/game/village/VillageSystem.ts#L9) | Объявление в этом модуле. |
-| `updateCamp` | [11](../src/game/village/VillageSystem.ts#L11) | Выбирает ближайшую дверь, жителя, сундук или предмет для E. |
-| `enterHouse` | [73](../src/game/village/VillageSystem.ts#L73) | Скрывает улицу и помещает героя в интерьер дома. |
-| `clearInterior` | [103](../src/game/village/VillageSystem.ts#L103) | Удаляет интерьер и возвращает видимость наружных объектов. |
-| `exitHouse` | [121](../src/game/village/VillageSystem.ts#L121) | Возвращает героя к двери на улице. |
-| `interact` | [137](../src/game/village/VillageSystem.ts#L137) | Исполняет доступное действие E по ближайшей цели. |
-| `say` | [188](../src/game/village/VillageSystem.ts#L188) | Начинает постепенный вывод реплики. |
-| `leaveDialog` | [194](../src/game/village/VillageSystem.ts#L194) | Закрывает разговор и возвращает управление. |
-| `openTravel` | [201](../src/game/village/VillageSystem.ts#L201) | Строит список посещённых деревень для перехода. |
-| `closeTravel` | [219](../src/game/village/VillageSystem.ts#L219) | Возвращает из списка путешествий в меню. |
-| `travelTo` | [226](../src/game/village/VillageSystem.ts#L226) | Перемещает к доступному посещённому костру. |
-| `renderDeliveryTalk` | [248](../src/game/village/VillageSystem.ts#L248) | Обновляет кнопку доставки для текущего жителя. |
-| `talkDelivery` | [275](../src/game/village/VillageSystem.ts#L275) | Принимает, передаёт или завершает доставку и выдаёт награду. |
+| `VillageSystem` | [15](../src/game/village/VillageSystem.ts#L15) | Объявление в этом модуле. |
+| `updateCamp` | [17](../src/game/village/VillageSystem.ts#L17) | Выбирает ближайшую дверь, жителя, сундук или предмет для E. |
+| `enterHouse` | [89](../src/game/village/VillageSystem.ts#L89) | Скрывает улицу и помещает героя в интерьер дома. |
+| `clearInterior` | [121](../src/game/village/VillageSystem.ts#L121) | Удаляет интерьер и возвращает видимость наружных объектов. |
+| `exitHouse` | [143](../src/game/village/VillageSystem.ts#L143) | Возвращает героя к двери на улице. |
+| `interact` | [163](../src/game/village/VillageSystem.ts#L163) | Исполняет доступное действие E по ближайшей цели. |
+| `say` | [218](../src/game/village/VillageSystem.ts#L218) | Начинает постепенный вывод реплики. |
+| `leaveDialog` | [224](../src/game/village/VillageSystem.ts#L224) | Закрывает разговор и возвращает управление. |
+| `openTravel` | [230](../src/game/village/VillageSystem.ts#L230) | Строит список посещённых деревень для перехода. |
+| `closeTravel` | [251](../src/game/village/VillageSystem.ts#L251) | Возвращает из списка путешествий в меню. |
+| `travelTo` | [257](../src/game/village/VillageSystem.ts#L257) | Перемещает к доступному посещённому костру. |
+| `renderDeliveryTalk` | [282](../src/game/village/VillageSystem.ts#L282) | Обновляет кнопку доставки для текущего жителя. |
+| `talkDelivery` | [309](../src/game/village/VillageSystem.ts#L309) | Принимает, передаёт или завершает доставку и выдаёт награду. |
+| `updateDialog` | [352](../src/game/village/VillageSystem.ts#L352) | Объявление в этом модуле. |
 
 ## Торговля и осколки
 
@@ -648,31 +864,20 @@
 
 Сбор осколков, кошелёк, ассортимент, покупки и экипировка.
 
-Строк: 319.
+Строк: 359.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `EconomySystem` | [29](../src/game/economy/EconomySystem.ts#L29) | Объявление в этом модуле. |
-| `spawnCoin` | [31](../src/game/economy/EconomySystem.ts#L31) | Создаёт осколок в мире. |
-| `grantCoins` | [48](../src/game/economy/EconomySystem.ts#L48) | Раздельно меняет кошелёк и силу биома; учитывает лимит наземного дохода. |
-| `collectCoins` | [92](../src/game/economy/EconomySystem.ts#L92) | Собирает осколки в радиусе героя и сообщает об этом заданиям. |
-| `openShop` | [119](../src/game/economy/EconomySystem.ts#L119) | Открывает магазин и выбирает доступные разделы по роли жителя. |
-| `renderShop` | [161](../src/game/economy/EconomySystem.ts#L161) | Обновляет кошелёк, вкладки, страницы и карточки магазина. |
-| `itemCards` | [190](../src/game/economy/EconomySystem.ts#L190) | Строит карточки цен, условий открытия и покупки. |
-| `applyEquipment` | [251](../src/game/economy/EconomySystem.ts#L251) | Пересчитывает доступные ресурсы и внешний вид после смены вещей. |
-| `equip` | [265](../src/game/economy/EconomySystem.ts#L265) | Надевает уже полученную вещь. |
-| `buyItem` | [280](../src/game/economy/EconomySystem.ts#L280) | Покупает расходник или вызывает общие правила покупки снаряжения. |
-
-### [src/game/economy/ShopCatalog.ts](../src/game/economy/ShopCatalog.ts)
-
-Зелье, перевязка, заряд фляги и полное лечение: идентификаторы, цены и подписи.
-
-Строк: 31.
-
-| Символ | Строка | Назначение |
-| --- | --- | --- |
-| `POTION_PRICE` | [1](../src/game/economy/ShopCatalog.ts#L1) | Параметры, таблица данных или функция, объявленная константой. |
-| `SUPPLIES` | [2](../src/game/economy/ShopCatalog.ts#L2) | Параметры, таблица данных или функция, объявленная константой. |
+| `EconomySystem` | [37](../src/game/economy/EconomySystem.ts#L37) | Объявление в этом модуле. |
+| `spawnCoin` | [39](../src/game/economy/EconomySystem.ts#L39) | Создаёт осколок в мире. |
+| `grantCoins` | [57](../src/game/economy/EconomySystem.ts#L57) | Раздельно меняет кошелёк и силу биома; учитывает лимит наземного дохода. |
+| `collectCoins` | [109](../src/game/economy/EconomySystem.ts#L109) | Собирает осколки в радиусе героя и сообщает об этом заданиям. |
+| `openShop` | [138](../src/game/economy/EconomySystem.ts#L138) | Открывает магазин и выбирает доступные разделы по роли жителя. |
+| `renderShop` | [184](../src/game/economy/EconomySystem.ts#L184) | Обновляет кошелёк, вкладки, страницы и карточки магазина. |
+| `itemCards` | [213](../src/game/economy/EconomySystem.ts#L213) | Строит карточки цен, условий открытия и покупки. |
+| `applyEquipment` | [276](../src/game/economy/EconomySystem.ts#L276) | Пересчитывает доступные ресурсы и внешний вид после смены вещей. |
+| `equip` | [290](../src/game/economy/EconomySystem.ts#L290) | Надевает уже полученную вещь. |
+| `buyItem` | [310](../src/game/economy/EconomySystem.ts#L310) | Покупает расходник или вызывает общие правила покупки снаряжения. |
 
 ## Развитие
 
@@ -680,222 +885,230 @@
 
 15 достижений и условия их получения по фактам текущего путешествия.
 
-Строк: 140.
+Строк: 34.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `ACHIEVEMENTS` | [2](../src/game/progression/Achievements.ts#L2) | Параметры, таблица данных или функция, объявленная константой. |
-| `AchievementId` | [111](../src/game/progression/Achievements.ts#L111) | Форма данных для проверки TypeScript. |
-| `AchievementFacts` | [112](../src/game/progression/Achievements.ts#L112) | Форма данных для проверки TypeScript. |
-| `bosses` | [113](../src/game/progression/Achievements.ts#L113) | Поле состояния или ссылка на систему. |
-| `counters` | [114](../src/game/progression/Achievements.ts#L114) | Поле состояния или ссылка на систему. |
-| `skills` | [115](../src/game/progression/Achievements.ts#L115) | Поле состояния или ссылка на систему. |
-| `deliveries` | [116](../src/game/progression/Achievements.ts#L116) | Состояния доставок: принято, передано и награда получена. |
-| `promise` | [117](../src/game/progression/Achievements.ts#L117) | Поле состояния или ссылка на систему. |
-| `kills` | [118](../src/game/progression/Achievements.ts#L118) | Число побеждённых противников текущего путешествия. |
-| `returned` | [119](../src/game/progression/Achievements.ts#L119) | Поле состояния или ссылка на систему. |
-| `trained` | [120](../src/game/progression/Achievements.ts#L120) | Поле состояния или ссылка на систему. |
-| `earnedAchievements` | [122](../src/game/progression/Achievements.ts#L122) | Выбирает достижения по переданным фактам. |
+| `AchievementId` | [5](../src/game/progression/Achievements.ts#L5) | Форма данных для проверки TypeScript. |
+| `AchievementFacts` | [6](../src/game/progression/Achievements.ts#L6) | Форма данных для проверки TypeScript. |
+| `bosses` | [7](../src/game/progression/Achievements.ts#L7) | Поле состояния или ссылка на систему. |
+| `counters` | [8](../src/game/progression/Achievements.ts#L8) | Поле состояния или ссылка на систему. |
+| `skills` | [9](../src/game/progression/Achievements.ts#L9) | Поле состояния или ссылка на систему. |
+| `deliveries` | [10](../src/game/progression/Achievements.ts#L10) | Состояния доставок: принято, передано и награда получена. |
+| `promise` | [11](../src/game/progression/Achievements.ts#L11) | Поле состояния или ссылка на систему. |
+| `kills` | [12](../src/game/progression/Achievements.ts#L12) | Число побеждённых противников текущего путешествия. |
+| `returned` | [13](../src/game/progression/Achievements.ts#L13) | Поле состояния или ссылка на систему. |
+| `trained` | [14](../src/game/progression/Achievements.ts#L14) | Поле состояния или ссылка на систему. |
+| `earnedAchievements` | [16](../src/game/progression/Achievements.ts#L16) | Выбирает достижения по переданным фактам. |
 
 ### [src/game/progression/PlayerProgression.ts](../src/game/progression/PlayerProgression.ts)
 
 Каталоги оружия, брони, обликов и улучшений; профиль, цены, покупки и проверка полей профиля.
 
-Строк: 545.
+Строк: 285.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `PROFILE_KEY` | [3](../src/game/progression/PlayerProgression.ts#L3) | Параметры, таблица данных или функция, объявленная константой. |
-| `LEGACY_KEYS` | [4](../src/game/progression/PlayerProgression.ts#L4) | Параметры, таблица данных или функция, объявленная константой. |
-| `SKINS` | [13](../src/game/progression/PlayerProgression.ts#L13) | Параметры, таблица данных или функция, объявленная константой. |
-| `WEAPONS` | [58](../src/game/progression/PlayerProgression.ts#L58) | Параметры, таблица данных или функция, объявленная константой. |
-| `WeaponId` | [180](../src/game/progression/PlayerProgression.ts#L180) | Форма данных для проверки TypeScript. |
-| `ARMORS` | [181](../src/game/progression/PlayerProgression.ts#L181) | Параметры, таблица данных или функция, объявленная константой. |
-| `ArmorId` | [235](../src/game/progression/PlayerProgression.ts#L235) | Форма данных для проверки TypeScript. |
-| `ATTRIBUTE_GAIN` | [236](../src/game/progression/PlayerProgression.ts#L236) | Параметры, таблица данных или функция, объявленная константой. |
-| `ATTRIBUTE_FIRST_PRICE` | [237](../src/game/progression/PlayerProgression.ts#L237) | Поле состояния или ссылка на систему. |
-| `ATTRIBUTE_PRICE_STEP` | [238](../src/game/progression/PlayerProgression.ts#L238) | Поле состояния или ссылка на систему. |
-| `AttributeId` | [239](../src/game/progression/PlayerProgression.ts#L239) | Форма данных для проверки TypeScript. |
-| `UPGRADES` | [240](../src/game/progression/PlayerProgression.ts#L240) | Параметры, таблица данных или функция, объявленная константой. |
-| `UpgradeId` | [326](../src/game/progression/PlayerProgression.ts#L326) | Форма данных для проверки TypeScript. |
-| `Profile` | [327](../src/game/progression/PlayerProgression.ts#L327) | Форма данных для проверки TypeScript. |
-| `healthLevel` | [328](../src/game/progression/PlayerProgression.ts#L328) | Поле состояния или ссылка на систему. |
-| `enduranceLevel` | [329](../src/game/progression/PlayerProgression.ts#L329) | Поле состояния или ссылка на систему. |
-| `potions` | [330](../src/game/progression/PlayerProgression.ts#L330) | Поле состояния или ссылка на систему. |
-| `trackedQuest` | [331](../src/game/progression/PlayerProgression.ts#L331) | Поле состояния или ссылка на систему. |
-| `skills` | [332](../src/game/progression/PlayerProgression.ts#L332) | Поле состояния или ссылка на систему. |
-| `unlockedSkills` | [333](../src/game/progression/PlayerProgression.ts#L333) | Поле состояния или ссылка на систему. |
-| `disabledSkills` | [334](../src/game/progression/PlayerProgression.ts#L334) | Поле состояния или ссылка на систему. |
-| `skillPoints` | [335](../src/game/progression/PlayerProgression.ts#L335) | Поле состояния или ссылка на систему. |
-| `achievements` | [336](../src/game/progression/PlayerProgression.ts#L336) | Поле состояния или ссылка на систему. |
-| `counterWins` | [337](../src/game/progression/PlayerProgression.ts#L337) | Поле состояния или ссылка на систему. |
-| `coins` | [338](../src/game/progression/PlayerProgression.ts#L338) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
-| `owned` | [339](../src/game/progression/PlayerProgression.ts#L339) | Поле состояния или ссылка на систему. |
-| `skin` | [340](../src/game/progression/PlayerProgression.ts#L340) | Поле состояния или ссылка на систему. |
-| `blade` | [341](../src/game/progression/PlayerProgression.ts#L341) | Поле состояния или ссылка на систему. |
-| `upgrades` | [342](../src/game/progression/PlayerProgression.ts#L342) | Поле состояния или ссылка на систему. |
-| `weapons` | [343](../src/game/progression/PlayerProgression.ts#L343) | Поле состояния или ссылка на систему. |
-| `weapon` | [344](../src/game/progression/PlayerProgression.ts#L344) | Поле состояния или ссылка на систему. |
-| `relics` | [345](../src/game/progression/PlayerProgression.ts#L345) | Поле состояния или ссылка на систему. |
-| `armors` | [346](../src/game/progression/PlayerProgression.ts#L346) | Поле состояния или ссылка на систему. |
-| `armor` | [347](../src/game/progression/PlayerProgression.ts#L347) | Поле состояния или ссылка на систему. |
-| `newProfile` | [349](../src/game/progression/PlayerProgression.ts#L349) | Начальные покупки, ресурсы развития и снаряжение. |
-| `weaponFor` | [384](../src/game/progression/PlayerProgression.ts#L384) | Параметры выбранного оружия; при неизвестном id возвращает меч. |
-| `armorFor` | [385](../src/game/progression/PlayerProgression.ts#L385) | Параметры надетой брони. |
-| `isAttribute` | [386](../src/game/progression/PlayerProgression.ts#L386) | Проверка повторного улучшения vitality или focus. |
-| `attributeLevel` | [387](../src/game/progression/PlayerProgression.ts#L387) | Текущий уровень повторного усиления. |
-| `id` | [388](../src/game/progression/PlayerProgression.ts#L388) | Поле состояния или ссылка на систему. |
-| `attributePrice` | [389](../src/game/progression/PlayerProgression.ts#L389) | Цена следующего усиления HP или выносливости. |
-| `parseProfile` | [391](../src/game/progression/PlayerProgression.ts#L391) | Проверяет профиль и отбрасывает неизвестные предметы и навыки. |
-| `itemUnlock` | [467](../src/game/progression/PlayerProgression.ts#L467) | Количество печатей для открытия предмета или ступени улучшения. |
-| `isAttribute` | [468](../src/game/progression/PlayerProgression.ts#L468) | Проверка повторного улучшения vitality или focus. |
-| `purchase` | [491](../src/game/progression/PlayerProgression.ts#L491) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
+| `WeaponId` | [16](../src/game/progression/PlayerProgression.ts#L16) | Форма данных для проверки TypeScript. |
+| `ArmorId` | [18](../src/game/progression/PlayerProgression.ts#L18) | Форма данных для проверки TypeScript. |
+| `AttributeId` | [20](../src/game/progression/PlayerProgression.ts#L20) | Форма данных для проверки TypeScript. |
+| `UpgradeId` | [22](../src/game/progression/PlayerProgression.ts#L22) | Форма данных для проверки TypeScript. |
+| `Profile` | [23](../src/game/progression/PlayerProgression.ts#L23) | Форма данных для проверки TypeScript. |
+| `healthLevel` | [24](../src/game/progression/PlayerProgression.ts#L24) | Поле состояния или ссылка на систему. |
+| `enduranceLevel` | [25](../src/game/progression/PlayerProgression.ts#L25) | Поле состояния или ссылка на систему. |
+| `potions` | [26](../src/game/progression/PlayerProgression.ts#L26) | Поле состояния или ссылка на систему. |
+| `trackedQuest` | [27](../src/game/progression/PlayerProgression.ts#L27) | Поле состояния или ссылка на систему. |
+| `skills` | [28](../src/game/progression/PlayerProgression.ts#L28) | Поле состояния или ссылка на систему. |
+| `unlockedSkills` | [29](../src/game/progression/PlayerProgression.ts#L29) | Поле состояния или ссылка на систему. |
+| `disabledSkills` | [30](../src/game/progression/PlayerProgression.ts#L30) | Поле состояния или ссылка на систему. |
+| `skillPoints` | [31](../src/game/progression/PlayerProgression.ts#L31) | Поле состояния или ссылка на систему. |
+| `achievements` | [32](../src/game/progression/PlayerProgression.ts#L32) | Поле состояния или ссылка на систему. |
+| `counterWins` | [33](../src/game/progression/PlayerProgression.ts#L33) | Поле состояния или ссылка на систему. |
+| `coins` | [34](../src/game/progression/PlayerProgression.ts#L34) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
+| `owned` | [35](../src/game/progression/PlayerProgression.ts#L35) | Поле состояния или ссылка на систему. |
+| `skin` | [36](../src/game/progression/PlayerProgression.ts#L36) | Поле состояния или ссылка на систему. |
+| `blade` | [37](../src/game/progression/PlayerProgression.ts#L37) | Поле состояния или ссылка на систему. |
+| `upgrades` | [38](../src/game/progression/PlayerProgression.ts#L38) | Поле состояния или ссылка на систему. |
+| `weapons` | [39](../src/game/progression/PlayerProgression.ts#L39) | Поле состояния или ссылка на систему. |
+| `weapon` | [40](../src/game/progression/PlayerProgression.ts#L40) | Поле состояния или ссылка на систему. |
+| `relics` | [41](../src/game/progression/PlayerProgression.ts#L41) | Поле состояния или ссылка на систему. |
+| `armors` | [42](../src/game/progression/PlayerProgression.ts#L42) | Поле состояния или ссылка на систему. |
+| `armor` | [43](../src/game/progression/PlayerProgression.ts#L43) | Поле состояния или ссылка на систему. |
+| `newProfile` | [45](../src/game/progression/PlayerProgression.ts#L45) | Начальные покупки, ресурсы развития и снаряжение. |
+| `weaponFor` | [80](../src/game/progression/PlayerProgression.ts#L80) | Параметры выбранного оружия; при неизвестном id возвращает меч. |
+| `armorFor` | [81](../src/game/progression/PlayerProgression.ts#L81) | Параметры надетой брони. |
+| `isAttribute` | [82](../src/game/progression/PlayerProgression.ts#L82) | Проверка повторного улучшения vitality или focus. |
+| `attributeLevel` | [83](../src/game/progression/PlayerProgression.ts#L83) | Текущий уровень повторного усиления. |
+| `id` | [84](../src/game/progression/PlayerProgression.ts#L84) | Поле состояния или ссылка на систему. |
+| `attributePrice` | [85](../src/game/progression/PlayerProgression.ts#L85) | Цена следующего усиления HP или выносливости. |
+| `parseProfile` | [87](../src/game/progression/PlayerProgression.ts#L87) | Проверяет профиль и отбрасывает неизвестные предметы и навыки. |
+| `itemUnlock` | [187](../src/game/progression/PlayerProgression.ts#L187) | Количество печатей для открытия предмета или ступени улучшения. |
+| `isAttribute` | [188](../src/game/progression/PlayerProgression.ts#L188) | Проверка повторного улучшения vitality или focus. |
+| `purchase` | [211](../src/game/progression/PlayerProgression.ts#L211) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
 
 ### [src/game/progression/Skills.ts](../src/game/progression/Skills.ts)
 
 12 оружейных навыков: цена, требуемые печати, изучение, отключение и возврат искр.
 
-Строк: 183.
+Строк: 54.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `WeaponStyle` | [2](../src/game/progression/Skills.ts#L2) | Форма данных для проверки TypeScript. |
-| `SKILL_TREE` | [3](../src/game/progression/Skills.ts#L3) | Параметры, таблица данных или функция, объявленная константой. |
-| `SkillId` | [150](../src/game/progression/Skills.ts#L150) | Форма данных для проверки TypeScript. |
-| `learnSkill` | [151](../src/game/progression/Skills.ts#L151) | Проверяет ветку, печати, искры и оплату навыка. |
-| `refundBranch` | [168](../src/game/progression/Skills.ts#L168) | Возвращает искры ветки, сохраняя оплаченное открытие. |
-| `toggleSkill` | [177](../src/game/progression/Skills.ts#L177) | Убирает изученный навык с панели или возвращает его. |
+| `WeaponStyle` | [4](../src/game/progression/Skills.ts#L4) | Форма данных для проверки TypeScript. |
+| `SkillId` | [6](../src/game/progression/Skills.ts#L6) | Форма данных для проверки TypeScript. |
+| `learnSkill` | [7](../src/game/progression/Skills.ts#L7) | Проверяет ветку, печати, искры и оплату навыка. |
+| `refundBranch` | [37](../src/game/progression/Skills.ts#L37) | Возвращает искры ветки, сохраняя оплаченное открытие. |
+| `toggleSkill` | [46](../src/game/progression/Skills.ts#L46) | Убирает изученный навык с панели или возвращает его. |
 
 ## Задания и награды
+
+### [src/game/quests/AchievementSystem.ts](../src/game/quests/AchievementSystem.ts)
+
+Условия достижений, уведомления и вкладка наград.
+
+Строк: 84.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `AchievementSystem` | [7](../src/game/quests/AchievementSystem.ts#L7) | Объявление в этом модуле. |
+| `syncAchievements` | [10](../src/game/quests/AchievementSystem.ts#L10) | Вычисляет новые достижения и ставит их в очередь уведомлений. |
+| `updateAchievementNotice` | [33](../src/game/quests/AchievementSystem.ts#L33) | Показывает очередное достижение ограниченное время. |
+| `renderAchievements` | [63](../src/game/quests/AchievementSystem.ts#L63) | Строит страницу открытых и закрытых достижений. |
 
 ### [src/game/quests/Journal.ts](../src/game/quests/Journal.ts)
 
 Описания испытаний и сборка записей о сюжетных поручениях и доставках.
 
-Строк: 143.
+Строк: 114.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `JournalEntry` | [13](../src/game/quests/Journal.ts#L13) | Форма данных для проверки TypeScript. |
-| `id` | [14](../src/game/quests/Journal.ts#L14) | Поле состояния или ссылка на систему. |
-| `title` | [15](../src/game/quests/Journal.ts#L15) | Поле состояния или ссылка на систему. |
-| `why` | [16](../src/game/quests/Journal.ts#L16) | Поле состояния или ссылка на систему. |
-| `status` | [17](../src/game/quests/Journal.ts#L17) | Поле состояния или ссылка на систему. |
-| `next` | [18](../src/game/quests/Journal.ts#L18) | Поле состояния или ссылка на систему. |
-| `steps` | [19](../src/game/quests/Journal.ts#L19) | Поле состояния или ссылка на систему. |
-| `reward` | [20](../src/game/quests/Journal.ts#L20) | Поле состояния или ссылка на систему. |
-| `done` | [21](../src/game/quests/Journal.ts#L21) | Поле состояния или ссылка на систему. |
-| `available` | [22](../src/game/quests/Journal.ts#L22) | Поле состояния или ссылка на систему. |
-| `point` | [23](../src/game/quests/Journal.ts#L23) | Поле состояния или ссылка на систему. |
-| `region` | [24](../src/game/quests/Journal.ts#L24) | Поле состояния или ссылка на систему. |
-| `village` | [25](../src/game/quests/Journal.ts#L25) | Поле состояния или ссылка на систему. |
-| `QUEST_NOTES` | [27](../src/game/quests/Journal.ts#L27) | Параметры, таблица данных или функция, объявленная константой. |
-| `lineJournal` | [50](../src/game/quests/Journal.ts#L50) | Запись и цель сюжетного поручения. |
-| `deliveryJournal` | [108](../src/game/quests/Journal.ts#L108) | Запись и цель доставки. |
+| `JournalEntry` | [6](../src/game/quests/Journal.ts#L6) | Форма данных для проверки TypeScript. |
+| `id` | [7](../src/game/quests/Journal.ts#L7) | Поле состояния или ссылка на систему. |
+| `title` | [8](../src/game/quests/Journal.ts#L8) | Поле состояния или ссылка на систему. |
+| `why` | [9](../src/game/quests/Journal.ts#L9) | Поле состояния или ссылка на систему. |
+| `status` | [10](../src/game/quests/Journal.ts#L10) | Поле состояния или ссылка на систему. |
+| `next` | [11](../src/game/quests/Journal.ts#L11) | Поле состояния или ссылка на систему. |
+| `steps` | [12](../src/game/quests/Journal.ts#L12) | Поле состояния или ссылка на систему. |
+| `reward` | [13](../src/game/quests/Journal.ts#L13) | Поле состояния или ссылка на систему. |
+| `done` | [14](../src/game/quests/Journal.ts#L14) | Поле состояния или ссылка на систему. |
+| `available` | [15](../src/game/quests/Journal.ts#L15) | Поле состояния или ссылка на систему. |
+| `point` | [16](../src/game/quests/Journal.ts#L16) | Поле состояния или ссылка на систему. |
+| `region` | [17](../src/game/quests/Journal.ts#L17) | Поле состояния или ссылка на систему. |
+| `village` | [18](../src/game/quests/Journal.ts#L18) | Поле состояния или ссылка на систему. |
+| `lineJournal` | [21](../src/game/quests/Journal.ts#L21) | Запись и цель сюжетного поручения. |
+| `deliveryJournal` | [79](../src/game/quests/Journal.ts#L79) | Запись и цель доставки. |
+
+### [src/game/quests/LootRollRules.ts](../src/game/quests/LootRollRules.ts)
+
+Взвешенный выбор награды сундука и подбор доступных предметов.
+
+Строк: 89.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `Loot` | [4](../src/game/quests/LootRollRules.ts#L4) | Форма данных для проверки TypeScript. |
+| `kind` | [5](../src/game/quests/LootRollRules.ts#L5) | Поле состояния или ссылка на систему. |
+| `name` | [6](../src/game/quests/LootRollRules.ts#L6) | Поле состояния или ссылка на систему. |
+| `icon` | [7](../src/game/quests/LootRollRules.ts#L7) | Поле состояния или ссылка на систему. |
+| `value` | [8](../src/game/quests/LootRollRules.ts#L8) | Поле состояния или ссылка на систему. |
+| `item` | [9](../src/game/quests/LootRollRules.ts#L9) | Поле состояния или ссылка на систему. |
+| `color` | [10](../src/game/quests/LootRollRules.ts#L10) | Поле состояния или ссылка на систему. |
+| `rollLoot` | [13](../src/game/quests/LootRollRules.ts#L13) | Выбирает награду по вероятностям и доступным предметам. |
+
+### [src/game/quests/LootSystem.ts](../src/game/quests/LootSystem.ts)
+
+Сундуки, рулетка и однократное начисление награды.
+
+Строк: 144.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `LootSystem` | [19](../src/game/quests/LootSystem.ts#L19) | Объявление в этом модуле. |
+| `resetAttemptRewards` | [22](../src/game/quests/LootSystem.ts#L22) | Удаляет сундуки непройденного биома и сбрасывает его испытания после смерти. |
+| `spawnChest` | [34](../src/game/quests/LootSystem.ts#L34) | Создаёт один сундук для пары биом–испытание. |
+| `openChest` | [49](../src/game/quests/LootSystem.ts#L49) | Проверяет расстояние и открытость, выбирает награду и запускает рулетку. |
+| `applyLoot` | [89](../src/game/quests/LootSystem.ts#L89) | Выдаёт выбранную награду один раз и обновляет интерфейс. |
+| `updateLoot` | [137](../src/game/quests/LootSystem.ts#L137) | Объявление в этом модуле. |
 
 ### [src/game/quests/QuestSystem.ts](../src/game/quests/QuestSystem.ts)
 
-Испытания, сундуки, сюжетные поручения, журнал и достижения.
+Испытания, сюжетные поручения, дневник и сопровождение.
 
-Строк: 533.
-
-| Символ | Строка | Назначение |
-| --- | --- | --- |
-| `QuestSystem` | [16](../src/game/quests/QuestSystem.ts#L16) | Объявление в этом модуле. |
-| `resetAttemptRewards` | [18](../src/game/quests/QuestSystem.ts#L18) | Удаляет сундуки непройденного биома и сбрасывает его испытания после смерти. |
-| `onQuestEvent` | [25](../src/game/quests/QuestSystem.ts#L25) | Передаёт событие испытаниям и создаёт сундук за новый успех. |
-| `spawnChest` | [40](../src/game/quests/QuestSystem.ts#L40) | Создаёт один сундук для пары биом–испытание. |
-| `openChest` | [50](../src/game/quests/QuestSystem.ts#L50) | Проверяет расстояние и открытость, выбирает награду и запускает рулетку. |
-| `applyLoot` | [87](../src/game/quests/QuestSystem.ts#L87) | Выдаёт выбранную награду один раз и обновляет интерфейс. |
-| `syncAchievements` | [127](../src/game/quests/QuestSystem.ts#L127) | Вычисляет новые достижения и ставит их в очередь уведомлений. |
-| `updateAchievementNotice` | [148](../src/game/quests/QuestSystem.ts#L148) | Показывает очередное достижение ограниченное время. |
-| `renderAchievements` | [172](../src/game/quests/QuestSystem.ts#L172) | Строит страницу открытых и закрытых достижений. |
-| `journalEntries` | [193](../src/game/quests/QuestSystem.ts#L193) | Собирает записи испытаний, сюжетных поручений и доставок. |
-| `trackQuest` | [300](../src/game/quests/QuestSystem.ts#L300) | Выбирает отслеживаемое задание и соответствующую отметку на карте. |
-| `renderQuests` | [312](../src/game/quests/QuestSystem.ts#L312) | Рисует выбранный раздел и страницу журнала. |
-| `renderQuestTalk` | [332](../src/game/quests/QuestSystem.ts#L332) | Обновляет доступность сюжетного поручения у жителя. |
-| `talkQuest` | [353](../src/game/quests/QuestSystem.ts#L353) | Принимает поручение или выдаёт награду за завершение. |
-| `makeQuestProps` | [392](../src/game/quests/QuestSystem.ts#L392) | Создаёт предметы поручений и сопровождаемого огонька. |
-| `touchQuestProp` | [447](../src/game/quests/QuestSystem.ts#L447) | Обрабатывает чтение или подбор сюжетного предмета. |
-| `updateWisp` | [482](../src/game/quests/QuestSystem.ts#L482) | Ведёт сопровождаемого огонька, учитывает страх и возвращение к цели. |
-
-### [src/game/quests/TrialsAndLoot.ts](../src/game/quests/TrialsAndLoot.ts)
-
-Три повторяемых испытания, события их прогресса и случайные награды сундуков.
-
-Строк: 168.
+Строк: 400.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `Quest` | [10](../src/game/quests/TrialsAndLoot.ts#L10) | Форма данных для проверки TypeScript. |
-| `id` | [11](../src/game/quests/TrialsAndLoot.ts#L11) | Поле состояния или ссылка на систему. |
-| `name` | [12](../src/game/quests/TrialsAndLoot.ts#L12) | Поле состояния или ссылка на систему. |
-| `description` | [13](../src/game/quests/TrialsAndLoot.ts#L13) | Поле состояния или ссылка на систему. |
-| `progress` | [14](../src/game/quests/TrialsAndLoot.ts#L14) | Прогресс по биомам: сила, время, босс, очищение, доход и однократная награда. |
-| `target` | [15](../src/game/quests/TrialsAndLoot.ts#L15) | Поле состояния или ссылка на систему. |
-| `elapsed` | [16](../src/game/quests/TrialsAndLoot.ts#L16) | Игровое время путешествия, секунды. |
-| `limit` | [17](../src/game/quests/TrialsAndLoot.ts#L17) | Поле состояния или ссылка на систему. |
-| `complete` | [18](../src/game/quests/TrialsAndLoot.ts#L18) | Поле состояния или ссылка на систему. |
-| `failed` | [19](../src/game/quests/TrialsAndLoot.ts#L19) | Поле состояния или ссылка на систему. |
-| `kills` | [20](../src/game/quests/TrialsAndLoot.ts#L20) | Число побеждённых противников текущего путешествия. |
-| `newQuests` | [22](../src/game/quests/TrialsAndLoot.ts#L22) | Создаёт три испытания нового биома. |
-| `advanceQuests` | [62](../src/game/quests/TrialsAndLoot.ts#L62) | Ведёт таймер и окно серии убийств. |
-| `questEvent` | [73](../src/game/quests/TrialsAndLoot.ts#L73) | Засчитывает действия, сбрасывает серию от урона и возвращает новые успехи. |
-| `Loot` | [92](../src/game/quests/TrialsAndLoot.ts#L92) | Форма данных для проверки TypeScript. |
-| `kind` | [93](../src/game/quests/TrialsAndLoot.ts#L93) | Поле состояния или ссылка на систему. |
-| `name` | [94](../src/game/quests/TrialsAndLoot.ts#L94) | Поле состояния или ссылка на систему. |
-| `icon` | [95](../src/game/quests/TrialsAndLoot.ts#L95) | Поле состояния или ссылка на систему. |
-| `value` | [96](../src/game/quests/TrialsAndLoot.ts#L96) | Поле состояния или ссылка на систему. |
-| `item` | [97](../src/game/quests/TrialsAndLoot.ts#L97) | Поле состояния или ссылка на систему. |
-| `color` | [98](../src/game/quests/TrialsAndLoot.ts#L98) | Поле состояния или ссылка на систему. |
-| `LOOT_ODDS` | [100](../src/game/quests/TrialsAndLoot.ts#L100) | Параметры, таблица данных или функция, объявленная константой. |
-| `rollLoot` | [102](../src/game/quests/TrialsAndLoot.ts#L102) | Выбирает награду по вероятностям и доступным предметам. |
+| `QuestSystem` | [12](../src/game/quests/QuestSystem.ts#L12) | Объявление в этом модуле. |
+| `onQuestEvent` | [15](../src/game/quests/QuestSystem.ts#L15) | Передаёт событие испытаниям и создаёт сундук за новый успех. |
+| `journalEntries` | [33](../src/game/quests/QuestSystem.ts#L33) | Собирает записи испытаний, сюжетных поручений и доставок. |
+| `trackQuest` | [142](../src/game/quests/QuestSystem.ts#L142) | Выбирает отслеживаемое задание и соответствующую отметку на карте. |
+| `renderQuests` | [156](../src/game/quests/QuestSystem.ts#L156) | Рисует выбранный раздел и страницу журнала. |
+| `renderQuestTalk` | [177](../src/game/quests/QuestSystem.ts#L177) | Обновляет доступность сюжетного поручения у жителя. |
+| `talkQuest` | [198](../src/game/quests/QuestSystem.ts#L198) | Принимает поручение или выдаёт награду за завершение. |
+| `makeQuestProps` | [243](../src/game/quests/QuestSystem.ts#L243) | Создаёт предметы поручений и сопровождаемого огонька. |
+| `touchQuestProp` | [307](../src/game/quests/QuestSystem.ts#L307) | Обрабатывает чтение или подбор сюжетного предмета. |
+| `updateWisp` | [346](../src/game/quests/QuestSystem.ts#L346) | Ведёт сопровождаемого огонька, учитывает страх и возвращение к цели. |
+
+### [src/game/quests/TrialRules.ts](../src/game/quests/TrialRules.ts)
+
+Чистые правила испытаний: цели, время, серии и события прогресса.
+
+Строк: 95.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `Quest` | [3](../src/game/quests/TrialRules.ts#L3) | Форма данных для проверки TypeScript. |
+| `id` | [4](../src/game/quests/TrialRules.ts#L4) | Поле состояния или ссылка на систему. |
+| `name` | [5](../src/game/quests/TrialRules.ts#L5) | Поле состояния или ссылка на систему. |
+| `description` | [6](../src/game/quests/TrialRules.ts#L6) | Поле состояния или ссылка на систему. |
+| `progress` | [7](../src/game/quests/TrialRules.ts#L7) | Прогресс по биомам: сила, время, босс, очищение, доход и однократная награда. |
+| `target` | [8](../src/game/quests/TrialRules.ts#L8) | Поле состояния или ссылка на систему. |
+| `elapsed` | [9](../src/game/quests/TrialRules.ts#L9) | Игровое время путешествия, секунды. |
+| `limit` | [10](../src/game/quests/TrialRules.ts#L10) | Поле состояния или ссылка на систему. |
+| `complete` | [11](../src/game/quests/TrialRules.ts#L11) | Поле состояния или ссылка на систему. |
+| `failed` | [12](../src/game/quests/TrialRules.ts#L12) | Поле состояния или ссылка на систему. |
+| `kills` | [13](../src/game/quests/TrialRules.ts#L13) | Число побеждённых противников текущего путешествия. |
+| `newQuests` | [15](../src/game/quests/TrialRules.ts#L15) | Создаёт три испытания нового биома. |
+| `advanceQuests` | [55](../src/game/quests/TrialRules.ts#L55) | Ведёт таймер и окно серии убийств. |
+| `questEvent` | [69](../src/game/quests/TrialRules.ts#L69) | Засчитывает действия, сбрасывает серию от урона и возвращает новые успехи. |
 
 ## История и обучение
 
-### [src/game/story/StoryContent.ts](../src/game/story/StoryContent.ts)
+### [src/game/story/StoryProgress.ts](../src/game/story/StoryProgress.ts)
 
-Вступление, финал, практические уроки, роли жителей, сюжетные поручения и доставки.
+Типы и начальное состояние сюжетных поручений и доставок.
 
-Строк: 247.
+Строк: 44.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `Area` | [1](../src/game/story/StoryContent.ts#L1) | Форма данных для проверки TypeScript. |
-| `Role` | [2](../src/game/story/StoryContent.ts#L2) | Форма данных для проверки TypeScript. |
-| `PEOPLE` | [3](../src/game/story/StoryContent.ts#L3) | Параметры, таблица данных или функция, объявленная константой. |
-| `OPENING` | [37](../src/game/story/StoryContent.ts#L37) | Параметры, таблица данных или функция, объявленная константой. |
-| `ENDING` | [59](../src/game/story/StoryContent.ts#L59) | Параметры, таблица данных или функция, объявленная константой. |
-| `LESSONS` | [71](../src/game/story/StoryContent.ts#L71) | Параметры, таблица данных или функция, объявленная константой. |
-| `LineId` | [139](../src/game/story/StoryContent.ts#L139) | Форма данных для проверки TypeScript. |
-| `QuestLine` | [140](../src/game/story/StoryContent.ts#L140) | Форма данных для проверки TypeScript. |
-| `id` | [141](../src/game/story/StoryContent.ts#L141) | Поле состояния или ссылка на систему. |
-| `accepted` | [142](../src/game/story/StoryContent.ts#L142) | Поле состояния или ссылка на систему. |
-| `kills` | [143](../src/game/story/StoryContent.ts#L143) | Число побеждённых противников текущего путешествия. |
-| `artifact` | [144](../src/game/story/StoryContent.ts#L144) | Поле состояния или ссылка на систему. |
-| `runes` | [145](../src/game/story/StoryContent.ts#L145) | Поле состояния или ссылка на систему. |
-| `escorted` | [146](../src/game/story/StoryContent.ts#L146) | Поле состояния или ссылка на систему. |
-| `claimed` | [147](../src/game/story/StoryContent.ts#L147) | Поле состояния или ссылка на систему. |
-| `newLines` | [149](../src/game/story/StoryContent.ts#L149) | Параметры, таблица данных или функция, объявленная константой. |
-| `LINES` | [159](../src/game/story/StoryContent.ts#L159) | Параметры, таблица данных или функция, объявленная константой. |
-| `lineReady` | [194](../src/game/story/StoryContent.ts#L194) | Проверяет выполнение сюжетного поручения. |
-| `DeliveryId` | [203](../src/game/story/StoryContent.ts#L203) | Форма данных для проверки TypeScript. |
-| `Delivery` | [204](../src/game/story/StoryContent.ts#L204) | Форма данных для проверки TypeScript. |
-| `id` | [205](../src/game/story/StoryContent.ts#L205) | Поле состояния или ссылка на систему. |
-| `accepted` | [206](../src/game/story/StoryContent.ts#L206) | Поле состояния или ссылка на систему. |
-| `delivered` | [207](../src/game/story/StoryContent.ts#L207) | Поле состояния или ссылка на систему. |
-| `claimed` | [208](../src/game/story/StoryContent.ts#L208) | Поле состояния или ссылка на систему. |
-| `newDeliveries` | [210](../src/game/story/StoryContent.ts#L210) | Параметры, таблица данных или функция, объявленная константой. |
-| `DELIVERIES` | [214](../src/game/story/StoryContent.ts#L214) | Параметры, таблица данных или функция, объявленная константой. |
-| `INTRO_DURATION` | [245](../src/game/story/StoryContent.ts#L245) | Параметры, таблица данных или функция, объявленная константой. |
-| `WEAPON_STEAL_AT` | [246](../src/game/story/StoryContent.ts#L246) | Параметры, таблица данных или функция, объявленная константой. |
-| `WEAPON_BREAK_AT` | [247](../src/game/story/StoryContent.ts#L247) | Параметры, таблица данных или функция, объявленная константой. |
+| `Area` | [1](../src/game/story/StoryProgress.ts#L1) | Форма данных для проверки TypeScript. |
+| `Role` | [2](../src/game/story/StoryProgress.ts#L2) | Форма данных для проверки TypeScript. |
+| `LineId` | [4](../src/game/story/StoryProgress.ts#L4) | Форма данных для проверки TypeScript. |
+| `QuestLine` | [5](../src/game/story/StoryProgress.ts#L5) | Форма данных для проверки TypeScript. |
+| `id` | [6](../src/game/story/StoryProgress.ts#L6) | Поле состояния или ссылка на систему. |
+| `accepted` | [7](../src/game/story/StoryProgress.ts#L7) | Поле состояния или ссылка на систему. |
+| `kills` | [8](../src/game/story/StoryProgress.ts#L8) | Число побеждённых противников текущего путешествия. |
+| `artifact` | [9](../src/game/story/StoryProgress.ts#L9) | Поле состояния или ссылка на систему. |
+| `runes` | [10](../src/game/story/StoryProgress.ts#L10) | Поле состояния или ссылка на систему. |
+| `escorted` | [11](../src/game/story/StoryProgress.ts#L11) | Поле состояния или ссылка на систему. |
+| `claimed` | [12](../src/game/story/StoryProgress.ts#L12) | Поле состояния или ссылка на систему. |
+| `newLines` | [14](../src/game/story/StoryProgress.ts#L14) | Параметры, таблица данных или функция, объявленная константой. |
+| `lineReady` | [25](../src/game/story/StoryProgress.ts#L25) | Проверяет выполнение сюжетного поручения. |
+| `DeliveryId` | [34](../src/game/story/StoryProgress.ts#L34) | Форма данных для проверки TypeScript. |
+| `Delivery` | [35](../src/game/story/StoryProgress.ts#L35) | Форма данных для проверки TypeScript. |
+| `id` | [36](../src/game/story/StoryProgress.ts#L36) | Поле состояния или ссылка на систему. |
+| `accepted` | [37](../src/game/story/StoryProgress.ts#L37) | Поле состояния или ссылка на систему. |
+| `delivered` | [38](../src/game/story/StoryProgress.ts#L38) | Поле состояния или ссылка на систему. |
+| `claimed` | [39](../src/game/story/StoryProgress.ts#L39) | Поле состояния или ссылка на систему. |
+| `newDeliveries` | [41](../src/game/story/StoryProgress.ts#L41) | Параметры, таблица данных или функция, объявленная константой. |
 
 ### [src/game/story/StorySystem.ts](../src/game/story/StorySystem.ts)
 
 Новое путешествие, сюжетные сцены и похищение оружия.
 
-Строк: 367.
+Строк: 317.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
@@ -904,281 +1117,439 @@
 | `beginIntro` | [30](../src/game/story/StorySystem.ts#L30) | Запускает появление призрака и похищение оружия в биоме. |
 | `clearReaper` | [64](../src/game/story/StorySystem.ts#L64) | Скрывает призрака, оружие и его графические эффекты. |
 | `updateIntro` | [70](../src/game/story/StorySystem.ts#L70) | Двигает призрака, отрывает и ломает оружие по времени сцены. |
-| `finishIntro` | [150](../src/game/story/StorySystem.ts#L150) | Закрывает сцену, оставляет героя без оружия до сбора силы. |
-| `resetJourney` | [165](../src/game/story/StorySystem.ts#L165) | Сбрасывает профиль, прогресс, задания, статистику и мир текущей игры. |
-| `beginStory` | [227](../src/game/story/StorySystem.ts#L227) | Запускает вступление или финальные кадры. |
-| `renderStoryText` | [241](../src/game/story/StorySystem.ts#L241) | Обновляет текст и номер сюжетного кадра. |
-| `advanceStory` | [251](../src/game/story/StorySystem.ts#L251) | Переходит к следующему кадру или завершает историю. |
-| `updateStory` | [262](../src/game/story/StorySystem.ts#L262) | Анимирует кадр и отсчитывает время до следующего. |
-| `finishStory` | [268](../src/game/story/StorySystem.ts#L268) | После вступления запускает обучение или первый биом, после финала открывает свободное исследование. |
-| `drawStory` | [292](../src/game/story/StorySystem.ts#L292) | Рисует кадр на сюжетном canvas. |
+| `finishIntro` | [152](../src/game/story/StorySystem.ts#L152) | Закрывает сцену, оставляет героя без оружия до сбора силы. |
+| `resetJourney` | [169](../src/game/story/StorySystem.ts#L169) | Сбрасывает профиль, прогресс, задания, статистику и мир текущей игры. |
+| `beginStory` | [172](../src/game/story/StorySystem.ts#L172) | Запускает вступление или финальные кадры. |
+| `renderStoryText` | [186](../src/game/story/StorySystem.ts#L186) | Обновляет текст и номер сюжетного кадра. |
+| `advanceStory` | [196](../src/game/story/StorySystem.ts#L196) | Переходит к следующему кадру или завершает историю. |
+| `updateStory` | [207](../src/game/story/StorySystem.ts#L207) | Анимирует кадр и отсчитывает время до следующего. |
+| `finishStory` | [215](../src/game/story/StorySystem.ts#L215) | После вступления запускает обучение или первый биом, после финала открывает свободное исследование. |
+| `drawStory` | [240](../src/game/story/StorySystem.ts#L240) | Рисует кадр на сюжетном canvas. |
 
-### [src/game/story/TutorialContent.ts](../src/game/story/TutorialContent.ts)
+### [src/game/story/TrainingEnemyRules.ts](../src/game/story/TrainingEnemyRules.ts)
 
-Шесть вводных карточек, клавиши-подсказки и выбор цели для учебной стрелки.
+Параметры учебного врага при запуске и восстановлении; размещение осколков.
 
-Строк: 119.
+Строк: 24.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `BRIEFING_CARDS` | [3](../src/game/story/TutorialContent.ts#L3) | Параметры, таблица данных или функция, объявленная константой. |
-| `LESSON_CUES` | [36](../src/game/story/TutorialContent.ts#L36) | Параметры, таблица данных или функция, объявленная константой. |
-| `lessonPoint` | [94](../src/game/story/TutorialContent.ts#L94) | Выбирает ближайшую цель текущего урока. |
+| `trainingEnemyParameters` | [4](../src/game/story/TrainingEnemyRules.ts#L4) | Объявление в этом модуле. |
+| `trainingCoinPoints` | [19](../src/game/story/TrainingEnemyRules.ts#L19) | Объявление в этом модуле. |
+
+### [src/game/story/TutorialLayout.ts](../src/game/story/TutorialLayout.ts)
+
+Выбор точки назначения указателя обучения.
+
+Строк: 29.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `lessonPoint` | [4](../src/game/story/TutorialLayout.ts#L4) | Выбирает ближайшую цель текущего урока. |
 
 ### [src/game/story/TutorialSystem.ts](../src/game/story/TutorialSystem.ts)
 
 Вводные карточки, практические уроки и подсказки обучения.
 
-Строк: 273.
+Строк: 310.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `TutorialSystem` | [10](../src/game/story/TutorialSystem.ts#L10) | Объявление в этом модуле. |
-| `trainingArea` | [12](../src/game/story/TutorialSystem.ts#L12) | Проверяет учебный двор и его интерьер. |
-| `renderBriefing` | [19](../src/game/story/TutorialSystem.ts#L19) | Показывает выбранную вводную карточку. |
-| `startLessons` | [30](../src/game/story/TutorialSystem.ts#L30) | Закрывает карточки и начинает практический урок. |
-| `teachingPoint` | [41](../src/game/story/TutorialSystem.ts#L41) | Выбирает цель подсказки: осколок, врага, дверь или жителя. |
-| `drawTeachingCue` | [57](../src/game/story/TutorialSystem.ts#L57) | Рисует учебный круг и стрелку. |
-| `updateTeachingUI` | [92](../src/game/story/TutorialSystem.ts#L92) | Подсвечивает нужные клавиши и элементы интерфейса. |
-| `beginTutorial` | [136](../src/game/story/TutorialSystem.ts#L136) | Подготавливает учебный двор, героя и вводные карточки. |
-| `lessonEvent` | [155](../src/game/story/TutorialSystem.ts#L155) | Засчитывает нужное действие и переключает урок после достижения цели. |
-| `prepareLesson` | [175](../src/game/story/TutorialSystem.ts#L175) | Создаёт или настраивает объекты текущего урока. |
-| `renderLesson` | [233](../src/game/story/TutorialSystem.ts#L233) | Показывает задание, клавиши и прогресс. |
-| `finishTutorial` | [249](../src/game/story/TutorialSystem.ts#L249) | Завершает обучение и возвращает к начальной деревне. |
+| `TutorialSystem` | [18](../src/game/story/TutorialSystem.ts#L18) | Объявление в этом модуле. |
+| `trainingArea` | [20](../src/game/story/TutorialSystem.ts#L20) | Проверяет учебный двор и его интерьер. |
+| `renderBriefing` | [27](../src/game/story/TutorialSystem.ts#L27) | Показывает выбранную вводную карточку. |
+| `startLessons` | [38](../src/game/story/TutorialSystem.ts#L38) | Закрывает карточки и начинает практический урок. |
+| `teachingPoint` | [48](../src/game/story/TutorialSystem.ts#L48) | Выбирает цель подсказки: осколок, врага, дверь или жителя. |
+| `drawTeachingCue` | [65](../src/game/story/TutorialSystem.ts#L65) | Рисует учебный круг и стрелку. |
+| `updateTeachingUI` | [103](../src/game/story/TutorialSystem.ts#L103) | Подсвечивает нужные клавиши и элементы интерфейса. |
+| `beginTutorial` | [156](../src/game/story/TutorialSystem.ts#L156) | Подготавливает учебный двор, героя и вводные карточки. |
+| `lessonEvent` | [175](../src/game/story/TutorialSystem.ts#L175) | Засчитывает нужное действие и переключает урок после достижения цели. |
+| `prepareLesson` | [196](../src/game/story/TutorialSystem.ts#L196) | Создаёт или настраивает объекты текущего урока. |
+| `renderLesson` | [252](../src/game/story/TutorialSystem.ts#L252) | Показывает задание, клавиши и прогресс. |
+| `finishTutorial` | [270](../src/game/story/TutorialSystem.ts#L270) | Завершает обучение и возвращает к начальной деревне. |
+| `updateProgress` | [296](../src/game/story/TutorialSystem.ts#L296) | Объявление в этом модуле. |
 
 ## Графика и анимация
 
 ### [src/game/rendering/ActorRenderer.ts](../src/game/rendering/ActorRenderer.ts)
 
-Позы, руки, оружие, враги, жители и отрисовка границ биома.
+Порядок вызова специализированных отрисовщиков и туманные границы биома.
 
-Строк: 785.
+Строк: 86.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `ActorRenderer` | [14](../src/game/rendering/ActorRenderer.ts#L14) | Объявление в этом модуле. |
-| `animateResidents` | [16](../src/game/rendering/ActorRenderer.ts#L16) | Обновляет видимость, позы и жесты жителей. |
-| `hideArms` | [67](../src/game/rendering/ActorRenderer.ts#L67) | Скрывает части рук героя. |
-| `bodyPoint` | [72](../src/game/rendering/ActorRenderer.ts#L72) | Переводит локальную точку тела в мировые координаты. |
-| `reachableGrip` | [80](../src/game/rendering/ActorRenderer.ts#L80) | Ограничивает хват длиной руки. |
-| `drawArm` | [90](../src/game/rendering/ActorRenderer.ts#L90) | Ставит плечо, предплечье и кисть между телом и хватом. |
-| `drawActors` | [132](../src/game/rendering/ActorRenderer.ts#L132) | Рисует героя, броню, оружие, врагов, монеты, зоны атак и эффекты. |
-| `drawGates` | [743](../src/game/rendering/ActorRenderer.ts#L743) | Рисует закрытые печати и обновляет вид очищенных биомов. |
+| `ActorRenderer` | [10](../src/game/rendering/ActorRenderer.ts#L10) | Объявление в этом модуле. |
+| `hero` | [11](../src/game/rendering/ActorRenderer.ts#L11) | Поле состояния или ссылка на систему. |
+| `enemies` | [12](../src/game/rendering/ActorRenderer.ts#L12) | Живые и завершающие анимацию смерти противники. |
+| `residents` | [13](../src/game/rendering/ActorRenderer.ts#L13) | Поле состояния или ссылка на систему. |
+| `objects` | [14](../src/game/rendering/ActorRenderer.ts#L14) | Поле состояния или ссылка на систему. |
+| `hideArms` | [21](../src/game/rendering/ActorRenderer.ts#L21) | Скрывает части рук героя. |
+| `drawActors` | [24](../src/game/rendering/ActorRenderer.ts#L24) | Рисует героя, броню, оружие, врагов, монеты, зоны атак и эффекты. |
+| `drawGates` | [42](../src/game/rendering/ActorRenderer.ts#L42) | Рисует закрытые печати и обновляет вид очищенных биомов. |
 
 ### [src/game/rendering/Atmosphere.ts](../src/game/rendering/Atmosphere.ts)
 
 Слои тумана, могил и цветов; смена облика очищенного биома.
 
-Строк: 75.
+Строк: 80.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `BiomeMood` | [3](../src/game/rendering/Atmosphere.ts#L3) | Форма данных для проверки TypeScript. |
-| `floor` | [4](../src/game/rendering/Atmosphere.ts#L4) | Поле состояния или ссылка на систему. |
-| `terrain` | [5](../src/game/rendering/Atmosphere.ts#L5) | Общий список препятствий наружного мира. |
-| `shade` | [6](../src/game/rendering/Atmosphere.ts#L6) | Поле состояния или ссылка на систему. |
-| `graves` | [7](../src/game/rendering/Atmosphere.ts#L7) | Поле состояния или ссылка на систему. |
-| `flowers` | [8](../src/game/rendering/Atmosphere.ts#L8) | Поле состояния или ссылка на систему. |
-| `cleared` | [9](../src/game/rendering/Atmosphere.ts#L9) | Поле состояния или ссылка на систему. |
-| `inside` | [10](../src/game/rendering/Atmosphere.ts#L10) | Поле состояния или ссылка на систему. |
-| `createBiomeMood` | [12](../src/game/rendering/Atmosphere.ts#L12) | Создаёт слои тумана, могил и цветов. |
-| `setBiomeMood` | [66](../src/game/rendering/Atmosphere.ts#L66) | Переключает внешний вид очищенного биома. |
+| `BiomeMood` | [4](../src/game/rendering/Atmosphere.ts#L4) | Форма данных для проверки TypeScript. |
+| `floor` | [5](../src/game/rendering/Atmosphere.ts#L5) | Поле состояния или ссылка на систему. |
+| `terrain` | [6](../src/game/rendering/Atmosphere.ts#L6) | Общий список препятствий наружного мира. |
+| `shade` | [7](../src/game/rendering/Atmosphere.ts#L7) | Поле состояния или ссылка на систему. |
+| `graves` | [8](../src/game/rendering/Atmosphere.ts#L8) | Поле состояния или ссылка на систему. |
+| `flowers` | [9](../src/game/rendering/Atmosphere.ts#L9) | Поле состояния или ссылка на систему. |
+| `cleared` | [10](../src/game/rendering/Atmosphere.ts#L10) | Поле состояния или ссылка на систему. |
+| `inside` | [11](../src/game/rendering/Atmosphere.ts#L11) | Поле состояния или ссылка на систему. |
+| `createBiomeMood` | [13](../src/game/rendering/Atmosphere.ts#L13) | Создаёт слои тумана, могил и цветов. |
+| `setBiomeMood` | [67](../src/game/rendering/Atmosphere.ts#L67) | Переключает внешний вид очищенного биома. |
+
+### [src/game/rendering/CombatEffectRenderer.ts](../src/game/rendering/CombatEffectRenderer.ts)
+
+Частицы, всплывающий текст и краткие рисунки атак; очистка временной графики.
+
+Строк: 143.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `CombatEffectRenderer` | [6](../src/game/rendering/CombatEffectRenderer.ts#L6) | Объявление в этом модуле. |
+| `temporary` | [9](../src/game/rendering/CombatEffectRenderer.ts#L9) | Поле состояния или ссылка на систему. |
+| `liveParticles` | [10](../src/game/rendering/CombatEffectRenderer.ts#L10) | Число живых частиц для ограничения их количества. |
+| `particles` | [12](../src/game/rendering/CombatEffectRenderer.ts#L12) | Создаёт ограниченное число частиц с удалением после анимации. |
+| `popup` | [36](../src/game/rendering/CombatEffectRenderer.ts#L36) | Показывает урон или награду над персонажем. |
+| `drawCombatImage` | [61](../src/game/rendering/CombatEffectRenderer.ts#L61) | Переиспользует спрайты боевых эффектов из пула. |
+| `cone` | [79](../src/game/rendering/CombatEffectRenderer.ts#L79) | Рисует сектор предупреждения атаки. |
+| `addEffect` | [107](../src/game/rendering/CombatEffectRenderer.ts#L107) | Добавляет короткую дугу, кольцо или след выпада. |
+| `updateEffects` | [127](../src/game/rendering/CombatEffectRenderer.ts#L127) | Объявление в этом модуле. |
+| `reset` | [134](../src/game/rendering/CombatEffectRenderer.ts#L134) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
+
+### [src/game/rendering/EnemyRenderer.ts](../src/game/rendering/EnemyRenderer.ts)
+
+Размеры и позы врагов, предупреждения атак и полосы здоровья.
+
+Строк: 189.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `EnemyRenderer` | [7](../src/game/rendering/EnemyRenderer.ts#L7) | Объявление в этом модуле. |
+| `draw` | [10](../src/game/rendering/EnemyRenderer.ts#L10) | Объявление в этом модуле. |
+
+### [src/game/rendering/HeroRenderer.ts](../src/game/rendering/HeroRenderer.ts)
+
+Поза героя, руки, броня, хват оружия и визуальные зоны его атак.
+
+Строк: 484.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `HeroRenderer` | [22](../src/game/rendering/HeroRenderer.ts#L22) | Объявление в этом модуле. |
+| `hideArms` | [25](../src/game/rendering/HeroRenderer.ts#L25) | Скрывает части рук героя. |
+| `bodyPoint` | [34](../src/game/rendering/HeroRenderer.ts#L34) | Переводит локальную точку тела в мировые координаты. |
+| `reachableGrip` | [43](../src/game/rendering/HeroRenderer.ts#L43) | Ограничивает хват длиной руки. |
+| `drawArm` | [54](../src/game/rendering/HeroRenderer.ts#L54) | Ставит плечо, предплечье и кисть между телом и хватом. |
+| `drawBody` | [101](../src/game/rendering/HeroRenderer.ts#L101) | Объявление в этом модуле. |
+| `drawOverlays` | [329](../src/game/rendering/HeroRenderer.ts#L329) | Объявление в этом модуле. |
 
 ### [src/game/rendering/RenderState.ts](../src/game/rendering/RenderState.ts)
 
 Ссылки на объекты Phaser, анимации и пулы графических эффектов.
 
-Строк: 37.
+Строк: 40.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `RenderState` | [4](../src/game/rendering/RenderState.ts#L4) | Объявление в этом модуле. |
-| `player` | [5](../src/game/rendering/RenderState.ts#L5) | Спрайт героя в мире. Логика героя находится в PlayerController, ресурсы — в PlayerState. |
-| `playerShadow` | [6](../src/game/rendering/RenderState.ts#L6) | Тень спрайта героя. |
-| `sword` | [7](../src/game/rendering/RenderState.ts#L7) | Спрайт удерживаемого оружия любого типа. |
-| `armorSprite` | [8](../src/game/rendering/RenderState.ts#L8) | Отдельный слой изображения надетой брони. |
-| `combatInk` | [9](../src/game/rendering/RenderState.ts#L9) | Графика зон атак, прицелов и боевых эффектов. |
-| `weatherInk` | [10](../src/game/rendering/RenderState.ts#L10) | Графика погодных зон и осадков. |
-| `gateInk` | [11](../src/game/rendering/RenderState.ts#L11) | Графика закрытых границ и печатей. |
-| `reaper` | [12](../src/game/rendering/RenderState.ts#L12) | Спрайт призрака, похищающего оружие. |
-| `stolenWeapon` | [13](../src/game/rendering/RenderState.ts#L13) | Спрайт оружия в сцене похищения. |
-| `reaperInk` | [14](../src/game/rendering/RenderState.ts#L14) | Графические эффекты сцены призрака. |
-| `animationTime` | [25](../src/game/rendering/RenderState.ts#L25) | Общее время визуальных анимаций. |
-| `weaponTrail` | [31](../src/game/rendering/RenderState.ts#L31) | Точки следа кончика оружия. |
-| `trailWeapon` | [32](../src/game/rendering/RenderState.ts#L32) | ID оружия, для которого был создан текущий след. |
-| `trailAttack` | [33](../src/game/rendering/RenderState.ts#L33) | Время атаки, связанной с текущим следом. |
-| `attackImages` | [34](../src/game/rendering/RenderState.ts#L34) | Пул переиспользуемых спрайтов эффектов атак. |
-| `attackImageCursor` | [35](../src/game/rendering/RenderState.ts#L35) | Следующий элемент пула эффектов для текущего кадра. |
-| `liveParticles` | [36](../src/game/rendering/RenderState.ts#L36) | Число живых частиц для ограничения их количества. |
+| `RenderState` | [5](../src/game/rendering/RenderState.ts#L5) | Объявление в этом модуле. |
+| `player` | [6](../src/game/rendering/RenderState.ts#L6) | Спрайт героя в мире. Логика героя находится в PlayerController, ресурсы — в PlayerState. |
+| `playerShadow` | [7](../src/game/rendering/RenderState.ts#L7) | Тень спрайта героя. |
+| `sword` | [8](../src/game/rendering/RenderState.ts#L8) | Спрайт удерживаемого оружия любого типа. |
+| `armorSprite` | [9](../src/game/rendering/RenderState.ts#L9) | Отдельный слой изображения надетой брони. |
+| `combatInk` | [10](../src/game/rendering/RenderState.ts#L10) | Графика зон атак, прицелов и боевых эффектов. |
+| `weatherInk` | [11](../src/game/rendering/RenderState.ts#L11) | Графика погодных зон и осадков. |
+| `gateInk` | [12](../src/game/rendering/RenderState.ts#L12) | Графика закрытых границ и печатей. |
+| `reaper` | [13](../src/game/rendering/RenderState.ts#L13) | Спрайт призрака, похищающего оружие. |
+| `stolenWeapon` | [14](../src/game/rendering/RenderState.ts#L14) | Спрайт оружия в сцене похищения. |
+| `reaperInk` | [15](../src/game/rendering/RenderState.ts#L15) | Графические эффекты сцены призрака. |
+| `animationTime` | [26](../src/game/rendering/RenderState.ts#L26) | Общее время визуальных анимаций. |
+| `weaponTrail` | [32](../src/game/rendering/RenderState.ts#L32) | Точки следа кончика оружия. |
+| `trailWeapon` | [33](../src/game/rendering/RenderState.ts#L33) | ID оружия, для которого был создан текущий след. |
+| `trailAttack` | [34](../src/game/rendering/RenderState.ts#L34) | Время атаки, связанной с текущим следом. |
+| `attackImages` | [35](../src/game/rendering/RenderState.ts#L35) | Пул переиспользуемых спрайтов эффектов атак. |
+| `attackImageCursor` | [36](../src/game/rendering/RenderState.ts#L36) | Следующий элемент пула эффектов для текущего кадра. |
+| `resetScene` | [37](../src/game/rendering/RenderState.ts#L37) | Объявление в этом модуле. |
 
-### [src/game/rendering/TextureFactory.ts](../src/game/rendering/TextureFactory.ts)
+### [src/game/rendering/ResidentRenderer.ts](../src/game/rendering/ResidentRenderer.ts)
 
-Генерирует процедурные текстуры и нарезает рисованные атласы героя, оружия, врагов и окружения.
+Положение и анимация жителей деревень.
 
-Строк: 2065.
+Строк: 63.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `mergeScenery` | [13](../src/game/rendering/TextureFactory.ts#L13) | Запекает неподвижный декор в существующий слой. |
-| `localScenery` | [20](../src/game/rendering/TextureFactory.ts#L20) | Объявление в этом модуле. |
-| `bakeScenery` | [24](../src/game/rendering/TextureFactory.ts#L24) | Создаёт отдельный запечённый растровый слой. |
-| `localScenery` | [33](../src/game/rendering/TextureFactory.ts#L33) | Объявление в этом модуле. |
-| `createArmArtwork` | [40](../src/game/rendering/TextureFactory.ts#L40) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `Palette` | [81](../src/game/rendering/TextureFactory.ts#L81) | Форма данных для проверки TypeScript. |
-| `ground` | [82](../src/game/rendering/TextureFactory.ts#L82) | Поле состояния или ссылка на систему. |
-| `light` | [83](../src/game/rendering/TextureFactory.ts#L83) | Поле состояния или ссылка на систему. |
-| `grass` | [84](../src/game/rendering/TextureFactory.ts#L84) | Поле состояния или ссылка на систему. |
-| `tree` | [85](../src/game/rendering/TextureFactory.ts#L85) | Поле состояния или ссылка на систему. |
-| `accent` | [86](../src/game/rendering/TextureFactory.ts#L86) | Поле состояния или ссылка на систему. |
-| `draw` | [93](../src/game/rendering/TextureFactory.ts#L93) | Поле состояния или ссылка на систему. |
-| `draw` | [100](../src/game/rendering/TextureFactory.ts#L100) | Объявление в этом модуле. |
-| `createArtwork` | [118](../src/game/rendering/TextureFactory.ts#L118) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `texture` | [205](../src/game/rendering/TextureFactory.ts#L205) | Объявление в этом модуле. |
-| `texture` | [231](../src/game/rendering/TextureFactory.ts#L231) | Объявление в этом модуле. |
-| `texture` | [258](../src/game/rendering/TextureFactory.ts#L258) | Объявление в этом модуле. |
-| `texture` | [274](../src/game/rendering/TextureFactory.ts#L274) | Объявление в этом модуле. |
-| `texture` | [314](../src/game/rendering/TextureFactory.ts#L314) | Объявление в этом модуле. |
-| `texture` | [339](../src/game/rendering/TextureFactory.ts#L339) | Объявление в этом модуле. |
-| `texture` | [376](../src/game/rendering/TextureFactory.ts#L376) | Объявление в этом модуле. |
-| `texture` | [413](../src/game/rendering/TextureFactory.ts#L413) | Объявление в этом модуле. |
-| `texture` | [442](../src/game/rendering/TextureFactory.ts#L442) | Объявление в этом модуле. |
-| `texture` | [469](../src/game/rendering/TextureFactory.ts#L469) | Объявление в этом модуле. |
-| `texture` | [490](../src/game/rendering/TextureFactory.ts#L490) | Объявление в этом модуле. |
-| `texture` | [516](../src/game/rendering/TextureFactory.ts#L516) | Объявление в этом модуле. |
-| `texture` | [539](../src/game/rendering/TextureFactory.ts#L539) | Объявление в этом модуле. |
-| `texture` | [568](../src/game/rendering/TextureFactory.ts#L568) | Объявление в этом модуле. |
-| `background` | [584](../src/game/rendering/TextureFactory.ts#L584) | Объявление в этом модуле. |
-| `createMysticArtwork` | [820](../src/game/rendering/TextureFactory.ts#L820) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `texture` | [821](../src/game/rendering/TextureFactory.ts#L821) | Объявление в этом модуле. |
-| `texture` | [859](../src/game/rendering/TextureFactory.ts#L859) | Объявление в этом модуле. |
-| `texture` | [935](../src/game/rendering/TextureFactory.ts#L935) | Объявление в этом модуле. |
-| `texture` | [993](../src/game/rendering/TextureFactory.ts#L993) | Объявление в этом модуле. |
-| `texture` | [1052](../src/game/rendering/TextureFactory.ts#L1052) | Объявление в этом модуле. |
-| `texture` | [1114](../src/game/rendering/TextureFactory.ts#L1114) | Объявление в этом модуле. |
-| `texture` | [1188](../src/game/rendering/TextureFactory.ts#L1188) | Объявление в этом модуле. |
-| `texture` | [1221](../src/game/rendering/TextureFactory.ts#L1221) | Объявление в этом модуле. |
-| `texture` | [1250](../src/game/rendering/TextureFactory.ts#L1250) | Объявление в этом модуле. |
-| `createVillageArtwork` | [1346](../src/game/rendering/TextureFactory.ts#L1346) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `texture` | [1378](../src/game/rendering/TextureFactory.ts#L1378) | Объявление в этом модуле. |
-| `texture` | [1399](../src/game/rendering/TextureFactory.ts#L1399) | Объявление в этом модуле. |
-| `texture` | [1417](../src/game/rendering/TextureFactory.ts#L1417) | Объявление в этом модуле. |
-| `texture` | [1466](../src/game/rendering/TextureFactory.ts#L1466) | Объявление в этом модуле. |
-| `createAtlasArtwork` | [1479](../src/game/rendering/TextureFactory.ts#L1479) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `texture` | [1510](../src/game/rendering/TextureFactory.ts#L1510) | Объявление в этом модуле. |
-| `texture` | [1539](../src/game/rendering/TextureFactory.ts#L1539) | Объявление в этом модуле. |
-| `createCreepyArtwork` | [1585](../src/game/rendering/TextureFactory.ts#L1585) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `biomeGround` | [1609](../src/game/rendering/TextureFactory.ts#L1609) | Объявление в этом модуле. |
-| `mergeScenery` | [1694](../src/game/rendering/TextureFactory.ts#L1694) | Запекает неподвижный декор в существующий слой. |
-| `createHeroArtwork` | [1723](../src/game/rendering/TextureFactory.ts#L1723) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createDetailArtwork` | [1752](../src/game/rendering/TextureFactory.ts#L1752) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createCombatArtwork` | [1800](../src/game/rendering/TextureFactory.ts#L1800) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createEquipmentArtwork` | [1843](../src/game/rendering/TextureFactory.ts#L1843) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createArmedMotionArtwork` | [1875](../src/game/rendering/TextureFactory.ts#L1875) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createStrideArtwork` | [1956](../src/game/rendering/TextureFactory.ts#L1956) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createMotionArtwork` | [1957](../src/game/rendering/TextureFactory.ts#L1957) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createRollArtwork` | [1959](../src/game/rendering/TextureFactory.ts#L1959) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createMotionArtwork` | [1960](../src/game/rendering/TextureFactory.ts#L1960) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
-| `createResidentArtwork` | [2000](../src/game/rendering/TextureFactory.ts#L2000) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `ResidentRenderer` | [5](../src/game/rendering/ResidentRenderer.ts#L5) | Объявление в этом модуле. |
+| `draw` | [8](../src/game/rendering/ResidentRenderer.ts#L8) | Объявление в этом модуле. |
+
+### [src/game/rendering/SceneArtwork.ts](../src/game/rendering/SceneArtwork.ts)
+
+Загрузка ресурсов и создание графических объектов сцены.
+
+Строк: 93.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `preloadSceneArtwork` | [24](../src/game/rendering/SceneArtwork.ts#L24) | Объявление в этом модуле. |
+| `createSceneArtwork` | [38](../src/game/rendering/SceneArtwork.ts#L38) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+
+### [src/game/rendering/textures/AtlasTextures.ts](../src/game/rendering/textures/AtlasTextures.ts)
+
+Нарезка зданий, предметов, врагов и жителей из атласов.
+
+Строк: 317.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `createAtlasArtwork` | [12](../src/game/rendering/textures/AtlasTextures.ts#L12) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `texture` | [51](../src/game/rendering/textures/AtlasTextures.ts#L51) | Объявление в этом модуле. |
+| `texture` | [80](../src/game/rendering/textures/AtlasTextures.ts#L80) | Объявление в этом модуле. |
+| `createCreepyArtwork` | [125](../src/game/rendering/textures/AtlasTextures.ts#L125) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createDetailArtwork` | [144](../src/game/rendering/textures/AtlasTextures.ts#L144) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createCombatArtwork` | [195](../src/game/rendering/textures/AtlasTextures.ts#L195) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createEquipmentArtwork` | [226](../src/game/rendering/textures/AtlasTextures.ts#L226) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createResidentArtwork` | [249](../src/game/rendering/textures/AtlasTextures.ts#L249) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+
+### [src/game/rendering/textures/BaseTextures.ts](../src/game/rendering/textures/BaseTextures.ts)
+
+Базовые процедурные рисунки героя, предметов и окружения.
+
+Строк: 470.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `createArtwork` | [5](../src/game/rendering/textures/BaseTextures.ts#L5) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `texture` | [91](../src/game/rendering/textures/BaseTextures.ts#L91) | Объявление в этом модуле. |
+| `texture` | [118](../src/game/rendering/textures/BaseTextures.ts#L118) | Объявление в этом модуле. |
+| `texture` | [145](../src/game/rendering/textures/BaseTextures.ts#L145) | Объявление в этом модуле. |
+| `texture` | [161](../src/game/rendering/textures/BaseTextures.ts#L161) | Объявление в этом модуле. |
+| `texture` | [203](../src/game/rendering/textures/BaseTextures.ts#L203) | Объявление в этом модуле. |
+| `texture` | [228](../src/game/rendering/textures/BaseTextures.ts#L228) | Объявление в этом модуле. |
+| `texture` | [265](../src/game/rendering/textures/BaseTextures.ts#L265) | Объявление в этом модуле. |
+| `texture` | [302](../src/game/rendering/textures/BaseTextures.ts#L302) | Объявление в этом модуле. |
+| `texture` | [331](../src/game/rendering/textures/BaseTextures.ts#L331) | Объявление в этом модуле. |
+| `texture` | [358](../src/game/rendering/textures/BaseTextures.ts#L358) | Объявление в этом модуле. |
+| `texture` | [379](../src/game/rendering/textures/BaseTextures.ts#L379) | Объявление в этом модуле. |
+| `texture` | [405](../src/game/rendering/textures/BaseTextures.ts#L405) | Объявление в этом модуле. |
+| `texture` | [428](../src/game/rendering/textures/BaseTextures.ts#L428) | Объявление в этом модуле. |
+| `texture` | [457](../src/game/rendering/textures/BaseTextures.ts#L457) | Объявление в этом модуле. |
+
+### [src/game/rendering/textures/CharacterTextures.ts](../src/game/rendering/textures/CharacterTextures.ts)
+
+Герой, рукава, бег, перекат и модульная анимация тела.
+
+Строк: 209.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `createArmArtwork` | [4](../src/game/rendering/textures/CharacterTextures.ts#L4) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createHeroArtwork` | [49](../src/game/rendering/textures/CharacterTextures.ts#L49) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createArmedMotionArtwork` | [87](../src/game/rendering/textures/CharacterTextures.ts#L87) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createStrideArtwork` | [155](../src/game/rendering/textures/CharacterTextures.ts#L155) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createMotionArtwork` | [156](../src/game/rendering/textures/CharacterTextures.ts#L156) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createRollArtwork` | [159](../src/game/rendering/textures/CharacterTextures.ts#L159) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createMotionArtwork` | [160](../src/game/rendering/textures/CharacterTextures.ts#L160) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `createMotionArtwork` | [163](../src/game/rendering/textures/CharacterTextures.ts#L163) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+
+### [src/game/rendering/textures/EnemyTextures.ts](../src/game/rendering/textures/EnemyTextures.ts)
+
+Процедурные рисунки мистических врагов.
+
+Строк: 532.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `createMysticArtwork` | [4](../src/game/rendering/textures/EnemyTextures.ts#L4) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `texture` | [5](../src/game/rendering/textures/EnemyTextures.ts#L5) | Объявление в этом модуле. |
+| `texture` | [43](../src/game/rendering/textures/EnemyTextures.ts#L43) | Объявление в этом модуле. |
+| `texture` | [119](../src/game/rendering/textures/EnemyTextures.ts#L119) | Объявление в этом модуле. |
+| `texture` | [177](../src/game/rendering/textures/EnemyTextures.ts#L177) | Объявление в этом модуле. |
+| `texture` | [236](../src/game/rendering/textures/EnemyTextures.ts#L236) | Объявление в этом модуле. |
+| `texture` | [300](../src/game/rendering/textures/EnemyTextures.ts#L300) | Объявление в этом модуле. |
+| `texture` | [374](../src/game/rendering/textures/EnemyTextures.ts#L374) | Объявление в этом модуле. |
+| `texture` | [407](../src/game/rendering/textures/EnemyTextures.ts#L407) | Объявление в этом модуле. |
+| `texture` | [436](../src/game/rendering/textures/EnemyTextures.ts#L436) | Объявление в этом модуле. |
+
+### [src/game/rendering/textures/SceneryTextures.ts](../src/game/rendering/textures/SceneryTextures.ts)
+
+Фон, поверхность биомов и объединение статических рисунков.
+
+Строк: 404.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `localScenery` | [4](../src/game/rendering/textures/SceneryTextures.ts#L4) | Объявление в этом модуле. |
+| `mergeScenery` | [13](../src/game/rendering/textures/SceneryTextures.ts#L13) | Запекает неподвижный декор в существующий слой. |
+| `localScenery` | [20](../src/game/rendering/textures/SceneryTextures.ts#L20) | Объявление в этом модуле. |
+| `bakeScenery` | [27](../src/game/rendering/textures/SceneryTextures.ts#L27) | Создаёт отдельный запечённый растровый слой. |
+| `localScenery` | [36](../src/game/rendering/textures/SceneryTextures.ts#L36) | Объявление в этом модуле. |
+| `background` | [44](../src/game/rendering/textures/SceneryTextures.ts#L44) | Объявление в этом модуле. |
+| `biomeGround` | [292](../src/game/rendering/textures/SceneryTextures.ts#L292) | Объявление в этом модуле. |
+| `mergeScenery` | [378](../src/game/rendering/textures/SceneryTextures.ts#L378) | Запекает неподвижный декор в существующий слой. |
+
+### [src/game/rendering/textures/TexturePrimitives.ts](../src/game/rendering/textures/TexturePrimitives.ts)
+
+Низкоуровневые операции рисования текстур.
+
+Строк: 41.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `Palette` | [3](../src/game/rendering/textures/TexturePrimitives.ts#L3) | Форма данных для проверки TypeScript. |
+| `ground` | [4](../src/game/rendering/textures/TexturePrimitives.ts#L4) | Поле состояния или ссылка на систему. |
+| `light` | [5](../src/game/rendering/textures/TexturePrimitives.ts#L5) | Поле состояния или ссылка на систему. |
+| `grass` | [6](../src/game/rendering/textures/TexturePrimitives.ts#L6) | Поле состояния или ссылка на систему. |
+| `tree` | [7](../src/game/rendering/textures/TexturePrimitives.ts#L7) | Поле состояния или ссылка на систему. |
+| `accent` | [8](../src/game/rendering/textures/TexturePrimitives.ts#L8) | Поле состояния или ссылка на систему. |
+| `texture` | [11](../src/game/rendering/textures/TexturePrimitives.ts#L11) | Объявление в этом модуле. |
+| `draw` | [14](../src/game/rendering/textures/TexturePrimitives.ts#L14) | Поле состояния или ссылка на систему. |
+| `draw` | [25](../src/game/rendering/textures/TexturePrimitives.ts#L25) | Объявление в этом модуле. |
+| `ellipse` | [29](../src/game/rendering/textures/TexturePrimitives.ts#L29) | Объявление в этом модуле. |
+
+### [src/game/rendering/textures/VillageTextures.ts](../src/game/rendering/textures/VillageTextures.ts)
+
+Процедурные рисунки деревенских объектов и жителей.
+
+Строк: 136.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `createVillageArtwork` | [4](../src/game/rendering/textures/VillageTextures.ts#L4) | Создаёт соответствующие текстуры персонажей, предметов или окружения. |
+| `texture` | [37](../src/game/rendering/textures/VillageTextures.ts#L37) | Объявление в этом модуле. |
+| `texture` | [58](../src/game/rendering/textures/VillageTextures.ts#L58) | Объявление в этом модуле. |
+| `texture` | [76](../src/game/rendering/textures/VillageTextures.ts#L76) | Объявление в этом модуле. |
+| `texture` | [126](../src/game/rendering/textures/VillageTextures.ts#L126) | Объявление в этом модуле. |
 
 ### [src/game/rendering/WeaponAnimation.ts](../src/game/rendering/WeaponAnimation.ts)
 
 Точки хвата оружия, замах, активная фаза, возврат, перекат и положение локтя.
 
-Строк: 216.
+Строк: 182.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `WEAPON_ART` | [11](../src/game/rendering/WeaponAnimation.ts#L11) | Параметры, таблица данных или функция, объявленная константой. |
-| `WEAPON_SIZE` | [22](../src/game/rendering/WeaponAnimation.ts#L22) | Параметры, таблица данных или функция, объявленная константой. |
-| `weaponTexture` | [25](../src/game/rendering/WeaponAnimation.ts#L25) | Параметры, таблица данных или функция, объявленная константой. |
-| `WeaponMotion` | [26](../src/game/rendering/WeaponAnimation.ts#L26) | Форма данных для проверки TypeScript. |
-| `combo` | [27](../src/game/rendering/WeaponAnimation.ts#L27) | Индекс удара в трёхчастном комбо: 0, 1 или 2. |
-| `skill` | [28](../src/game/rendering/WeaponAnimation.ts#L28) | Поле состояния или ссылка на систему. |
-| `guard` | [29](../src/game/rendering/WeaponAnimation.ts#L29) | Поле состояния или ссылка на систему. |
-| `runPhase` | [30](../src/game/rendering/WeaponAnimation.ts#L30) | Поле состояния или ссылка на систему. |
-| `roll` | [31](../src/game/rendering/WeaponAnimation.ts#L31) | Поле состояния или ссылка на систему. |
-| `chain` | [32](../src/game/rendering/WeaponAnimation.ts#L32) | Поле состояния или ссылка на систему. |
-| `ROLL_GRIPS` | [35](../src/game/rendering/WeaponAnimation.ts#L35) | Параметры, таблица данных или функция, объявленная константой. |
-| `weaponPose` | [62](../src/game/rendering/WeaponAnimation.ts#L62) | Вычисляет позу оружия и рук для текущей фазы действия. |
-| `heavy` | [70](../src/game/rendering/WeaponAnimation.ts#L70) | Поле состояния или ссылка на систему. |
-| `motion` | [71](../src/game/rendering/WeaponAnimation.ts#L71) | Поле состояния или ссылка на систему. |
-| `UPPER_ARM_LENGTH` | [197](../src/game/rendering/WeaponAnimation.ts#L197) | Параметры, таблица данных или функция, объявленная константой. |
-| `FOREARM_LENGTH` | [198](../src/game/rendering/WeaponAnimation.ts#L198) | Поле состояния или ссылка на систему. |
-| `armElbow` | [199](../src/game/rendering/WeaponAnimation.ts#L199) | Вычисляет локоть по плечу, кисти и длинам сегментов руки. |
-| `shoulder` | [200](../src/game/rendering/WeaponAnimation.ts#L200) | Поле состояния или ссылка на систему. |
-| `hand` | [201](../src/game/rendering/WeaponAnimation.ts#L201) | Поле состояния или ссылка на систему. |
+| `weaponTexture` | [13](../src/game/rendering/WeaponAnimation.ts#L13) | Параметры, таблица данных или функция, объявленная константой. |
+| `WeaponMotion` | [14](../src/game/rendering/WeaponAnimation.ts#L14) | Форма данных для проверки TypeScript. |
+| `combo` | [15](../src/game/rendering/WeaponAnimation.ts#L15) | Индекс удара в трёхчастном комбо: 0, 1 или 2. |
+| `skill` | [16](../src/game/rendering/WeaponAnimation.ts#L16) | Поле состояния или ссылка на систему. |
+| `guard` | [17](../src/game/rendering/WeaponAnimation.ts#L17) | Поле состояния или ссылка на систему. |
+| `runPhase` | [18](../src/game/rendering/WeaponAnimation.ts#L18) | Поле состояния или ссылка на систему. |
+| `roll` | [19](../src/game/rendering/WeaponAnimation.ts#L19) | Поле состояния или ссылка на систему. |
+| `chain` | [20](../src/game/rendering/WeaponAnimation.ts#L20) | Поле состояния или ссылка на систему. |
+| `weaponPose` | [24](../src/game/rendering/WeaponAnimation.ts#L24) | Вычисляет позу оружия и рук для текущей фазы действия. |
+| `heavy` | [32](../src/game/rendering/WeaponAnimation.ts#L32) | Поле состояния или ссылка на систему. |
+| `motion` | [33](../src/game/rendering/WeaponAnimation.ts#L33) | Поле состояния или ссылка на систему. |
+| `armElbow` | [165](../src/game/rendering/WeaponAnimation.ts#L165) | Вычисляет локоть по плечу, кисти и длинам сегментов руки. |
+| `shoulder` | [166](../src/game/rendering/WeaponAnimation.ts#L166) | Поле состояния или ссылка на систему. |
+| `hand` | [167](../src/game/rendering/WeaponAnimation.ts#L167) | Поле состояния или ссылка на систему. |
+
+### [src/game/rendering/WorldObjectRenderer.ts](../src/game/rendering/WorldObjectRenderer.ts)
+
+Рисунки снарядов, опасных зон, монет, сундуков и предметов мира.
+
+Строк: 140.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `WorldObjectRenderer` | [7](../src/game/rendering/WorldObjectRenderer.ts#L7) | Объявление в этом модуле. |
+| `drawBiomeMoods` | [10](../src/game/rendering/WorldObjectRenderer.ts#L10) | Объявление в этом модуле. |
+| `drawHazards` | [23](../src/game/rendering/WorldObjectRenderer.ts#L23) | Объявление в этом модуле. |
+| `drawProjectiles` | [83](../src/game/rendering/WorldObjectRenderer.ts#L83) | Объявление в этом модуле. |
+| `drawCollectibles` | [103](../src/game/rendering/WorldObjectRenderer.ts#L103) | Объявление в этом модуле. |
 
 ## Музыка и звук
+
+### [src/game/audio/AudioDirector.ts](../src/game/audio/AudioDirector.ts)
+
+Выбор музыкального режима по текущей игровой ситуации.
+
+Строк: 48.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `AudioDirector` | [6](../src/game/audio/AudioDirector.ts#L6) | Объявление в этом модуле. |
+| `combatLeft` | [7](../src/game/audio/AudioDirector.ts#L7) | Поле состояния или ссылка на систему. |
+| `reset` | [11](../src/game/audio/AudioDirector.ts#L11) | Сбрасывает данные или ресурсы, которыми владеет модуль. |
+| `update` | [15](../src/game/audio/AudioDirector.ts#L15) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `mode` | [32](../src/game/audio/AudioDirector.ts#L32) | Объявление в этом модуле. |
 
 ### [src/game/audio/GameAudio.ts](../src/game/audio/GameAudio.ts)
 
 Звуковые эффекты Web Audio, громкость, шаги, погода и резервная синтезированная музыка.
 
-Строк: 467.
+Строк: 484.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `Sound` | [4](../src/game/audio/GameAudio.ts#L4) | Форма данных для проверки TypeScript. |
-| `AudioSettings` | [30](../src/game/audio/GameAudio.ts#L30) | Форма данных для проверки TypeScript. |
-| `master` | [31](../src/game/audio/GameAudio.ts#L31) | Поле состояния или ссылка на систему. |
-| `music` | [32](../src/game/audio/GameAudio.ts#L32) | Поле состояния или ссылка на систему. |
-| `effects` | [33](../src/game/audio/GameAudio.ts#L33) | Короткоживущие дуги, кольца и следы выпадов. |
-| `muted` | [34](../src/game/audio/GameAudio.ts#L34) | Поле состояния или ссылка на систему. |
-| `DEFAULT_AUDIO` | [36](../src/game/audio/GameAudio.ts#L36) | Параметры, таблица данных или функция, объявленная константой. |
-| `ForestAudio` | [51](../src/game/audio/GameAudio.ts#L51) | Объявление в этом модуле. |
-| `settings` | [52](../src/game/audio/GameAudio.ts#L52) | Поле состояния или ссылка на систему. |
-| `available` | [53](../src/game/audio/GameAudio.ts#L53) | Поле состояния или ссылка на систему. |
-| `context` | [54](../src/game/audio/GameAudio.ts#L54) | Поле состояния или ссылка на систему. |
-| `master` | [55](../src/game/audio/GameAudio.ts#L55) | Поле состояния или ссылка на систему. |
-| `music` | [56](../src/game/audio/GameAudio.ts#L56) | Поле состояния или ссылка на систему. |
-| `guitar` | [57](../src/game/audio/GameAudio.ts#L57) | Поле состояния или ссылка на систему. |
-| `recorded` | [58](../src/game/audio/GameAudio.ts#L58) | Поле состояния или ссылка на систему. |
-| `mode` | [59](../src/game/audio/GameAudio.ts#L59) | Поле состояния или ссылка на систему. |
-| `ambientLeft` | [60](../src/game/audio/GameAudio.ts#L60) | Поле состояния или ссылка на систему. |
-| `effects` | [61](../src/game/audio/GameAudio.ts#L61) | Короткоживущие дуги, кольца и следы выпадов. |
-| `rain` | [62](../src/game/audio/GameAudio.ts#L62) | Поле состояния или ссылка на систему. |
-| `rainSource` | [63](../src/game/audio/GameAudio.ts#L63) | Поле состояния или ссылка на систему. |
-| `noise` | [64](../src/game/audio/GameAudio.ts#L64) | Поле состояния или ссылка на систему. |
-| `region` | [65](../src/game/audio/GameAudio.ts#L65) | Поле состояния или ссылка на систему. |
-| `note` | [66](../src/game/audio/GameAudio.ts#L66) | Поле состояния или ссылка на систему. |
-| `nextNote` | [67](../src/game/audio/GameAudio.ts#L67) | Поле состояния или ссылка на систему. |
-| `paused` | [68](../src/game/audio/GameAudio.ts#L68) | Поле состояния или ссылка на систему. |
-| `weather` | [69](../src/game/audio/GameAudio.ts#L69) | Текущее погодное событие или clear. |
-| `stepLeft` | [70](../src/game/audio/GameAudio.ts#L70) | Поле состояния или ссылка на систему. |
-| `unlock` | [71](../src/game/audio/GameAudio.ts#L71) | Объявление в этом модуле. |
+| `Sound` | [12](../src/game/audio/GameAudio.ts#L12) | Форма данных для проверки TypeScript. |
+| `AudioSettings` | [38](../src/game/audio/GameAudio.ts#L38) | Форма данных для проверки TypeScript. |
+| `master` | [39](../src/game/audio/GameAudio.ts#L39) | Поле состояния или ссылка на систему. |
+| `music` | [40](../src/game/audio/GameAudio.ts#L40) | Поле состояния или ссылка на систему. |
+| `effects` | [41](../src/game/audio/GameAudio.ts#L41) | Короткоживущие дуги, кольца и следы выпадов. |
+| `muted` | [42](../src/game/audio/GameAudio.ts#L42) | Поле состояния или ссылка на систему. |
+| `ForestAudio` | [47](../src/game/audio/GameAudio.ts#L47) | Объявление в этом модуле. |
+| `settings` | [48](../src/game/audio/GameAudio.ts#L48) | Поле состояния или ссылка на систему. |
+| `available` | [49](../src/game/audio/GameAudio.ts#L49) | Поле состояния или ссылка на систему. |
+| `context` | [50](../src/game/audio/GameAudio.ts#L50) | Поле состояния или ссылка на систему. |
+| `master` | [51](../src/game/audio/GameAudio.ts#L51) | Поле состояния или ссылка на систему. |
+| `music` | [52](../src/game/audio/GameAudio.ts#L52) | Поле состояния или ссылка на систему. |
+| `guitar` | [53](../src/game/audio/GameAudio.ts#L53) | Поле состояния или ссылка на систему. |
+| `recorded` | [54](../src/game/audio/GameAudio.ts#L54) | Поле состояния или ссылка на систему. |
+| `mode` | [55](../src/game/audio/GameAudio.ts#L55) | Поле состояния или ссылка на систему. |
+| `ambientLeft` | [56](../src/game/audio/GameAudio.ts#L56) | Поле состояния или ссылка на систему. |
+| `effects` | [57](../src/game/audio/GameAudio.ts#L57) | Короткоживущие дуги, кольца и следы выпадов. |
+| `rain` | [58](../src/game/audio/GameAudio.ts#L58) | Поле состояния или ссылка на систему. |
+| `rainSource` | [59](../src/game/audio/GameAudio.ts#L59) | Поле состояния или ссылка на систему. |
+| `noise` | [60](../src/game/audio/GameAudio.ts#L60) | Поле состояния или ссылка на систему. |
+| `region` | [61](../src/game/audio/GameAudio.ts#L61) | Поле состояния или ссылка на систему. |
+| `note` | [62](../src/game/audio/GameAudio.ts#L62) | Поле состояния или ссылка на систему. |
+| `nextNote` | [63](../src/game/audio/GameAudio.ts#L63) | Поле состояния или ссылка на систему. |
+| `paused` | [64](../src/game/audio/GameAudio.ts#L64) | Поле состояния или ссылка на систему. |
+| `weather` | [65](../src/game/audio/GameAudio.ts#L65) | Текущее погодное событие или clear. |
+| `stepLeft` | [66](../src/game/audio/GameAudio.ts#L66) | Поле состояния или ссылка на систему. |
+| `unlock` | [67](../src/game/audio/GameAudio.ts#L67) | Объявление в этом модуле. |
 | `setSettings` | [124](../src/game/audio/GameAudio.ts#L124) | Объявление в этом модуле. |
-| `applySettings` | [130](../src/game/audio/GameAudio.ts#L130) | Объявление в этом модуле. |
-| `setRegion` | [137](../src/game/audio/GameAudio.ts#L137) | Объявление в этом модуле. |
-| `update` | [144](../src/game/audio/GameAudio.ts#L144) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
-| `tone` | [242](../src/game/audio/GameAudio.ts#L242) | Объявление в этом модуле. |
-| `noiseBurst` | [270](../src/game/audio/GameAudio.ts#L270) | Объявление в этом модуле. |
-| `play` | [301](../src/game/audio/GameAudio.ts#L301) | Объявление в этом модуле. |
-| `weaponSound` | [411](../src/game/audio/GameAudio.ts#L411) | Объявление в этом модуле. |
-| `footstep` | [445](../src/game/audio/GameAudio.ts#L445) | Объявление в этом модуле. |
-| `destroy` | [461](../src/game/audio/GameAudio.ts#L461) | Объявление в этом модуле. |
+| `applySettings` | [131](../src/game/audio/GameAudio.ts#L131) | Объявление в этом модуле. |
+| `setRegion` | [140](../src/game/audio/GameAudio.ts#L140) | Объявление в этом модуле. |
+| `update` | [147](../src/game/audio/GameAudio.ts#L147) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `tone` | [251](../src/game/audio/GameAudio.ts#L251) | Объявление в этом модуле. |
+| `noiseBurst` | [283](../src/game/audio/GameAudio.ts#L283) | Объявление в этом модуле. |
+| `play` | [316](../src/game/audio/GameAudio.ts#L316) | Объявление в этом модуле. |
+| `weaponSound` | [428](../src/game/audio/GameAudio.ts#L428) | Объявление в этом модуле. |
+| `footstep` | [459](../src/game/audio/GameAudio.ts#L459) | Объявление в этом модуле. |
+| `trackTitle` | [475](../src/game/audio/GameAudio.ts#L475) | Объявление в этом модуле. |
+| `destroy` | [478](../src/game/audio/GameAudio.ts#L478) | Объявление в этом модуле. |
 
 ### [src/game/audio/Soundtrack.ts](../src/game/audio/Soundtrack.ts)
 
 Десять музыкальных записей, выбор темы по биому и режиму, загрузка и воспроизведение.
 
-Строк: 240.
+Строк: 133.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `TRACKS` | [11](../src/game/audio/Soundtrack.ts#L11) | Параметры, таблица данных или функция, объявленная константой. |
-| `TrackId` | [73](../src/game/audio/Soundtrack.ts#L73) | Форма данных для проверки TypeScript. |
-| `MusicMode` | [74](../src/game/audio/Soundtrack.ts#L74) | Форма данных для проверки TypeScript. |
-| `THEMES` | [75](../src/game/audio/Soundtrack.ts#L75) | Параметры, таблица данных или функция, объявленная константой. |
-| `soundtrack` | [125](../src/game/audio/Soundtrack.ts#L125) | Выбирает запись по биому и ситуации. |
-| `mode` | [126](../src/game/audio/Soundtrack.ts#L126) | Поле состояния или ссылка на систему. |
-| `RecordedMusic` | [132](../src/game/audio/Soundtrack.ts#L132) | Объявление в этом модуле. |
-| `failed` | [133](../src/game/audio/Soundtrack.ts#L133) | Поле состояния или ссылка на систему. |
-| `current` | [134](../src/game/audio/Soundtrack.ts#L134) | Поле состояния или ссылка на систему. |
-| `active` | [142](../src/game/audio/Soundtrack.ts#L142) | Поле состояния или ссылка на систему. |
-| `playing` | [143](../src/game/audio/Soundtrack.ts#L143) | Поле состояния или ссылка на систему. |
-| `positions` | [144](../src/game/audio/Soundtrack.ts#L144) | Поле состояния или ссылка на систему. |
-| `update` | [149](../src/game/audio/Soundtrack.ts#L149) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
-| `destroy` | [230](../src/game/audio/Soundtrack.ts#L230) | Объявление в этом модуле. |
+| `TrackId` | [3](../src/game/audio/Soundtrack.ts#L3) | Форма данных для проверки TypeScript. |
+| `MusicMode` | [4](../src/game/audio/Soundtrack.ts#L4) | Форма данных для проверки TypeScript. |
+| `soundtrack` | [6](../src/game/audio/Soundtrack.ts#L6) | Выбирает запись по биому и ситуации. |
+| `mode` | [7](../src/game/audio/Soundtrack.ts#L7) | Поле состояния или ссылка на систему. |
+| `RecordedMusic` | [13](../src/game/audio/Soundtrack.ts#L13) | Объявление в этом модуле. |
+| `failed` | [14](../src/game/audio/Soundtrack.ts#L14) | Поле состояния или ссылка на систему. |
+| `current` | [15](../src/game/audio/Soundtrack.ts#L15) | Поле состояния или ссылка на систему. |
+| `active` | [23](../src/game/audio/Soundtrack.ts#L23) | Поле состояния или ссылка на систему. |
+| `playing` | [24](../src/game/audio/Soundtrack.ts#L24) | Поле состояния или ссылка на систему. |
+| `positions` | [25](../src/game/audio/Soundtrack.ts#L25) | Поле состояния или ссылка на систему. |
+| `update` | [30](../src/game/audio/Soundtrack.ts#L30) | Порядок обновления систем на каждом кадре; пауза останавливает игровые действия. |
+| `title` | [118](../src/game/audio/Soundtrack.ts#L118) | Объявление в этом модуле. |
+| `destroy` | [123](../src/game/audio/Soundtrack.ts#L123) | Объявление в этом модуле. |
 
 ## Сохранения
 
@@ -1186,79 +1557,80 @@
 
 Схема ручного сохранения v7, проверка данных и перенос старых форматов v5/v6.
 
-Строк: 336.
+Строк: 370.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `RegionProgress` | [26](../src/game/persistence/SaveSchema.ts#L26) | Форма данных для проверки TypeScript. |
-| `coins` | [27](../src/game/persistence/SaveSchema.ts#L27) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
-| `elapsed` | [28](../src/game/persistence/SaveSchema.ts#L28) | Игровое время путешествия, секунды. |
-| `spawned` | [29](../src/game/persistence/SaveSchema.ts#L29) | Поле состояния или ссылка на систему. |
-| `bossDead` | [30](../src/game/persistence/SaveSchema.ts#L30) | Поле состояния или ссылка на систему. |
-| `cleared` | [31](../src/game/persistence/SaveSchema.ts#L31) | Поле состояния или ссылка на систему. |
-| `income` | [32](../src/game/persistence/SaveSchema.ts#L32) | Поле состояния или ссылка на систему. |
-| `rewarded` | [33](../src/game/persistence/SaveSchema.ts#L33) | Поле состояния или ссылка на систему. |
-| `SavedEnemy` | [35](../src/game/persistence/SaveSchema.ts#L35) | Форма данных для проверки TypeScript. |
-| `kind` | [36](../src/game/persistence/SaveSchema.ts#L36) | Поле состояния или ссылка на систему. |
-| `region` | [37](../src/game/persistence/SaveSchema.ts#L37) | Поле состояния или ссылка на систему. |
-| `hp` | [38](../src/game/persistence/SaveSchema.ts#L38) | Текущее здоровье. Для героя максимум задаёт CombatRules.stats().maxHP. |
-| `phase2` | [39](../src/game/persistence/SaveSchema.ts#L39) | Поле состояния или ссылка на систему. |
-| `variant` | [40](../src/game/persistence/SaveSchema.ts#L40) | Поле состояния или ссылка на систему. |
-| `training` | [41](../src/game/persistence/SaveSchema.ts#L41) | Поле состояния или ссылка на систему. |
-| `SavedChest` | [43](../src/game/persistence/SaveSchema.ts#L43) | Форма данных для проверки TypeScript. |
-| `region` | [44](../src/game/persistence/SaveSchema.ts#L44) | Поле состояния или ссылка на систему. |
-| `quest` | [45](../src/game/persistence/SaveSchema.ts#L45) | Поле состояния или ссылка на систему. |
-| `opened` | [46](../src/game/persistence/SaveSchema.ts#L46) | Поле состояния или ссылка на систему. |
-| `Snapshot` | [48](../src/game/persistence/SaveSchema.ts#L48) | Форма данных для проверки TypeScript. |
-| `version` | [49](../src/game/persistence/SaveSchema.ts#L49) | Поле состояния или ссылка на систему. |
-| `manual` | [50](../src/game/persistence/SaveSchema.ts#L50) | Поле состояния или ссылка на систему. |
-| `savedAt` | [51](../src/game/persistence/SaveSchema.ts#L51) | Поле состояния или ссылка на систему. |
-| `profile` | [52](../src/game/persistence/SaveSchema.ts#L52) | Покупки, кошелёк, улучшения, экипировка, навыки и достижения текущего путешествия. |
-| `region` | [53](../src/game/persistence/SaveSchema.ts#L53) | Поле состояния или ссылка на систему. |
-| `progress` | [54](../src/game/persistence/SaveSchema.ts#L54) | Прогресс по биомам: сила, время, босс, очищение, доход и однократная награда. |
-| `player` | [55](../src/game/persistence/SaveSchema.ts#L55) | Поле состояния или ссылка на систему. |
-| `checkpoint` | [56](../src/game/persistence/SaveSchema.ts#L56) | Координаты последнего контрольного костра. |
-| `hp` | [57](../src/game/persistence/SaveSchema.ts#L57) | Текущее здоровье. Для героя максимум задаёт CombatRules.stats().maxHP. |
-| `stamina` | [58](../src/game/persistence/SaveSchema.ts#L58) | Текущая выносливость; расходуется атаками, навыками и перекатом. |
-| `flasks` | [59](../src/game/persistence/SaveSchema.ts#L59) | Оставшиеся заряды лечебной фляги Q. |
-| `armed` | [60](../src/game/persistence/SaveSchema.ts#L60) | Может ли герой использовать духовное оружие в текущей области. |
-| `ultimate` | [61](../src/game/persistence/SaveSchema.ts#L61) | Накопленный заряд абсолютного умения, от 0 до 100. |
-| `elapsed` | [62](../src/game/persistence/SaveSchema.ts#L62) | Игровое время путешествия, секунды. |
-| `score` | [63](../src/game/persistence/SaveSchema.ts#L63) | Набранные очки; отдельный показатель, не кошелёк. |
-| `kills` | [64](../src/game/persistence/SaveSchema.ts#L64) | Число побеждённых противников текущего путешествия. |
-| `deaths` | [65](../src/game/persistence/SaveSchema.ts#L65) | Число смертей героя в текущем путешествии. |
-| `enemies` | [66](../src/game/persistence/SaveSchema.ts#L66) | Живые и завершающие анимацию смерти противники. |
-| `coins` | [67](../src/game/persistence/SaveSchema.ts#L67) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
-| `quests` | [68](../src/game/persistence/SaveSchema.ts#L68) | Три испытания для каждого биома. |
-| `chests` | [69](../src/game/persistence/SaveSchema.ts#L69) | Сундуки испытаний и их открытость. |
-| `audio` | [70](../src/game/persistence/SaveSchema.ts#L70) | Поле состояния или ссылка на систему. |
-| `area` | [71](../src/game/persistence/SaveSchema.ts#L71) | Тип области: village, biome, tutorial или interior. |
-| `villageIndex` | [72](../src/game/persistence/SaveSchema.ts#L72) | Индекс текущей деревни; начальная деревня имеет индекс -1. |
-| `lastVillage` | [73](../src/game/persistence/SaveSchema.ts#L73) | Индекс последнего посещённого костра для возвращения после смерти. |
-| `lesson` | [74](../src/game/persistence/SaveSchema.ts#L74) | Поле состояния или ссылка на систему. |
-| `lessonProgress` | [75](../src/game/persistence/SaveSchema.ts#L75) | Количество зачтённых действий текущего урока. |
-| `lines` | [76](../src/game/persistence/SaveSchema.ts#L76) | Состояния сюжетных поручений: принятие, предметы и награды. |
-| `wisp` | [77](../src/game/persistence/SaveSchema.ts#L77) | Спрайт сопровождаемого огонька или null. |
-| `villages` | [78](../src/game/persistence/SaveSchema.ts#L78) | Поле состояния или ссылка на систему. |
-| `deliveries` | [79](../src/game/persistence/SaveSchema.ts#L79) | Состояния доставок: принято, передано и награда получена. |
-| `interiorRole` | [80](../src/game/persistence/SaveSchema.ts#L80) | Роль владельца открытого дома или null. |
-| `interiorReturn` | [81](../src/game/persistence/SaveSchema.ts#L81) | После выхода из интерьера вернуться в деревню или учебный двор. |
-| `migrated` | [82](../src/game/persistence/SaveSchema.ts#L82) | Поле состояния или ссылка на систему. |
-| `parseSave` | [98](../src/game/persistence/SaveSchema.ts#L98) | Проверяет JSON, ограничивает значения и переносит сохранения v5/v6 в v7. |
+| `RegionProgress` | [28](../src/game/persistence/SaveSchema.ts#L28) | Форма данных для проверки TypeScript. |
+| `coins` | [29](../src/game/persistence/SaveSchema.ts#L29) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
+| `elapsed` | [30](../src/game/persistence/SaveSchema.ts#L30) | Игровое время путешествия, секунды. |
+| `spawned` | [31](../src/game/persistence/SaveSchema.ts#L31) | Поле состояния или ссылка на систему. |
+| `bossDead` | [32](../src/game/persistence/SaveSchema.ts#L32) | Поле состояния или ссылка на систему. |
+| `cleared` | [33](../src/game/persistence/SaveSchema.ts#L33) | Поле состояния или ссылка на систему. |
+| `income` | [34](../src/game/persistence/SaveSchema.ts#L34) | Поле состояния или ссылка на систему. |
+| `rewarded` | [35](../src/game/persistence/SaveSchema.ts#L35) | Поле состояния или ссылка на систему. |
+| `SavedEnemy` | [37](../src/game/persistence/SaveSchema.ts#L37) | Форма данных для проверки TypeScript. |
+| `kind` | [38](../src/game/persistence/SaveSchema.ts#L38) | Поле состояния или ссылка на систему. |
+| `region` | [39](../src/game/persistence/SaveSchema.ts#L39) | Поле состояния или ссылка на систему. |
+| `hp` | [40](../src/game/persistence/SaveSchema.ts#L40) | Текущее здоровье. Для героя максимум задаёт CombatRules.stats().maxHP. |
+| `phase2` | [41](../src/game/persistence/SaveSchema.ts#L41) | Поле состояния или ссылка на систему. |
+| `variant` | [42](../src/game/persistence/SaveSchema.ts#L42) | Поле состояния или ссылка на систему. |
+| `training` | [43](../src/game/persistence/SaveSchema.ts#L43) | Поле состояния или ссылка на систему. |
+| `SavedChest` | [45](../src/game/persistence/SaveSchema.ts#L45) | Форма данных для проверки TypeScript. |
+| `region` | [46](../src/game/persistence/SaveSchema.ts#L46) | Поле состояния или ссылка на систему. |
+| `quest` | [47](../src/game/persistence/SaveSchema.ts#L47) | Поле состояния или ссылка на систему. |
+| `opened` | [48](../src/game/persistence/SaveSchema.ts#L48) | Поле состояния или ссылка на систему. |
+| `Snapshot` | [50](../src/game/persistence/SaveSchema.ts#L50) | Форма данных для проверки TypeScript. |
+| `version` | [51](../src/game/persistence/SaveSchema.ts#L51) | Поле состояния или ссылка на систему. |
+| `manual` | [52](../src/game/persistence/SaveSchema.ts#L52) | Поле состояния или ссылка на систему. |
+| `savedAt` | [53](../src/game/persistence/SaveSchema.ts#L53) | Поле состояния или ссылка на систему. |
+| `profile` | [54](../src/game/persistence/SaveSchema.ts#L54) | Покупки, кошелёк, улучшения, экипировка, навыки и достижения текущего путешествия. |
+| `region` | [55](../src/game/persistence/SaveSchema.ts#L55) | Поле состояния или ссылка на систему. |
+| `progress` | [56](../src/game/persistence/SaveSchema.ts#L56) | Прогресс по биомам: сила, время, босс, очищение, доход и однократная награда. |
+| `player` | [57](../src/game/persistence/SaveSchema.ts#L57) | Поле состояния или ссылка на систему. |
+| `checkpoint` | [58](../src/game/persistence/SaveSchema.ts#L58) | Координаты последнего контрольного костра. |
+| `hp` | [59](../src/game/persistence/SaveSchema.ts#L59) | Текущее здоровье. Для героя максимум задаёт CombatRules.stats().maxHP. |
+| `stamina` | [60](../src/game/persistence/SaveSchema.ts#L60) | Текущая выносливость; расходуется атаками, навыками и перекатом. |
+| `flasks` | [61](../src/game/persistence/SaveSchema.ts#L61) | Оставшиеся заряды лечебной фляги Q. |
+| `armed` | [62](../src/game/persistence/SaveSchema.ts#L62) | Может ли герой использовать духовное оружие в текущей области. |
+| `ultimate` | [63](../src/game/persistence/SaveSchema.ts#L63) | Накопленный заряд абсолютного умения, от 0 до 100. |
+| `elapsed` | [64](../src/game/persistence/SaveSchema.ts#L64) | Игровое время путешествия, секунды. |
+| `score` | [65](../src/game/persistence/SaveSchema.ts#L65) | Набранные очки; отдельный показатель, не кошелёк. |
+| `kills` | [66](../src/game/persistence/SaveSchema.ts#L66) | Число побеждённых противников текущего путешествия. |
+| `deaths` | [67](../src/game/persistence/SaveSchema.ts#L67) | Число смертей героя в текущем путешествии. |
+| `enemies` | [68](../src/game/persistence/SaveSchema.ts#L68) | Живые и завершающие анимацию смерти противники. |
+| `coins` | [69](../src/game/persistence/SaveSchema.ts#L69) | Осколки в мире. Кошелёк находится в journey.profile.coins. |
+| `quests` | [70](../src/game/persistence/SaveSchema.ts#L70) | Три испытания для каждого биома. |
+| `chests` | [71](../src/game/persistence/SaveSchema.ts#L71) | Сундуки испытаний и их открытость. |
+| `audio` | [72](../src/game/persistence/SaveSchema.ts#L72) | Поле состояния или ссылка на систему. |
+| `area` | [73](../src/game/persistence/SaveSchema.ts#L73) | Тип области: village, biome, tutorial или interior. |
+| `villageIndex` | [74](../src/game/persistence/SaveSchema.ts#L74) | Индекс текущей деревни; начальная деревня имеет индекс -1. |
+| `lastVillage` | [75](../src/game/persistence/SaveSchema.ts#L75) | Индекс последнего посещённого костра для возвращения после смерти. |
+| `lesson` | [76](../src/game/persistence/SaveSchema.ts#L76) | Поле состояния или ссылка на систему. |
+| `lessonProgress` | [77](../src/game/persistence/SaveSchema.ts#L77) | Количество зачтённых действий текущего урока. |
+| `lines` | [78](../src/game/persistence/SaveSchema.ts#L78) | Состояния сюжетных поручений: принятие, предметы и награды. |
+| `wisp` | [79](../src/game/persistence/SaveSchema.ts#L79) | Спрайт сопровождаемого огонька или null. |
+| `villages` | [80](../src/game/persistence/SaveSchema.ts#L80) | Поле состояния или ссылка на систему. |
+| `deliveries` | [81](../src/game/persistence/SaveSchema.ts#L81) | Состояния доставок: принято, передано и награда получена. |
+| `interiorRole` | [82](../src/game/persistence/SaveSchema.ts#L82) | Роль владельца открытого дома или null. |
+| `interiorReturn` | [83](../src/game/persistence/SaveSchema.ts#L83) | После выхода из интерьера вернуться в деревню или учебный двор. |
+| `migrated` | [84](../src/game/persistence/SaveSchema.ts#L84) | Поле состояния или ссылка на систему. |
+| `parseSave` | [100](../src/game/persistence/SaveSchema.ts#L100) | Проверяет JSON, ограничивает значения и переносит сохранения v5/v6 в v7. |
 
 ### [src/game/persistence/SaveSystem.ts](../src/game/persistence/SaveSystem.ts)
 
 Ручная запись, загрузка и отображение состояния сохранения.
 
-Строк: 270.
+Строк: 275.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `SaveSystem` | [11](../src/game/persistence/SaveSystem.ts#L11) | Объявление в этом модуле. |
-| `refreshSaveUI` | [13](../src/game/persistence/SaveSystem.ts#L13) | Обновляет доступность загрузки и текст о ручном сохранении. |
-| `snapshot` | [23](../src/game/persistence/SaveSystem.ts#L23) | Создаёт объект сохранения из текущего состояния систем. |
-| `saveProgress` | [91](../src/game/persistence/SaveSystem.ts#L91) | Пишет JSON в localStorage из меню, паузы или финала. |
-| `loadProgress` | [108](../src/game/persistence/SaveSystem.ts#L108) | Проверяет запись, восстанавливает профиль, объекты и окна, сбрасывает временные эффекты. |
+| `SaveSystem` | [17](../src/game/persistence/SaveSystem.ts#L17) | Объявление в этом модуле. |
+| `initialize` | [19](../src/game/persistence/SaveSystem.ts#L19) | Объявление в этом модуле. |
+| `refreshSaveUI` | [30](../src/game/persistence/SaveSystem.ts#L30) | Обновляет доступность загрузки и текст о ручном сохранении. |
+| `snapshot` | [40](../src/game/persistence/SaveSystem.ts#L40) | Создаёт объект сохранения из текущего состояния систем. |
+| `saveProgress` | [108](../src/game/persistence/SaveSystem.ts#L108) | Пишет JSON в localStorage из меню, паузы или финала. |
+| `loadProgress` | [132](../src/game/persistence/SaveSystem.ts#L132) | Проверяет запись, восстанавливает профиль, объекты и окна, сбрасывает временные эффекты. |
 
 ## Интерфейс и ввод
 
@@ -1268,114 +1640,141 @@ DOM-разметка игровых окон и идентификаторы, к
 
 Строк: 457.
 
+### [src/game/ui/HudController.ts](../src/game/ui/HudController.ts)
+
+Показатели героя, цель, информация о боссе и направляющая стрелка.
+
+Строк: 232.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `HudController` | [19](../src/game/ui/HudController.ts#L19) | Объявление в этом модуле. |
+| `updateHUD` | [22](../src/game/ui/HudController.ts#L22) | Обновляет HP, выносливость, силу, таймеры, босса и стрелку направления. |
+
 ### [src/game/ui/InputController.ts](../src/game/ui/InputController.ts)
 
 Привязка DOM-кнопок, клавиатуры и мыши, сброс ввода и полноэкранный режим.
 
-Строк: 394.
+Строк: 539.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `InputController` | [12](../src/game/ui/InputController.ts#L12) | Объявление в этом модуле. |
+| `InputController` | [11](../src/game/ui/InputController.ts#L11) | Объявление в этом модуле. |
+| `disposers` | [12](../src/game/ui/InputController.ts#L12) | Поле состояния или ссылка на систему. |
 | `bindControls` | [14](../src/game/ui/InputController.ts#L14) | Подключает DOM-кнопки, события мыши, клавиатуры, скрытия вкладки и предупреждение о выходе. |
-| `fullscreen` | [378](../src/game/ui/InputController.ts#L378) | Переключает полноэкранный режим браузера. |
-| `resetInput` | [388](../src/game/ui/InputController.ts#L388) | Сбрасывает движение, удержание мыши и клавиши. |
+| `fullscreen` | [416](../src/game/ui/InputController.ts#L416) | Переключает полноэкранный режим браузера. |
+| `resetInput` | [426](../src/game/ui/InputController.ts#L426) | Сбрасывает движение, удержание мыши и клавиши. |
+| `updateGlobal` | [433](../src/game/ui/InputController.ts#L433) | Объявление в этом модуле. |
+| `updatePlaying` | [495](../src/game/ui/InputController.ts#L495) | Объявление в этом модуле. |
+| `bindPointer` | [526](../src/game/ui/InputController.ts#L526) | Объявление в этом модуле. |
+| `destroy` | [532](../src/game/ui/InputController.ts#L532) | Объявление в этом модуле. |
 
 ### [src/game/ui/InterfaceState.ts](../src/game/ui/InterfaceState.ts)
 
-Режим игры, выбор окон, ввод, диалоги и уведомления.
+Выбранные вкладки, ввод и временные данные окон; режим здесь не хранится.
 
-Строк: 66.
+Строк: 56.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `GameState` | [7](../src/game/ui/InterfaceState.ts#L7) | Форма данных для проверки TypeScript. |
-| `ShopTab` | [25](../src/game/ui/InterfaceState.ts#L25) | Форма данных для проверки TypeScript. |
-| `MenuTab` | [26](../src/game/ui/InterfaceState.ts#L26) | Форма данных для проверки TypeScript. |
-| `InterfaceState` | [27](../src/game/ui/InterfaceState.ts#L27) | Объявление в этом модуле. |
-| `keys` | [28](../src/game/ui/InterfaceState.ts#L28) | Клавиши Phaser, подключённые при создании сцены. |
-| `listeners` | [29](../src/game/ui/InterfaceState.ts#L29) | AbortController для отключения DOM-обработчиков при остановке сцены. |
-| `state` | [30](../src/game/ui/InterfaceState.ts#L30) | Режим игры: playing, menu, paused, dialog, shop, map и другие состояния. |
-| `nearestNPC` | [31](../src/game/ui/InterfaceState.ts#L31) | Индекс ближайшего доступного собеседника; -1 — отсутствует. |
-| `dialogRole` | [32](../src/game/ui/InterfaceState.ts#L32) | Роль текущего собеседника; влияет на реплики и магазин. |
-| `nearestHouse` | [33](../src/game/ui/InterfaceState.ts#L33) | Индекс ближайшей доступной двери. |
-| `nearestProp` | [34](../src/game/ui/InterfaceState.ts#L34) | Индекс ближайшего сюжетного предмета. |
-| `questView` | [35](../src/game/ui/InterfaceState.ts#L35) | Выбранный раздел журнала: испытания, история или доставки. |
-| `questPage` | [36](../src/game/ui/InterfaceState.ts#L36) | Номер страницы текущего раздела журнала. |
-| `mapMode` | [37](../src/game/ui/InterfaceState.ts#L37) | Локальная карта или карта мира. |
-| `mapFocusRegion` | [38](../src/game/ui/InterfaceState.ts#L38) | Биом, выбранный для просмотра на карте. |
-| `mapFocusVillage` | [39](../src/game/ui/InterfaceState.ts#L39) | Деревня, выбранная для просмотра на карте. |
-| `confirmReturn` | [40](../src/game/ui/InterfaceState.ts#L40) | Режим, к которому вернуться при отмене выхода. |
-| `confirmTarget` | [41](../src/game/ui/InterfaceState.ts#L41) | Цель подтверждённого выхода: титульный экран или новая игра. |
-| `achievementQueue` | [42](../src/game/ui/InterfaceState.ts#L42) | Очередь новых достижений для коротких уведомлений. |
-| `achievementLeft` | [43](../src/game/ui/InterfaceState.ts#L43) | Оставшееся время текущего уведомления достижения. |
-| `achievementPage` | [44](../src/game/ui/InterfaceState.ts#L44) | Страница списка достижений. |
-| `mouse` | [45](../src/game/ui/InterfaceState.ts#L45) | Последняя экранная точка мыши для прицеливания. |
-| `mouseHeld` | [46](../src/game/ui/InterfaceState.ts#L46) | Удерживается ли ЛКМ для повторения атак. |
-| `hudLeft` | [47](../src/game/ui/InterfaceState.ts#L47) | Таймер до очередного обновления DOM-индикаторов. |
-| `toastTimeout` | [48](../src/game/ui/InterfaceState.ts#L48) | Идентификатор таймера скрытия короткого сообщения. |
-| `checkpointBannerLeft` | [49](../src/game/ui/InterfaceState.ts#L49) | Оставшееся время сообщения о костре. |
-| `nearestChest` | [50](../src/game/ui/InterfaceState.ts#L50) | Индекс ближайшего доступного сундука. |
-| `dialogTarget` | [51](../src/game/ui/InterfaceState.ts#L51) | Полный текст постепенно показываемой реплики. |
-| `dialogTime` | [52](../src/game/ui/InterfaceState.ts#L52) | Время показа реплики для эффекта печати. |
-| `shopTab` | [53](../src/game/ui/InterfaceState.ts#L53) | Выбранная вкладка магазина. |
-| `shopPage` | [54](../src/game/ui/InterfaceState.ts#L54) | Страница товаров текущей вкладки магазина. |
-| `menuTab` | [55](../src/game/ui/InterfaceState.ts#L55) | Выбранный раздел меню путешествия. |
-| `menuReturn` | [56](../src/game/ui/InterfaceState.ts#L56) | Режим, который восстановится после закрытия меню. |
-| `mapReturn` | [57](../src/game/ui/InterfaceState.ts#L57) | Режим, который восстановится после закрытия карты. |
-| `equipmentTab` | [58](../src/game/ui/InterfaceState.ts#L58) | Выбранный тип вещей: оружие, броня или облики. |
-| `equipmentPage` | [59](../src/game/ui/InterfaceState.ts#L59) | Страница списка принадлежащих герою вещей. |
-| `guideWanted` | [60](../src/game/ui/InterfaceState.ts#L60) | Пользователь хочет видеть краткую справку. |
-| `briefingPage` | [61](../src/game/ui/InterfaceState.ts#L61) | Номер вводной карточки обучения. |
-| `loot` | [62](../src/game/ui/InterfaceState.ts#L62) | Выбранная, но ещё не выданная награда сундука. |
-| `lootLeft` | [63](../src/game/ui/InterfaceState.ts#L63) | Время до завершения анимации рулетки. |
-| `bossDigit` | [64](../src/game/ui/InterfaceState.ts#L64) | Последняя показанная цифра перед появлением босса. |
-| `bossDigitLeft` | [65](../src/game/ui/InterfaceState.ts#L65) | Оставшееся время видимости цифры босса. |
+| `ShopTab` | [9](../src/game/ui/InterfaceState.ts#L9) | Форма данных для проверки TypeScript. |
+| `MenuTab` | [10](../src/game/ui/InterfaceState.ts#L10) | Форма данных для проверки TypeScript. |
+| `InterfaceState` | [11](../src/game/ui/InterfaceState.ts#L11) | Объявление в этом модуле. |
+| `keys` | [12](../src/game/ui/InterfaceState.ts#L12) | Клавиши Phaser, подключённые при создании сцены. |
+| `listeners` | [13](../src/game/ui/InterfaceState.ts#L13) | AbortController для отключения DOM-обработчиков при остановке сцены. |
+| `nearestNPC` | [14](../src/game/ui/InterfaceState.ts#L14) | Индекс ближайшего доступного собеседника; -1 — отсутствует. |
+| `dialogRole` | [15](../src/game/ui/InterfaceState.ts#L15) | Роль текущего собеседника; влияет на реплики и магазин. |
+| `nearestHouse` | [16](../src/game/ui/InterfaceState.ts#L16) | Индекс ближайшей доступной двери. |
+| `nearestProp` | [17](../src/game/ui/InterfaceState.ts#L17) | Индекс ближайшего сюжетного предмета. |
+| `questView` | [18](../src/game/ui/InterfaceState.ts#L18) | Выбранный раздел журнала: испытания, история или доставки. |
+| `questPage` | [19](../src/game/ui/InterfaceState.ts#L19) | Номер страницы текущего раздела журнала. |
+| `mapMode` | [20](../src/game/ui/InterfaceState.ts#L20) | Локальная карта или карта мира. |
+| `mapFocusRegion` | [21](../src/game/ui/InterfaceState.ts#L21) | Биом, выбранный для просмотра на карте. |
+| `mapFocusVillage` | [22](../src/game/ui/InterfaceState.ts#L22) | Деревня, выбранная для просмотра на карте. |
+| `confirmReturn` | [23](../src/game/ui/InterfaceState.ts#L23) | Режим, к которому вернуться при отмене выхода. |
+| `confirmTarget` | [24](../src/game/ui/InterfaceState.ts#L24) | Цель подтверждённого выхода: титульный экран или новая игра. |
+| `achievementQueue` | [25](../src/game/ui/InterfaceState.ts#L25) | Очередь новых достижений для коротких уведомлений. |
+| `achievementLeft` | [26](../src/game/ui/InterfaceState.ts#L26) | Оставшееся время текущего уведомления достижения. |
+| `achievementPage` | [27](../src/game/ui/InterfaceState.ts#L27) | Страница списка достижений. |
+| `mouse` | [28](../src/game/ui/InterfaceState.ts#L28) | Последняя экранная точка мыши для прицеливания. |
+| `mouseHeld` | [29](../src/game/ui/InterfaceState.ts#L29) | Удерживается ли ЛКМ для повторения атак. |
+| `hudLeft` | [30](../src/game/ui/InterfaceState.ts#L30) | Таймер до очередного обновления DOM-индикаторов. |
+| `toastTimeout` | [31](../src/game/ui/InterfaceState.ts#L31) | Идентификатор таймера скрытия короткого сообщения. |
+| `checkpointBannerLeft` | [32](../src/game/ui/InterfaceState.ts#L32) | Оставшееся время сообщения о костре. |
+| `nearestChest` | [33](../src/game/ui/InterfaceState.ts#L33) | Индекс ближайшего доступного сундука. |
+| `dialogTarget` | [34](../src/game/ui/InterfaceState.ts#L34) | Полный текст постепенно показываемой реплики. |
+| `dialogTime` | [35](../src/game/ui/InterfaceState.ts#L35) | Время показа реплики для эффекта печати. |
+| `shopTab` | [36](../src/game/ui/InterfaceState.ts#L36) | Выбранная вкладка магазина. |
+| `shopPage` | [37](../src/game/ui/InterfaceState.ts#L37) | Страница товаров текущей вкладки магазина. |
+| `menuTab` | [38](../src/game/ui/InterfaceState.ts#L38) | Выбранный раздел меню путешествия. |
+| `menuReturn` | [39](../src/game/ui/InterfaceState.ts#L39) | Режим, который восстановится после закрытия меню. |
+| `mapReturn` | [40](../src/game/ui/InterfaceState.ts#L40) | Режим, который восстановится после закрытия карты. |
+| `equipmentTab` | [41](../src/game/ui/InterfaceState.ts#L41) | Выбранный тип вещей: оружие, броня или облики. |
+| `equipmentPage` | [42](../src/game/ui/InterfaceState.ts#L42) | Страница списка принадлежащих герою вещей. |
+| `guideWanted` | [43](../src/game/ui/InterfaceState.ts#L43) | Пользователь хочет видеть краткую справку. |
+| `briefingPage` | [44](../src/game/ui/InterfaceState.ts#L44) | Номер вводной карточки обучения. |
+| `loot` | [45](../src/game/ui/InterfaceState.ts#L45) | Выбранная, но ещё не выданная награда сундука. |
+| `lootLeft` | [46](../src/game/ui/InterfaceState.ts#L46) | Время до завершения анимации рулетки. |
+| `bossDigit` | [47](../src/game/ui/InterfaceState.ts#L47) | Последняя показанная цифра перед появлением босса. |
+| `bossDigitLeft` | [48](../src/game/ui/InterfaceState.ts#L48) | Оставшееся время видимости цифры босса. |
+| `resetSession` | [50](../src/game/ui/InterfaceState.ts#L50) | Очищает временное состояние интерфейса. |
 
 ### [src/game/ui/MapController.ts](../src/game/ui/MapController.ts)
 
 Локальная карта, карта мира и выбор области.
 
-Строк: 487.
+Строк: 523.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `MapController` | [18](../src/game/ui/MapController.ts#L18) | Объявление в этом модуле. |
-| `toggleMap` | [20](../src/game/ui/MapController.ts#L20) | Открывает или закрывает карту. |
-| `drawMaps` | [39](../src/game/ui/MapController.ts#L39) | Рисует карту мира и список областей. |
-| `drawLocalMap` | [202](../src/game/ui/MapController.ts#L202) | Рисует локальную карту с героем, врагами, сундуками и заданиями. |
+| `MapController` | [16](../src/game/ui/MapController.ts#L16) | Объявление в этом модуле. |
+| `toggleMap` | [18](../src/game/ui/MapController.ts#L18) | Открывает или закрывает карту. |
+| `drawMaps` | [45](../src/game/ui/MapController.ts#L45) | Рисует карту мира и список областей. |
+| `drawLocalMap` | [223](../src/game/ui/MapController.ts#L223) | Рисует локальную карту с героем, врагами, сундуками и заданиями. |
 
 ### [src/game/ui/MenuController.ts](../src/game/ui/MenuController.ts)
 
-Меню, HUD, пауза, справка, начальный экран и подтверждение выхода.
+Меню, пауза, справка, начальный экран и подтверждение выхода.
 
-Строк: 518.
+Строк: 368.
 
 | Символ | Строка | Назначение |
 | --- | --- | --- |
-| `MenuController` | [19](../src/game/ui/MenuController.ts#L19) | Объявление в этом модуле. |
-| `toast` | [22](../src/game/ui/MenuController.ts#L22) | Показывает короткое исчезающее сообщение. |
-| `toggleMenu` | [31](../src/game/ui/MenuController.ts#L31) | Открывает или закрывает меню, сохраняя прежний режим. |
-| `renderMenu` | [52](../src/game/ui/MenuController.ts#L52) | Выбирает вкладку, обновляет кошелёк и вызывает её отрисовку. |
-| `renderSkills` | [78](../src/game/ui/MenuController.ts#L78) | Выводит навыки текущего оружия и условия изучения. |
-| `renderEquipment` | [103](../src/game/ui/MenuController.ts#L103) | Выводит страницы принадлежащих герою вещей. |
-| `renderAudio` | [127](../src/game/ui/MenuController.ts#L127) | Показывает текущие громкости и выключение звука. |
-| `setGuideText` | [138](../src/game/ui/MenuController.ts#L138) | Обновляет краткую справку управления. |
-| `syncGuide` | [149](../src/game/ui/MenuController.ts#L149) | Согласует видимость справки с режимом игры. |
-| `toggleGuide` | [156](../src/game/ui/MenuController.ts#L156) | Включает или убирает справку. |
-| `togglePause` | [162](../src/game/ui/MenuController.ts#L162) | Ставит мир на паузу и продолжает его. |
-| `showPauseModal` | [177](../src/game/ui/MenuController.ts#L177) | Показывает окно привала. |
-| `primaryAction` | [189](../src/game/ui/MenuController.ts#L189) | Обрабатывает главную кнопку: старт, продолжение или исследование после финала. |
-| `showModal` | [206](../src/game/ui/MenuController.ts#L206) | Заполняет общий экран сообщения. |
-| `hideModal` | [223](../src/game/ui/MenuController.ts#L223) | Скрывает общий экран и показывает сцену. |
-| `showStats` | [229](../src/game/ui/MenuController.ts#L229) | Выводит очки, убийства, смерти, время и кошелёк. |
-| `updateHUD` | [236](../src/game/ui/MenuController.ts#L236) | Обновляет HP, выносливость, силу, таймеры, босса и стрелку направления. |
-| `showTitle` | [436](../src/game/ui/MenuController.ts#L436) | Возвращает к начальному экрану и скрывает игровые окна. |
-| `askTraining` | [475](../src/game/ui/MenuController.ts#L475) | Показывает старт с выбором обучения. |
-| `requestNew` | [479](../src/game/ui/MenuController.ts#L479) | Запрашивает новую игру с учётом несохранённых изменений. |
-| `confirmExit` | [485](../src/game/ui/MenuController.ts#L485) | Открывает выбор сохранения перед выходом или новой игрой. |
-| `cancelExit` | [496](../src/game/ui/MenuController.ts#L496) | Возвращает к состоянию до подтверждения. |
-| `commitExit` | [502](../src/game/ui/MenuController.ts#L502) | Исполняет выбранный выход после сохранения или отказа от него. |
+| `MenuController` | [17](../src/game/ui/MenuController.ts#L17) | Объявление в этом модуле. |
+| `toast` | [20](../src/game/ui/MenuController.ts#L20) | Показывает короткое исчезающее сообщение. |
+| `toggleMenu` | [32](../src/game/ui/MenuController.ts#L32) | Открывает или закрывает меню, сохраняя прежний режим. |
+| `renderMenu` | [57](../src/game/ui/MenuController.ts#L57) | Выбирает вкладку, обновляет кошелёк и вызывает её отрисовку. |
+| `renderSkills` | [95](../src/game/ui/MenuController.ts#L95) | Выводит навыки текущего оружия и условия изучения. |
+| `renderEquipment` | [121](../src/game/ui/MenuController.ts#L121) | Выводит страницы принадлежащих герою вещей. |
+| `renderAudio` | [146](../src/game/ui/MenuController.ts#L146) | Показывает текущие громкости и выключение звука. |
+| `setGuideText` | [158](../src/game/ui/MenuController.ts#L158) | Обновляет краткую справку управления. |
+| `syncGuide` | [171](../src/game/ui/MenuController.ts#L171) | Согласует видимость справки с режимом игры. |
+| `toggleGuide` | [179](../src/game/ui/MenuController.ts#L179) | Включает или убирает справку. |
+| `togglePause` | [185](../src/game/ui/MenuController.ts#L185) | Ставит мир на паузу и продолжает его. |
+| `showPauseModal` | [199](../src/game/ui/MenuController.ts#L199) | Показывает окно привала. |
+| `primaryAction` | [211](../src/game/ui/MenuController.ts#L211) | Обрабатывает главную кнопку: старт, продолжение или исследование после финала. |
+| `showModal` | [228](../src/game/ui/MenuController.ts#L228) | Заполняет общий экран сообщения. |
+| `hideModal` | [245](../src/game/ui/MenuController.ts#L245) | Скрывает общий экран и показывает сцену. |
+| `showStats` | [251](../src/game/ui/MenuController.ts#L251) | Выводит очки, убийства, смерти, время и кошелёк. |
+| `showTitle` | [258](../src/game/ui/MenuController.ts#L258) | Возвращает к начальному экрану и скрывает игровые окна. |
+| `askTraining` | [298](../src/game/ui/MenuController.ts#L298) | Показывает старт с выбором обучения. |
+| `requestNew` | [302](../src/game/ui/MenuController.ts#L302) | Запрашивает новую игру с учётом несохранённых изменений. |
+| `confirmExit` | [311](../src/game/ui/MenuController.ts#L311) | Открывает выбор сохранения перед выходом или новой игрой. |
+| `cancelExit` | [322](../src/game/ui/MenuController.ts#L322) | Возвращает к состоянию до подтверждения. |
+| `commitExit` | [328](../src/game/ui/MenuController.ts#L328) | Исполняет выбранный выход после сохранения или отказа от него. |
+| `resetSession` | [349](../src/game/ui/MenuController.ts#L349) | Очищает временное состояние интерфейса. |
+| `updateNotices` | [358](../src/game/ui/MenuController.ts#L358) | Объявление в этом модуле. |
+
+### [src/game/ui/Pagination.ts](../src/game/ui/Pagination.ts)
+
+Единые границы страниц магазина, экипировки и достижений.
+
+Строк: 10.
+
+| Символ | Строка | Назначение |
+| --- | --- | --- |
+| `pageCount` | [4](../src/game/ui/Pagination.ts#L4) | Объявление в этом модуле. |
+| `pageRange` | [7](../src/game/ui/Pagination.ts#L7) | Объявление в этом модуле. |
 
 ### [src/style.css](../src/style.css)
 
@@ -2026,145 +2425,145 @@ DOM-разметка игровых окон и идентификаторы, к
 
 ### [src/assets/armed-motion-atlas.webp](../src/assets/armed-motion-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.52 МиБ.
 
 ### [src/assets/biome-atlas.webp](../src/assets/biome-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.74 МиБ.
 
 ### [src/assets/combat-atlas.webp](../src/assets/combat-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.54 МиБ.
 
 ### [src/assets/creep-atlas.webp](../src/assets/creep-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.68 МиБ.
 
 ### [src/assets/details-atlas.webp](../src/assets/details-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.68 МиБ.
 
 ### [src/assets/equipment-atlas.webp](../src/assets/equipment-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.28 МиБ.
 
 ### [src/assets/hero-atlas.webp](../src/assets/hero-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.32 МиБ.
 
 ### [src/assets/interiors-atlas.webp](../src/assets/interiors-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.63 МиБ.
 
 ### [src/assets/music/boss-battle-10-metal.mp3](../src/assets/music/boss-battle-10-metal.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 0.49 МиБ.
 
 ### [src/assets/music/boss-battle-2-symphonic-metal.mp3](../src/assets/music/boss-battle-2-symphonic-metal.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 0.30 МиБ.
 
 ### [src/assets/music/boss-battle-9-metal.mp3](../src/assets/music/boss-battle-9-metal.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 0.49 МиБ.
 
 ### [src/assets/music/choir-1.mp3](../src/assets/music/choir-1.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 1.05 МиБ.
 
 ### [src/assets/music/choir-2.mp3](../src/assets/music/choir-2.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 0.61 МиБ.
 
 ### [src/assets/music/choir-3.mp3](../src/assets/music/choir-3.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 1.44 МиБ.
 
 ### [src/assets/music/fairy-adventure.mp3](../src/assets/music/fairy-adventure.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 1.65 МиБ.
 
 ### [src/assets/music/fight-for-better-future-rockmetal.mp3](../src/assets/music/fight-for-better-future-rockmetal.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 0.78 МиБ.
 
 ### [src/assets/music/heavy-battle-1.mp3](../src/assets/music/heavy-battle-1.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 0.93 МиБ.
 
 ### [src/assets/music/heavy-battle-2.mp3](../src/assets/music/heavy-battle-2.mp3)
 
-Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
+Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.
 
 Ресурс: 0.95 МиБ.
 
 ### [src/assets/resident-atlas.webp](../src/assets/resident-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.38 МиБ.
 
 ### [src/assets/roll-atlas.webp](../src/assets/roll-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.50 МиБ.
 
 ### [src/assets/story-atlas.webp](../src/assets/story-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.63 МиБ.
 
 ### [src/assets/stride-atlas.webp](../src/assets/stride-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.47 МиБ.
 
 ### [src/assets/title-v10.webp](../src/assets/title-v10.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.18 МиБ.
 
 ### [src/assets/village-atlas.webp](../src/assets/village-atlas.webp)
 
-Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.
+Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.
 
 Ресурс: 0.52 МиБ.
 
@@ -2174,7 +2573,7 @@ DOM-разметка игровых окон и идентификаторы, к
 
 Команды проекта, зависимости и требование к версии Node.js.
 
-Строк: 31.
+Строк: 29.
 
 ### [scripts/build-offline.mjs](../scripts/build-offline.mjs)
 
@@ -2192,13 +2591,13 @@ DOM-разметка игровых окон и идентификаторы, к
 
 Обновляет эту карту и индекс символов из текущих исходников.
 
-Строк: 149.
+Строк: 172.
 
-### [scripts/test-domain.mjs](../scripts/test-domain.mjs)
+### [scripts/templates/project-map.html](../scripts/templates/project-map.html)
 
-Собирает тесты правил игры и запускает встроенный тестовый раннер Node.js.
+Модуль: project-map.html.
 
-Строк: 35.
+Строк: 693.
 
 ### [tsconfig.json](../tsconfig.json)
 
@@ -2211,37 +2610,3 @@ DOM-разметка игровых окон и идентификаторы, к
 Настройки Vite; base ./ сохраняет работу сайта в подпапке GitHub Pages.
 
 Строк: 10.
-
-## Проверки
-
-### [tests/browser.mjs](../tests/browser.mjs)
-
-Проверяет настоящую игру в Chromium, интерфейс, сохранения и готовые сборки.
-
-Строк: 412.
-
-| Символ | Строка | Назначение |
-| --- | --- | --- |
-| `args` | [14](../tests/browser.mjs#L14) | Поле состояния или ссылка на систему. |
-
-### [tests/domain.test.ts](../tests/domain.test.ts)
-
-Проверяет формулы, покупки, навыки, задания, сохранения, босcов и геометрию.
-
-Строк: 205.
-
-| Символ | Строка | Назначение |
-| --- | --- | --- |
-| `purchase` | [26](../tests/domain.test.ts#L26) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `purchase` | [30](../tests/domain.test.ts#L30) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `purchase` | [35](../tests/domain.test.ts#L35) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `purchase` | [38](../tests/domain.test.ts#L38) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `purchase` | [46](../tests/domain.test.ts#L46) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `purchase` | [49](../tests/domain.test.ts#L49) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `purchase` | [52](../tests/domain.test.ts#L52) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `purchase` | [54](../tests/domain.test.ts#L54) | Проверяет цену, печати и владение; списывает валюту и меняет профиль. |
-| `learnSkill` | [63](../tests/domain.test.ts#L63) | Проверяет ветку, печати, искры и оплату навыка. |
-| `toggleSkill` | [66](../tests/domain.test.ts#L66) | Убирает изученный навык с панели или возвращает его. |
-| `learnSkill` | [72](../tests/domain.test.ts#L72) | Проверяет ветку, печати, искры и оплату навыка. |
-| `questEvent` | [131](../tests/domain.test.ts#L131) | Засчитывает действия, сбрасывает серию от урона и возвращает новые успехи. |
-| `advanceQuests` | [138](../tests/domain.test.ts#L138) | Ведёт таймер и окно серии убийств. |

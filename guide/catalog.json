@@ -1,20 +1,20 @@
 {
-  "baseCommit": "3186059b6c07881b5bbe3b2f6017dd327aea5bcf",
+  "baseCommit": "7673a0b5975ff52c63072068e04ba4f08f49761a",
   "files": {
     "src/game/player/PlayerController.ts": {
       "description": "Движение, здоровье, лечение и уклонение героя.",
       "group": "player"
     },
     "src/game/combat/CombatSystem.ts": {
-      "description": "Атаки героя, парирование, урон врагам и награды за победу.",
+      "description": "Обычные атаки героя, комбо, навыки, парирование и попадания.",
       "group": "combat"
     },
-    "src/game/combat/CombatEffects.ts": {
-      "description": "Снаряды, опасные зоны, боевые эффекты и сообщения над персонажами.",
-      "group": "combat"
+    "src/game/rendering/CombatEffectRenderer.ts": {
+      "description": "Частицы, всплывающий текст и краткие рисунки атак; очистка временной графики.",
+      "group": "rendering"
     },
     "src/game/enemies/EnemySystem.ts": {
-      "description": "Создание противников, волны, поиск пути и обычные вражеские атаки.",
+      "description": "Создание, движение, поиск пути и обновление состояния врагов.",
       "group": "enemies"
     },
     "src/game/enemies/BossSystem.ts": {
@@ -38,11 +38,11 @@
       "group": "economy"
     },
     "src/game/quests/QuestSystem.ts": {
-      "description": "Испытания, сундуки, сюжетные поручения, журнал и достижения.",
+      "description": "Испытания, сюжетные поручения, дневник и сопровождение.",
       "group": "quests"
     },
     "src/game/ui/MenuController.ts": {
-      "description": "Меню, HUD, пауза, справка, начальный экран и подтверждение выхода.",
+      "description": "Меню, пауза, справка, начальный экран и подтверждение выхода.",
       "group": "ui"
     },
     "src/game/ui/MapController.ts": {
@@ -66,7 +66,7 @@
       "group": "story"
     },
     "src/game/rendering/ActorRenderer.ts": {
-      "description": "Позы, руки, оружие, враги, жители и отрисовка границ биома.",
+      "description": "Порядок вызова специализированных отрисовщиков и туманные границы биома.",
       "group": "rendering"
     },
     "src/game/world/WeatherSystem.ts": {
@@ -86,7 +86,7 @@
       "group": "core"
     },
     "src/game/ui/InterfaceState.ts": {
-      "description": "Режим игры, выбор окон, ввод, диалоги и уведомления.",
+      "description": "Выбранные вкладки, ввод и временные данные окон; режим здесь не хранится.",
       "group": "ui"
     },
     "src/game/rendering/RenderState.ts": {
@@ -101,10 +101,6 @@
       "description": "Настраивает движок, масштабирование холста, частоту кадров и начальную сцену.",
       "group": "core"
     },
-    "src/game/rendering/TextureFactory.ts": {
-      "description": "Генерирует процедурные текстуры и нарезает рисованные атласы героя, оружия, врагов и окружения.",
-      "group": "rendering"
-    },
     "src/game/world/Navigation.ts": {
       "description": "Геометрия, столкновения кругов, видимость между точками и A* на сетке.",
       "group": "world"
@@ -117,20 +113,20 @@
       "description": "Формулы максимального HP, выносливости, урона и защиты; фазы атак, лечение и стоимость действий.",
       "group": "combat"
     },
-    "src/game/world/WorldConfig.ts": {
-      "description": "Восемь биомов: цели, таймеры, HP боссов, состав врагов, размеры и положение деревень.",
+    "src/game/world/WorldLayout.ts": {
+      "description": "Типы биомов и вычисление координат областей, деревень и контрольных точек.",
       "group": "world"
     },
     "src/game/audio/GameAudio.ts": {
       "description": "Звуковые эффекты Web Audio, громкость, шаги, погода и резервная синтезированная музыка.",
       "group": "audio"
     },
-    "src/game/quests/TrialsAndLoot.ts": {
-      "description": "Три повторяемых испытания, события их прогресса и случайные награды сундуков.",
+    "src/game/quests/TrialRules.ts": {
+      "description": "Чистые правила испытаний: цели, время, серии и события прогресса.",
       "group": "quests"
     },
-    "src/game/story/StoryContent.ts": {
-      "description": "Вступление, финал, практические уроки, роли жителей, сюжетные поручения и доставки.",
+    "src/game/story/StoryProgress.ts": {
+      "description": "Типы и начальное состояние сюжетных поручений и доставок.",
       "group": "story"
     },
     "src/game/persistence/SaveSchema.ts": {
@@ -153,8 +149,8 @@
       "description": "Координаты домов, двери, границы интерьеров, препятствия и оформление помещений.",
       "group": "village"
     },
-    "src/game/story/TutorialContent.ts": {
-      "description": "Шесть вводных карточек, клавиши-подсказки и выбор цели для учебной стрелки.",
+    "src/game/story/TutorialLayout.ts": {
+      "description": "Выбор точки назначения указателя обучения.",
       "group": "story"
     },
     "src/game/village/Residents.ts": {
@@ -181,13 +177,9 @@
       "description": "Тип живого врага: HP, режим поведения, путь, текущая атака, эффекты и спрайты.",
       "group": "enemies"
     },
-    "src/game/enemies/EnemyConfig.ts": {
-      "description": "Базовое HP обычных врагов, рост характеристик по биомам, награда, скорость и лимит волн.",
+    "src/game/enemies/EnemyStats.ts": {
+      "description": "Расчёт характеристик врага по общей таблице параметров.",
       "group": "enemies"
-    },
-    "src/game/economy/ShopCatalog.ts": {
-      "description": "Зелье, перевязка, заряд фляги и полное лечение: идентификаторы, цены и подписи.",
-      "group": "economy"
     },
     "src/main.ts": {
       "description": "Запускает игру по кнопке начального экрана и обрабатывает выход.",
@@ -217,21 +209,129 @@
       "description": "Собирает docs/ для сайта и PLAY.html с папкой play/ для запуска без интернета.",
       "group": "tooling"
     },
-    "scripts/test-domain.mjs": {
-      "description": "Собирает тесты правил игры и запускает встроенный тестовый раннер Node.js.",
-      "group": "tooling"
-    },
     "scripts/generate-project-map.mjs": {
       "description": "Обновляет эту карту и индекс символов из текущих исходников.",
       "group": "tooling"
     },
-    "tests/domain.test.ts": {
-      "description": "Проверяет формулы, покупки, навыки, задания, сохранения, босcов и геометрию.",
-      "group": "tests"
+    "src/game/Constants.ts": {
+      "description": "Общие константы, баланс, каталоги, тексты, пути ресурсов и таблицы кадров.",
+      "group": "core"
     },
-    "tests/browser.mjs": {
-      "description": "Проверяет настоящую игру в Chromium, интерфейс, сохранения и готовые сборки.",
-      "group": "tests"
+    "src/game/core/GameStateSystem.ts": {
+      "description": "Единственный владелец режима и проверка допустимых переходов.",
+      "group": "core"
+    },
+    "src/game/core/GameSession.ts": {
+      "description": "Полный сброс, обновление времени и диспетчер отдельных режимов сессии.",
+      "group": "core"
+    },
+    "src/game/core/BossAwakeningSystem.ts": {
+      "description": "Условие пробуждения босса по осколкам и однократный переход к его появлению.",
+      "group": "core"
+    },
+    "src/game/enemies/EnemySpawnSystem.ts": {
+      "description": "Волны, их часы, ограничения числа врагов и появление босса.",
+      "group": "enemies"
+    },
+    "src/game/enemies/EnemyAttackSystem.ts": {
+      "description": "Выбор и выполнение обычных вражеских приёмов.",
+      "group": "enemies"
+    },
+    "src/game/enemies/EnemyDefeatSystem.ts": {
+      "description": "Однократная победа, награда и завершение боя с боссом.",
+      "group": "enemies"
+    },
+    "src/game/combat/UltimateSystem.ts": {
+      "description": "Запуск, импульсы и завершение абсолютной атаки.",
+      "group": "combat"
+    },
+    "src/game/quests/AchievementSystem.ts": {
+      "description": "Условия достижений, уведомления и вкладка наград.",
+      "group": "quests"
+    },
+    "src/game/quests/LootSystem.ts": {
+      "description": "Сундуки, рулетка и однократное начисление награды.",
+      "group": "quests"
+    },
+    "src/game/ui/HudController.ts": {
+      "description": "Показатели героя, цель, информация о боссе и направляющая стрелка.",
+      "group": "ui"
+    },
+    "src/game/audio/AudioDirector.ts": {
+      "description": "Выбор музыкального режима по текущей игровой ситуации.",
+      "group": "audio"
+    },
+    "src/game/rendering/SceneArtwork.ts": {
+      "description": "Загрузка ресурсов и создание графических объектов сцены.",
+      "group": "rendering"
+    },
+    "src/game/rendering/textures/TexturePrimitives.ts": {
+      "description": "Низкоуровневые операции рисования текстур.",
+      "group": "rendering"
+    },
+    "src/game/rendering/textures/SceneryTextures.ts": {
+      "description": "Фон, поверхность биомов и объединение статических рисунков.",
+      "group": "rendering"
+    },
+    "src/game/rendering/textures/BaseTextures.ts": {
+      "description": "Базовые процедурные рисунки героя, предметов и окружения.",
+      "group": "rendering"
+    },
+    "src/game/rendering/textures/EnemyTextures.ts": {
+      "description": "Процедурные рисунки мистических врагов.",
+      "group": "rendering"
+    },
+    "src/game/rendering/textures/VillageTextures.ts": {
+      "description": "Процедурные рисунки деревенских объектов и жителей.",
+      "group": "rendering"
+    },
+    "src/game/rendering/textures/AtlasTextures.ts": {
+      "description": "Нарезка зданий, предметов, врагов и жителей из атласов.",
+      "group": "rendering"
+    },
+    "src/game/rendering/textures/CharacterTextures.ts": {
+      "description": "Герой, рукава, бег, перекат и модульная анимация тела.",
+      "group": "rendering"
+    },
+    "src/game/combat/ProjectileSystem.ts": {
+      "description": "Создание, движение, столкновения и удаление снарядов.",
+      "group": "combat"
+    },
+    "src/game/combat/HazardSystem.ts": {
+      "description": "Предупреждения, время жизни и попадания опасных зон.",
+      "group": "combat"
+    },
+    "src/game/rendering/HeroRenderer.ts": {
+      "description": "Поза героя, руки, броня, хват оружия и визуальные зоны его атак.",
+      "group": "rendering"
+    },
+    "src/game/rendering/EnemyRenderer.ts": {
+      "description": "Размеры и позы врагов, предупреждения атак и полосы здоровья.",
+      "group": "rendering"
+    },
+    "src/game/rendering/ResidentRenderer.ts": {
+      "description": "Положение и анимация жителей деревень.",
+      "group": "rendering"
+    },
+    "src/game/rendering/WorldObjectRenderer.ts": {
+      "description": "Рисунки снарядов, опасных зон, монет, сундуков и предметов мира.",
+      "group": "rendering"
+    },
+    "src/game/quests/LootRollRules.ts": {
+      "description": "Взвешенный выбор награды сундука и подбор доступных предметов.",
+      "group": "quests"
+    },
+    "src/game/ui/Pagination.ts": {
+      "description": "Единые границы страниц магазина, экипировки и достижений.",
+      "group": "ui"
+    },
+    "src/game/story/TrainingEnemyRules.ts": {
+      "description": "Параметры учебного врага при запуске и восстановлении; размещение осколков.",
+      "group": "story"
+    },
+    "src/game/enemies/EnemyAttackGeometry.ts": {
+      "description": "Общая геометрия обычных ударов и предупреждений.",
+      "group": "enemies"
     }
   },
   "methodHelp": {
@@ -267,9 +367,9 @@
     "popup": "Показывает урон или награду над персонажем.",
     "predict": "Предсказывает положение героя с учётом его скорости.",
     "walkEnemy": "Ведёт врага по прямой или маршруту A* и обходит препятствия.",
-    "spawnEnemy": "Создаёт спрайт и состояние врага по параметрам EnemyConfig.",
+    "spawnEnemy": "Создаёт спрайт и состояние врага по EnemyStats.",
     "updateWaves": "Удаляет завершённые спрайты и создаёт новые волны в пределах лимита.",
-    "spawnBoss": "Отмечает появление босса в прогрессе, создаёт его и включает бой.",
+    "spawnBoss": "Создаёт босса и показывает начало боя; флаг перехода устанавливает PhaseSystem.",
     "startEnemyAttack": "Выбирает обычный вражеский приём и начинает замах.",
     "updateEnemies": "Обновляет состояние врагов: преследование, замах, рывок, восстановление, эффекты и вторую фазу.",
     "recoverEnemy": "Переводит врага в восстановление после атаки.",
@@ -612,7 +712,13 @@
     "attackImageCursor": "Следующий элемент пула эффектов для текущего кадра.",
     "effects": "Короткоживущие дуги, кольца и следы выпадов.",
     "animationTime": "Общее время визуальных анимаций.",
-    "liveParticles": "Число живых частиц для ограничения их количества."
+    "liveParticles": "Число живых частиц для ограничения их количества.",
+    "transitionTo": "Проверяет и выполняет переход режима.",
+    "shouldAwakenBoss": "Проверяет квоту осколков и состояние активного биома.",
+    "enterBossPhase": "Один раз отмечает появление и поручает генератору создать босса.",
+    "reset": "Сбрасывает данные или ресурсы, которыми владеет модуль.",
+    "resetSession": "Очищает временное состояние интерфейса.",
+    "updateTimers": "Обновляет временные окна владельца во время активной игры."
   },
   "mechanics": [
     {
@@ -653,7 +759,7 @@
     {
       "title": "HP и урон врагов",
       "tags": "враг hp урон скорость награда",
-      "file": "src/game/enemies/EnemyConfig.ts",
+      "file": "src/game/enemies/EnemyStats.ts",
       "symbol": "enemyStats",
       "description": "Базовое HP обычных врагов — ENEMY_BASE_HP. HP босса берётся из REGIONS[index].bossHP."
     },
@@ -662,7 +768,7 @@
       "tags": "босс boss фаза атака",
       "file": "src/game/enemies/BossPatterns.ts",
       "symbol": "bossPattern",
-      "description": "Восемь наборов по три уникальных приёма. EnemySystem включает phase2 при HP ≤ 50%."
+      "description": "Восемь наборов по три уникальных приёма. BossSystem включает ярость при половине HP."
     },
     {
       "title": "Деньги и сила биома",
@@ -718,33 +824,114 @@
       "tags": "кнопки клавиши интерфейс HUD html",
       "file": "src/game/ui/InputController.ts",
       "symbol": "bindControls",
-      "description": "HTML хранит id окон, InputController привязывает события, MenuController обновляет HUD и меню."
+      "description": "InputController привязывает события; HudController обновляет показатели, MenuController показывает меню."
+    },
+    {
+      "title": "Все параметры игры",
+      "file": "src/game/Constants.ts",
+      "symbol": "PLAYER_CONFIG",
+      "tags": "константы параметры баланс настройки config",
+      "description": "Общие настройки находятся в одном файле и разделены по назначению."
+    },
+    {
+      "title": "Режимы и пауза",
+      "file": "src/game/core/GameStateSystem.ts",
+      "symbol": "transitionTo",
+      "tags": "пауза state переход режим",
+      "description": "Проверка допустимого перехода; остальным системам доступно чтение режима."
+    },
+    {
+      "title": "Новое путешествие",
+      "file": "src/game/core/GameSession.ts",
+      "symbol": "reset",
+      "tags": "сброс restart reset новая игра",
+      "description": "Очистка ресурсов и возврат состояний к исходным значениям."
+    },
+    {
+      "title": "Пробуждение босса",
+      "file": "src/game/core/BossAwakeningSystem.ts",
+      "symbol": "shouldAwakenBoss",
+      "tags": "фаза coins квота босс",
+      "description": "Условие по осколкам отделено от однократного входа в стадию босса."
+    },
+    {
+      "title": "Появление волн",
+      "file": "src/game/enemies/EnemySpawnSystem.ts",
+      "symbol": "updateWaves",
+      "tags": "волны таймер спавн spawn",
+      "description": "Генератор владеет часами волн и сбрасывает их при новой попытке."
+    },
+    {
+      "title": "Абсолютная атака",
+      "file": "src/game/combat/UltimateSystem.ts",
+      "symbol": "useUltimate",
+      "tags": "ultimate абсолютное R",
+      "description": "Расход накопленного заряда, импульсы и завершение умения."
+    },
+    {
+      "title": "Награда сундука",
+      "file": "src/game/quests/LootSystem.ts",
+      "symbol": "applyLoot",
+      "tags": "сундук лут награда loot",
+      "description": "Выбранная награда применяется один раз, после чего очищается."
+    },
+    {
+      "title": "Достижения",
+      "file": "src/game/quests/AchievementSystem.ts",
+      "symbol": "syncAchievements",
+      "tags": "достижения очередь achievement",
+      "description": "Проверка условий, запись результата и очередь уведомлений."
+    },
+    {
+      "title": "Загрузка рисунков",
+      "file": "src/game/rendering/SceneArtwork.ts",
+      "symbol": "createSceneArtwork",
+      "tags": "атлас спрайты текстуры графика",
+      "description": "Общие текстуры создаются один раз, объекты сцены восстанавливаются при запуске."
+    },
+    {
+      "title": "Снаряды",
+      "file": "src/game/combat/ProjectileSystem.ts",
+      "symbol": "shoot",
+      "tags": "снаряд полёт попадание projectile",
+      "description": "Движение и попадание отделены от визуальной части."
+    },
+    {
+      "title": "Опасные зоны",
+      "file": "src/game/combat/HazardSystem.ts",
+      "symbol": "update",
+      "tags": "зона яд волна метеор hazard",
+      "description": "Владелец предупреждений, урона и завершения зон."
+    },
+    {
+      "title": "Отрисовка героя",
+      "file": "src/game/rendering/HeroRenderer.ts",
+      "symbol": "drawBody",
+      "tags": "герой оружие руки анимация",
+      "description": "Поза, хват оружия и рисунки атак героя."
+    },
+    {
+      "title": "Выбор награды",
+      "file": "src/game/quests/LootRollRules.ts",
+      "symbol": "rollLoot",
+      "tags": "случайный награда шанс вероятность",
+      "description": "Вес каждого исхода и величина награды задаются в LOOT_CONFIG."
+    },
+    {
+      "title": "Размер страницы",
+      "file": "src/game/ui/Pagination.ts",
+      "symbol": "pageRange",
+      "tags": "пагинация карточки страница",
+      "description": "Одна настройка управляет всеми списками карточек."
+    },
+    {
+      "title": "Учебные противники",
+      "file": "src/game/story/TrainingEnemyRules.ts",
+      "symbol": "trainingEnemyParameters",
+      "tags": "урок обучение загрузка",
+      "description": "Одинаковые параметры при подготовке и восстановлении урока."
     }
   ],
-  "moves": {
-    "art": "rendering/TextureFactory",
-    "world": "world/Navigation",
-    "progression": "progression/PlayerProgression",
-    "combat": "combat/CombatRules",
-    "regions": "world/WorldConfig",
-    "audio": "audio/GameAudio",
-    "quests": "quests/TrialsAndLoot",
-    "story": "story/StoryContent",
-    "save": "persistence/SaveSchema",
-    "skills": "progression/Skills",
-    "achievements": "progression/Achievements",
-    "journal": "quests/Journal",
-    "village": "village/VillageLayout",
-    "learning": "story/TutorialContent",
-    "residents": "village/Residents",
-    "events": "world/WeatherSystem",
-    "weaponAnimation": "rendering/WeaponAnimation",
-    "mood": "rendering/Atmosphere",
-    "boss": "enemies/BossPatterns",
-    "soundtrack": "audio/Soundtrack",
-    "config": "createGame",
-    "GameScene": "GameScene"
-  },
   "fieldHelp": {
     "src/game/rendering/RenderState.ts": {
       "player": "Спрайт героя в мире. Логика героя находится в PlayerController, ресурсы — в PlayerState."
@@ -754,18 +941,18 @@
       "hero": "Группа PlayerState: текущие ресурсы и боевые окна героя.",
       "worldState": "Группа WorldState: объекты, геометрия, область и погода.",
       "journey": "Группа JourneyState: профиль и прогресс путешествия.",
-      "ui": "Группа InterfaceState: окна, режим, ввод и уведомления.",
+      "ui": "Группа InterfaceState: окна, ввод, вкладки и уведомления.",
       "visuals": "Группа RenderState: спрайты и визуальные эффекты.",
-      "combat": "Атаки героя, парирование, урон врагам и награды за победу.",
-      "effects": "Снаряды, опасные зоны, боевые эффекты и сообщения над персонажами.",
-      "enemies": "Создание противников, волны, поиск пути и обычные вражеские атаки.",
+      "combat": "Обычные атаки героя, комбо, навыки, парирование и попадания.",
+      "effects": "Временные визуальные эффекты, частицы и всплывающий текст.",
+      "enemies": "Создание, движение, поиск пути и обновление состояния врагов.",
       "bosses": "Предупреждения появления и выполнение уникальных приёмов боссов.",
       "world": "Границы, переходы между областями, камера, контрольные точки и возрождение.",
       "scenery": "Создание декораций биомов и деревень с ленивой загрузкой.",
       "village": "Дома, собеседники, взаимодействия, доставки и быстрое путешествие.",
       "economy": "Сбор осколков, кошелёк, ассортимент, покупки и экипировка.",
       "quests": "Испытания, сундуки, сюжетные поручения, журнал и достижения.",
-      "menu": "Меню, HUD, пауза, справка, начальный экран и подтверждение выхода.",
+      "menu": "Меню, пауза, справка, начальный экран и подтверждение выхода.",
       "map": "Локальная карта, карта мира и выбор области.",
       "controls": "Привязка DOM-кнопок, клавиатуры и мыши, сброс ввода и полноэкранный режим.",
       "saves": "Ручная запись, загрузка и отображение состояния сохранения.",
@@ -773,7 +960,20 @@
       "tutorial": "Вводные карточки, практические уроки и подсказки обучения.",
       "actors": "Позы, руки, оружие, враги, жители и отрисовка границ биома.",
       "weather": "Дождь, гроза, метеоры, ураган и замедление от поверхности.",
-      "audio": "Управление звуковыми эффектами, музыкой и громкостью."
+      "audio": "Управление звуковыми эффектами, музыкой и громкостью.",
+      "flow": "Единственный владелец режима игры.",
+      "session": "Сброс и время путешествия.",
+      "ultimate": "Абсолютное умение героя.",
+      "enemyAttacks": "Обычные приёмы врагов.",
+      "defeats": "Награды и завершение боя.",
+      "hud": "Показатели героя и текущая цель.",
+      "loot": "Сундуки и начисление награды.",
+      "achievements": "Достижения и очередь уведомлений.",
+      "music": "Выбор музыкального режима.",
+      "projectiles": "Владелец движения и столкновений снарядов.",
+      "hazards": "Владелец времени и попаданий опасных зон.",
+      "enemySpawner": "Волны и часы появления.",
+      "bossAwakening": "Условие и переход к бою с боссом."
     },
     "src/game/enemies/EnemyTypes.ts": {
       "id": "Уникальный ID противника для попаданий, контрударов и владельцев зон.",

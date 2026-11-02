@@ -5,9 +5,9 @@ import { createHash } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 
 const source = await readFile('index.html', 'utf8');
-const courseLicense = await readFile('LICENSE', 'utf8');
+const projectLicense = await readFile('LICENSE', 'utf8');
 const phaserLicense = await readFile('node_modules/phaser/LICENSE.md', 'utf8');
-const credits = `<!-- ${courseLicense}\nPhaser: ${phaserLicense} -->`;
+const credits = `<!-- ${projectLicense}\nPhaser: ${phaserLicense} -->`;
 
 // Pages: small HTML, cached images, and music downloaded only when played.
 await rm(resolve('docs'), { recursive: true, force: true });

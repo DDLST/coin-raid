@@ -1,5 +1,6 @@
-import { WEAPONS, type WeaponId } from '../progression/PlayerProgression';
-import type { SkillId } from '../progression/Skills';
+import { FOREARM_LENGTH, UPPER_ARM_LENGTH, WEAPONS } from '../Constants';
+import { type WeaponId } from '../progression/PlayerProgression';
+import { type SkillId } from '../progression/Skills';
 
 const ease = (n: number) => {
   const t = Math.max(0, Math.min(1, n));
@@ -8,20 +9,7 @@ const ease = (n: number) => {
 const nearestAngle = (angle: number, reference: number) =>
   reference + Math.atan2(Math.sin(angle - reference), Math.cos(angle - reference));
 // Each painting has its own measured hilt pivot. The hand always coincides with it.
-export const WEAPON_ART: Record<
-  WeaponId,
-  { size: number; gripX: number; gripY: number; tipY: number }
-> = {
-  sword: { size: 100, gripX: 0.5, gripY: 0.802, tipY: 0.04 },
-  dawnblade: { size: 102, gripX: 0.5, gripY: 0.847, tipY: 0.04 },
-  spear: { size: 148, gripX: 0.498, gripY: 0.671, tipY: 0.04 },
-  axe: { size: 114, gripX: 0.5, gripY: 0.741, tipY: 0.04 },
-  staff: { size: 124, gripX: 0.509, gripY: 0.715, tipY: 0.04 },
-  runicstaff: { size: 122, gripX: 0.499, gripY: 0.761, tipY: 0.04 },
-};
-export const WEAPON_SIZE = Object.fromEntries(
-  WEAPONS.map((w) => [w.id, WEAPON_ART[w.id].size]),
-) as Record<WeaponId, number>;
+
 export const weaponTexture = (id: WeaponId) => `held-${id}`;
 export type WeaponMotion = {
   combo?: number;
@@ -32,32 +20,6 @@ export type WeaponMotion = {
   chain?: boolean;
 };
 // Grip centres on the existing four painted roll frames (128px character textures).
-export const ROLL_GRIPS: Record<string, readonly (readonly [number, number])[]> = {
-  front: [
-    [89, 98],
-    [64, 112],
-    [78, 92],
-    [123, 115],
-  ],
-  back: [
-    [105, 118],
-    [84, 64],
-    [27, 85],
-    [122, 117],
-  ],
-  left: [
-    [78, 96],
-    [80, 89],
-    [79, 60],
-    [100, 99],
-  ],
-  right: [
-    [93, 54],
-    [54, 92],
-    [24, 69],
-    [102, 100],
-  ],
-};
 
 export function weaponPose(
   id: WeaponId,
@@ -70,18 +32,18 @@ export function weaponPose(
   heavy = false,
   motion: WeaponMotion = {},
 ) {
-  const w = WEAPONS.find((w) => w.id === id)!,
-    side = Math.cos(face) < 0 ? -1 : 1,
-    combo = motion.combo ?? 0;
+  const w = WEAPONS.find((w) => w.id === id)!;
+  const side = Math.cos(face) < 0 ? -1 : 1;
+  const combo = motion.combo ?? 0;
   const rest = w.style === 'spear' ? -1.25 : w.style === 'staff' ? -1.48 : side > 0 ? -0.95 : -2.19;
-  const aim = nearestAngle(face, rest),
-    progress = time < 0 ? 0 : ease(time / Math.max(0.01, duration));
-  let angle = rest,
-    extension = 0,
-    power = 0,
-    lean = 0,
-    prepared = aim - arc - 0.4,
-    end = aim + arc;
+  const aim = nearestAngle(face, rest);
+  const progress = time < 0 ? 0 : ease(time / Math.max(0.01, duration));
+  let angle = rest;
+  let extension = 0;
+  let power = 0;
+  let lean = 0;
+  let prepared = aim - arc - 0.4;
+  let end = aim + arc;
   const thrust = w.style === 'spear' || motion.skill === 'sword_lunge';
   if (w.style === 'sword') {
     if (combo === 1) {
@@ -104,12 +66,16 @@ export function weaponPose(
     end = aim + (heavy ? Math.PI * 2 : cleave ? 0.42 : arc);
   }
   const thrustAim = aim + (w.style === 'spear' ? [0, 0.1, -0.1][combo] : 0);
-  if (thrust) prepared = thrustAim;
+  if (thrust) {
+    prepared = thrustAim;
+  }
   if (time >= 0) {
     power = Math.sin(progress * Math.PI);
     if (time < windup) {
       angle = rest + (prepared - rest) * ease(time / Math.max(0.01, windup));
-      if (thrust) extension = -3 * ease(time / Math.max(0.01, windup));
+      if (thrust) {
+        extension = -3 * ease(time / Math.max(0.01, windup));
+      }
     } else if (time <= activeEnd) {
       const t = ease((time - windup) / Math.max(0.01, activeEnd - windup));
       angle = thrust ? thrustAim : prepared + (end - prepared) * t;
@@ -119,13 +85,14 @@ export function weaponPose(
           ? power * 4
           : 0;
     } else {
-      const finish = thrust ? thrustAim : end,
-        target = nearestAngle(rest, finish);
+      const finish = thrust ? thrustAim : end;
+      const target = nearestAngle(rest, finish);
       angle =
         finish +
         (target - finish) * ease((time - activeEnd) / Math.max(0.01, duration - activeEnd));
-      if (thrust)
+      if (thrust) {
         extension = -3 * (1 - ease((time - activeEnd) / Math.max(0.01, duration - activeEnd)));
+      }
     }
     if (w.style === 'staff') {
       const casting = aim + [-0.35, 0.3, -0.1][combo];
@@ -155,9 +122,9 @@ export function weaponPose(
   const bob = motion.runPhase === undefined ? 0 : Math.sin(motion.runPhase) * 1.8;
   let handX = side * (both ? 13 : 16) + Math.cos(face) * extension + Math.cos(angle) * power * 3;
   let handY = -10 + Math.sin(face) * extension * 0.55 + Math.sin(angle) * power * 3 + bob;
-  let otherX = -side * 13,
-    otherY = -4 - bob,
-    otherAngle = 0.12 * side;
+  let otherX = -side * 13;
+  let otherY = -4 - bob;
+  let otherAngle = 0.12 * side;
   const separation = w.style === 'spear' ? -12 : w.style === 'axe' ? -8 : -6;
   if (both) {
     otherX = handX + Math.cos(angle) * separation;
@@ -194,21 +161,20 @@ export function weaponPose(
 }
 
 // Painted upper arm and bracer meet at the elbow; neither segment floats.
-export const UPPER_ARM_LENGTH = 14,
-  FOREARM_LENGTH = 16;
+
 export function armElbow(
   shoulder: { x: number; y: number },
   hand: { x: number; y: number },
   bend: number,
 ) {
-  const dx = hand.x - shoulder.x,
-    dy = hand.y - shoulder.y,
-    distance = Math.hypot(dx, dy),
-    d = Math.max(3, Math.min(UPPER_ARM_LENGTH + FOREARM_LENGTH - 0.01, distance));
-  const along = (UPPER_ARM_LENGTH ** 2 - FOREARM_LENGTH ** 2 + d * d) / (2 * d),
-    height = Math.sqrt(Math.max(0, UPPER_ARM_LENGTH ** 2 - along * along));
-  const ux = distance > 0.001 ? dx / distance : 0,
-    uy = distance > 0.001 ? dy / distance : 1;
+  const dx = hand.x - shoulder.x;
+  const dy = hand.y - shoulder.y;
+  const distance = Math.hypot(dx, dy);
+  const d = Math.max(3, Math.min(UPPER_ARM_LENGTH + FOREARM_LENGTH - 0.01, distance));
+  const along = (UPPER_ARM_LENGTH ** 2 - FOREARM_LENGTH ** 2 + d * d) / (2 * d);
+  const height = Math.sqrt(Math.max(0, UPPER_ARM_LENGTH ** 2 - along * along));
+  const ux = distance > 0.001 ? dx / distance : 0;
+  const uy = distance > 0.001 ? dy / distance : 1;
   return {
     x: shoulder.x + ux * along - uy * height * bend,
     y: shoulder.y + uy * along + ux * height * bend,

@@ -5,7 +5,9 @@ let started = false;
 const button = document.getElementById('primary-button') as HTMLButtonElement;
 button.disabled = false;
 button.addEventListener('click', () => {
-  if (started) return;
+  if (started) {
+    return;
+  }
   started = true;
   button.disabled = true;
   document.getElementById('title-status')!.textContent = 'Подготовка мира…';
@@ -13,8 +15,10 @@ button.addEventListener('click', () => {
   requestAnimationFrame(() => createGame('game', training));
 });
 document.getElementById('exit-button')!.addEventListener('click', () => {
-  if (window.opener) window.close();
-  else
+  if (window.opener) {
+    window.close();
+  } else {
     document.getElementById('title-status')!.textContent =
       'Чтобы выйти, закрой эту вкладку браузера.';
+  }
 });

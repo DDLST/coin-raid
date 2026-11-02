@@ -13,3 +13,15 @@ dist/
 test-results/
 playwright-report/
 coverage/
+
+.parameter-test-build/
+
+# Локальные служебные материалы не входят в публикуемый проект.
+/tests/
+/scripts/test-*.mjs
+/scripts/check-architecture.mjs
+/guide/REVIEW.md
+/.github/workflows/check.yml
+/private-checks/
+/coin-raid-private-checks/
+*.zip

@@ -1,8 +1,10 @@
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
+import { PEOPLE } from '../Constants';
+import { type Role } from '../story/StoryProgress';
+import { type Bounds, type Point, type Terrain } from '../world/Navigation';
+import { villagePosition } from '../world/WorldLayout';
 import { houseName } from './Residents';
-import type { Point, Bounds, Terrain } from '../world/Navigation';
-import { PEOPLE, type Role } from '../story/StoryContent';
-import { villagePosition } from '../world/WorldConfig';
+
 export type House = {
   village: number;
   role: Role;
@@ -12,15 +14,10 @@ export type House = {
   roof: Phaser.GameObjects.Image;
   label: Phaser.GameObjects.Text;
 };
-export const HOUSE_NAMES: Record<Role, string> = {
-  smith: 'Кузница Бруна',
-  armorer: 'Мастерская Мары',
-  healer: 'Дом настоек Ивы',
-  trader: 'Лавка Лисандра',
-};
+
 export function housePoint(village: number, role: Role): Point {
-  const at = villagePosition(village),
-    index = PEOPLE.findIndex((n) => n.role === role);
+  const at = villagePosition(village);
+  const index = PEOPLE.findIndex((n) => n.role === role);
   return { x: at.x + (index % 2 ? 205 : -205), y: index < 2 ? 285 : 805 };
 }
 export function interiorBounds(h: Point): Bounds {

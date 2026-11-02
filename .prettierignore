@@ -7,9 +7,8 @@ guide/index.html
 .test-build/
 test-results/
 package-lock.json
-tests/fixtures/
 
-ASSET_CREDITS.md
-CHANGELOG.md
 
 guide/SOURCE_INDEX.md
+
+.parameter-test-build/

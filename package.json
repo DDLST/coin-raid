@@ -1,7 +1,7 @@
 {
   "name": "coin-raid",
   "private": true,
-  "version": "10.0.0",
+  "version": "10.2.0",
   "type": "module",
   "engines": {
     "node": ">=20.19.0"
@@ -14,18 +14,16 @@
     "build:offline": "tsc --noEmit && node scripts/build-offline.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "node scripts/test-domain.mjs",
-    "test:browser": "node tests/browser.mjs",
     "docs:map": "node scripts/generate-project-map.mjs",
-    "verify": "npm run format:check && npm run typecheck && npm test && npm run build && npm run build:offline"
+    "verify": "npm run format:check && npm run typecheck && npm run build && npm run build:offline && npm run docs:map:check",
+    "docs:map:check": "node scripts/generate-project-map.mjs --check"
   },
   "dependencies": {
     "phaser": "4.2.1"
   },
   "devDependencies": {
-    "playwright": "1.61.1",
     "prettier": "3.8.3",
     "typescript": "7.0.2",
-    "vite": "8.3.2"
+    "vite": "8.3.5"
   }
 }

@@ -19,10 +19,24 @@ const groups = {
   ui: 'Интерфейс и ввод',
   assets: 'Изображения и музыка',
   tooling: 'Сборка и настройки',
-  tests: 'Проверки',
 };
 const entries = [];
-for (const [path, meta] of Object.entries(catalog.files)) {
+const sourceFiles = new Set(Object.keys(catalog.files));
+async function collectSources(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = directory + '/' + entry.name;
+    if (path === 'src/assets') continue;
+    if (entry.isDirectory()) await collectSources(path);
+    else if (/\.(ts|mjs|css|html)$/.test(path)) sourceFiles.add(path);
+  }
+}
+for (const directory of ['src', 'scripts']) await collectSources(directory);
+for (const path of sourceFiles) {
+  const group = path.startsWith('src/game/') ? path.split('/')[2] : 'tooling';
+  const meta = catalog.files[path] ?? {
+    group: groups[group] ? group : 'core',
+    description: 'Модуль: ' + path.split('/').pop() + '.',
+  };
   const source = await readFile(path, 'utf8');
   const lines = source.split('\n');
   const symbols = [];
@@ -32,7 +46,9 @@ for (const [path, meta] of Object.entries(catalog.files)) {
       line,
     );
     const method =
-      /^  (?:(?:public|private|protected|static|async|readonly)\s+)*(\w+)(?:<[^>]*>)?\(/.exec(line);
+      /^  (?:(?:public|private|protected|static|async|readonly|get|set)\s+)*(\w+)(?:<[^>]*>)?\(/.exec(
+        line,
+      );
     const field =
       /^  (?:(?:public|private|protected|static|readonly)\s+)*(\w+)[!?]?(?:\s*:[^=;]+)?\s*=/.exec(
         line,
@@ -80,8 +96,8 @@ async function assets(directory) {
       path,
       group: 'assets',
       description: music
-        ? 'Музыкальная запись. Подключение и выбор режима — audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.'
-        : 'Рисованный атлас или иллюстрация. Загрузка — GameScene.preload; нарезка — rendering/TextureFactory.ts; титульное изображение — src/style.css.',
+        ? 'Музыкальная запись. Подключение и выбор режима — Constants.ts (TRACKS), audio/Soundtrack.ts; авторы и лицензия — ASSET_CREDITS.md.'
+        : 'Рисованный атлас или иллюстрация. Загрузка — rendering/SceneArtwork.ts; нарезка — rendering/textures/; титульное изображение — src/style.css.',
       lines: 0,
       size,
       source: null,
@@ -106,10 +122,7 @@ for (const m of data.mechanics) {
 }
 const json = JSON.stringify(data).replaceAll('<', '\\u003c');
 const template = await readFile('scripts/templates/project-map.html', 'utf8');
-await writeFile(
-  'guide/index.html',
-  template.replace('__PROJECT_DATA__', () => json),
-);
+const html = template.replace('__PROJECT_DATA__', () => json);
 let md = '# Индекс исходников RAID COIN\n\n';
 md +=
   'Индекс создан из текущего кода командой `npm run docs:map`. В браузерной [карте проекта](index.html) можно искать механику, выбирать файл и читать код с номерами строк.\n\n';
@@ -143,7 +156,17 @@ for (const [group, title] of Object.entries(groups)) {
     md += '\n';
   }
 }
-await writeFile('guide/SOURCE_INDEX.md', md.trimEnd() + '\n');
+const outputs = [
+  ['guide/index.html', html],
+  ['guide/SOURCE_INDEX.md', md.trimEnd() + '\n'],
+];
+for (const [path, content] of outputs) {
+  if (process.argv.includes('--check')) {
+    const existing = await readFile(path, 'utf8');
+    if (existing !== content)
+      throw new Error('Устаревшая карта: ' + path + '. Выполни npm run docs:map.');
+  } else await writeFile(path, content);
+}
 console.log(
   `Карта обновлена: ${entries.filter((f) => f.source).length} файлов с кодом и настройками, ${entries.filter((f) => !f.source).length} ресурсов, ${catalog.mechanics.length} механик.`,
 );

@@ -1,6 +1,14 @@
-import { RecordedMusic, type MusicMode } from './Soundtrack';
-import type { WeaponId } from '../progression/PlayerProgression';
-import type { WeatherKind } from '../world/WeatherSystem';
+import {
+  AUDIO_MELODIES,
+  AUDIO_RIFFS,
+  AUDIO_ROOT_NOTES,
+  DEFAULT_AUDIO,
+  WEAPON_SOUND_PARAMETERS,
+} from '../Constants';
+import { type WeaponId } from '../progression/PlayerProgression';
+import { type WeatherKind } from '../world/WeatherSystem';
+import { type MusicMode, RecordedMusic } from './Soundtrack';
+
 export type Sound =
   | 'slash'
   | 'thrust'
@@ -33,19 +41,7 @@ export type AudioSettings = {
   effects: number;
   muted: boolean;
 };
-export const DEFAULT_AUDIO: AudioSettings = {
-  master: 0.65,
-  music: 0.42,
-  effects: 0.7,
-  muted: false,
-};
-const MELODIES = [
-  [64, 67, 71, 67, 62, 66, 69, 66, 60, 64, 67, 64, 62, 66, 69, 71],
-  [57, 60, 64, 60, 55, 59, 62, 59, 53, 57, 60, 57, 55, 59, 62, 64],
-  [62, 65, 69, 72, 69, 65, 60, 64, 67, 70, 67, 64, 58, 62, 65, 69],
-  [55, 58, 62, 65, 62, 58, 53, 57, 60, 63, 60, 57, 51, 55, 58, 62],
-  [60, 63, 67, 70, 67, 63, 58, 62, 65, 68, 65, 62, 56, 60, 63, 67],
-];
+
 const freq = (midi: number) => 440 * 2 ** ((midi - 69) / 12);
 // Записи CC0 хранятся в игре. Звуки мира и резервная музыка синтезируются в браузере.
 export class ForestAudio {
@@ -69,7 +65,9 @@ export class ForestAudio {
   private weather: WeatherKind = 'clear';
   private stepLeft = 0;
   unlock(): void {
-    if (!this.available) return;
+    if (!this.available) {
+      return;
+    }
     try {
       if (!this.context) {
         this.context = new AudioContext();
@@ -101,7 +99,9 @@ export class ForestAudio {
         this.guitar.connect(cabinet).connect(this.music);
         this.noise = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
         const data = this.noise.getChannelData(0);
-        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        for (let i = 0; i < data.length; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
         this.rainSource = c.createBufferSource();
         this.rainSource.buffer = this.noise;
         this.rainSource.loop = true;
@@ -123,12 +123,15 @@ export class ForestAudio {
   }
   setSettings(patch: Partial<AudioSettings>): void {
     this.settings = { ...this.settings, ...patch };
-    for (const key of ['master', 'music', 'effects'] as const)
+    for (const key of ['master', 'music', 'effects'] as const) {
       this.settings[key] = Math.max(0, Math.min(1, this.settings[key]));
+    }
     this.applySettings();
   }
   private applySettings(): void {
-    if (!this.context) return;
+    if (!this.context) {
+      return;
+    }
     const at = this.context.currentTime;
     this.master.gain.setTargetAtTime(this.settings.muted ? 0 : this.settings.master, at, 0.05);
     this.music.gain.setTargetAtTime(this.settings.music * 0.6, at, 0.12);
@@ -144,7 +147,9 @@ export class ForestAudio {
   update(dt: number, playing: boolean, weather: WeatherKind, mode: MusicMode = 'explore'): void {
     this.stepLeft = Math.max(0, this.stepLeft - dt);
     const c = this.context;
-    if (!c || c.state !== 'running') return;
+    if (!c || c.state !== 'running') {
+      return;
+    }
     if (this.paused !== !playing || this.weather !== weather) {
       this.paused = !playing;
       this.weather = weather;
@@ -175,37 +180,36 @@ export class ForestAudio {
     this.ambientLeft -= dt;
     if (this.ambientLeft <= 0) {
       this.ambientLeft = 18 + Math.random() * 13;
-      if (mode === 'explore' && (this.region === 0 || this.region === 2)) this.play('howl');
+      if (mode === 'explore' && (this.region === 0 || this.region === 2)) {
+        this.play('howl');
+      }
     }
-    if (this.recorded && !this.recorded.failed) return;
-    const index = this.region % 5,
-      roots = [40, 38, 39, 37, 36],
-      root = roots[index],
-      bpm =
-        mode === 'boss'
-          ? 174 + this.region * 3
-          : mode === 'combat'
-            ? 132 + this.region * 4
-            : 92 + this.region * 3;
-    const step = 60 / bpm / 2,
-      riffs = [
-        [0, 0, 3, 0, 5, 0, 6, 5],
-        [0, 0, 0, 3, 0, 5, 3, 1],
-        [0, 3, 0, 6, 5, 0, 3, 1],
-        [0, 0, 6, 0, 5, 3, 1, 0],
-        [0, 0, 1, 0, 6, 5, 3, 1],
-      ];
+    if (this.recorded && !this.recorded.failed) {
+      return;
+    }
+    const index = this.region % 5;
+    const roots = AUDIO_ROOT_NOTES;
+    const root = roots[index];
+    const bpm =
+      mode === 'boss'
+        ? 174 + this.region * 3
+        : mode === 'combat'
+          ? 132 + this.region * 4
+          : 92 + this.region * 3;
+    const step = 60 / bpm / 2;
+    const riffs = AUDIO_RIFFS;
     while (this.nextNote < c.currentTime + 0.14) {
-      const n = this.note,
-        at = this.nextNote,
-        heavy = mode !== 'explore';
+      const n = this.note;
+      const at = this.nextNote;
+      const heavy = mode !== 'explore';
       if (heavy) {
         const offset = riffs[index][n % 8];
         this.tone(freq(root + offset), step * 0.78, 0.075, 'sawtooth', this.guitar, at);
         this.tone(freq(root + offset + 7), step * 0.65, 0.035, 'square', this.guitar, at + 0.002);
         this.tone(freq(root + offset - 12), step * 0.92, 0.09, 'sine', this.music, at);
-        if (n % 4 === 0 || (mode === 'boss' && n % 2 === 0))
+        if (n % 4 === 0 || (mode === 'boss' && n % 2 === 0)) {
           this.tone(128, 0.18, 0.2, 'sine', this.music, at, 42);
+        }
         if (n % 8 === 4) {
           this.noiseBurst(0.17, 0.1, 1600, 'highpass', this.music, at);
           this.tone(180, 0.08, 0.045, 'triangle', this.music, at, 95);
@@ -218,7 +222,7 @@ export class ForestAudio {
           this.music,
           at,
         );
-        if (n % 4 === 0)
+        if (n % 4 === 0) {
           this.tone(
             freq(root + 24 + [0, 3, 7, 5][Math.floor(n / 4) % 4]),
             step * 1.8,
@@ -227,13 +231,18 @@ export class ForestAudio {
             this.music,
             at + 0.01,
           );
+        }
       } else if (n % 2 === 0) {
-        const melody = MELODIES[index],
-          key = melody[Math.floor(n / 2) % 16];
+        const melody = AUDIO_MELODIES[index];
+        const key = melody[Math.floor(n / 2) % 16];
         this.tone(freq(key), step * 3, 0.055, 'sine', this.music, at);
         this.tone(freq(root - 12), step * 3, 0.048, 'triangle', this.music, at);
-        if (n % 8 === 0) this.tone(96, 0.15, 0.055, 'sine', this.music, at, 44);
-        if (n % 4 === 2) this.noiseBurst(0.055, 0.009, 4500, 'highpass', this.music, at);
+        if (n % 8 === 0) {
+          this.tone(96, 0.15, 0.055, 'sine', this.music, at, 44);
+        }
+        if (n % 4 === 2) {
+          this.noiseBurst(0.055, 0.009, 4500, 'highpass', this.music, at);
+        }
       }
       this.note++;
       this.nextNote += step;
@@ -249,13 +258,17 @@ export class ForestAudio {
     endHz?: number,
   ): void {
     const c = this.context;
-    if (!c) return;
+    if (!c) {
+      return;
+    }
     const at = start ?? c.currentTime;
-    const oscillator = c.createOscillator(),
-      gain = c.createGain();
+    const oscillator = c.createOscillator();
+    const gain = c.createGain();
     oscillator.type = type;
     oscillator.frequency.setValueAtTime(hz, at);
-    if (endHz) oscillator.frequency.exponentialRampToValueAtTime(endHz, at + duration);
+    if (endHz) {
+      oscillator.frequency.exponentialRampToValueAtTime(endHz, at + duration);
+    }
     gain.gain.setValueAtTime(0.0001, at);
     gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, volume), at + 0.015);
     gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
@@ -276,11 +289,13 @@ export class ForestAudio {
     start?: number,
   ): void {
     const c = this.context;
-    if (!c) return;
+    if (!c) {
+      return;
+    }
     const at = start ?? c.currentTime;
-    const source = c.createBufferSource(),
-      filter = c.createBiquadFilter(),
-      gain = c.createGain();
+    const source = c.createBufferSource();
+    const filter = c.createBiquadFilter();
+    const gain = c.createGain();
     source.buffer = this.noise;
     filter.type = type;
     filter.frequency.value = hz;
@@ -299,7 +314,9 @@ export class ForestAudio {
     };
   }
   play(sound: Sound): void {
-    if (!this.context || this.context.state !== 'running' || this.settings.muted) return;
+    if (!this.context || this.context.state !== 'running' || this.settings.muted) {
+      return;
+    }
     switch (sound) {
       case 'heartbeat':
         this.tone(62, 0.2, 0.12, 'sine', undefined, undefined, 34);
@@ -409,19 +426,14 @@ export class ForestAudio {
     }
   }
   weaponSound(weapon: WeaponId, impact = false): void {
-    if (!this.context || this.context.state !== 'running' || this.settings.muted) return;
+    if (!this.context || this.context.state !== 'running' || this.settings.muted) {
+      return;
+    }
     const at = this.context.currentTime;
     const params: Record<
       WeaponId,
       { hz: number; end: number; body: number; air: number; duration: number }
-    > = {
-      sword: { hz: 780, end: 230, body: 0.07, air: 3800, duration: 0.19 },
-      dawnblade: { hz: 1120, end: 420, body: 0.075, air: 5100, duration: 0.23 },
-      spear: { hz: 340, end: 150, body: 0.085, air: 2300, duration: 0.17 },
-      axe: { hz: 140, end: 44, body: 0.15, air: 1200, duration: 0.31 },
-      staff: { hz: 220, end: 940, body: 0.095, air: 1700, duration: 0.34 },
-      runicstaff: { hz: 370, end: 1320, body: 0.09, air: 2900, duration: 0.39 },
-    };
+    > = WEAPON_SOUND_PARAMETERS;
     const p = params[weapon];
     this.noiseBurst(
       impact ? 0.15 : p.duration,
@@ -438,13 +450,16 @@ export class ForestAudio {
       at,
       p.end,
     );
-    if (weapon === 'staff' || weapon === 'runicstaff')
+    if (weapon === 'staff' || weapon === 'runicstaff') {
       this.tone(p.hz * 1.5, p.duration, 0.055, 'triangle', undefined, at + 0.04, p.end * 1.5);
-    else this.tone(impact ? 135 : 210, 0.09, 0.055, 'triangle', undefined, at, 60);
+    } else {
+      this.tone(impact ? 135 : 210, 0.09, 0.055, 'triangle', undefined, at, 60);
+    }
   }
   footstep(ground: 'grass' | 'stone' | 'water' | 'ash', running: boolean): void {
-    if (!running || this.stepLeft > 0 || !this.context || this.paused || this.settings.muted)
+    if (!running || this.stepLeft > 0 || !this.context || this.paused || this.settings.muted) {
       return;
+    }
     this.stepLeft = 0.23;
     const params = {
       grass: [1500, 0.035],
@@ -453,7 +468,9 @@ export class ForestAudio {
       ash: [2100, 0.038],
     }[ground];
     this.noiseBurst(ground === 'water' ? 0.17 : 0.07, params[1], params[0]);
-    if (ground === 'stone') this.tone(220 + Math.random() * 80, 0.035, 0.015, 'triangle');
+    if (ground === 'stone') {
+      this.tone(220 + Math.random() * 80, 0.035, 0.015, 'triangle');
+    }
   }
   get trackTitle(): string {
     return this.recorded?.title ?? 'Резервная синтезированная тема';
